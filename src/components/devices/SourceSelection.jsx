@@ -1,10 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wifi, Lectern, Video, Minus } from "lucide-react";
-import { useSerialJoin } from "../../hooks/useJoin";
-import { SERIAL_JOINS } from "../../crestron/joins";
+import { Laptop, Cast, Video } from "lucide-react";
+import { useSerialJoin, useDigitalJoin } from "../../hooks/useJoin";
+import { SERIAL_JOINS, DIGITAL_JOINS } from "../../crestron/joins";
 import { safeSessionStorage } from "../../utils/safeStorage";
 import Button from "../ui/Button";
+
+// Real inputs for this room, matching AVMatrixPage.jsx's INPUT_SOURCES order
+// (Laptop, Air Media, Codec 1, Codec 2). Both pages drive the same physical
+// matrix, so the 0-based index here MUST match AVMatrixPage's array index,
+// and the 1-based backend routing ID is that index + 1.
+const SOURCES = [
+  { key: "laptop", name: "Laptop", icon: Laptop, index: 0, backendId: 1, navigateToAVMatrix: false },
+  { key: "airMedia", name: "Air Media", icon: Cast, index: 1, backendId: 2, navigateToAVMatrix: false },
+  { key: "codec1", name: "Codec 1", icon: Video, index: 2, backendId: 3, navigateToAVMatrix: true },
+  { key: "codec2", name: "Codec 2", icon: Video, index: 3, backendId: 4, navigateToAVMatrix: true },
+];
+
+const sendPulse = (setFn) => {
+  setFn(true);
+  setTimeout(() => setFn(false), 100);
+};
 
 const SourceSelection = () => {
   const navigate = useNavigate();
@@ -14,20 +30,23 @@ const SourceSelection = () => {
   const didInitAirMediaDefault = useRef(false);
 
   // Local active state for UI toggle — seeded so a fresh startup / Combined switch defaults to Air Media
-  const [activeSources, setActiveSources] = useState(() => {
+  const [activeKey, setActiveKey] = useState(() => {
     const saved = safeSessionStorage.getItem('avmatrix_routing_map');
     const forceAirMedia = safeSessionStorage.getItem('combinedForceAirMediaSource') === 'true';
 
     // Fresh startup (nothing stored) or a Boardroom→Combined switch → default to Air Media
     if (forceAirMedia || saved === null) {
       didInitAirMediaDefault.current = true;
-      return { airMedia: true, lectern: false, codec: false, blank: false };
+      return 'airMedia';
     }
-    return { airMedia: false, lectern: false, codec: false, blank: false };
+    return null;
   });
 
   // Serial join hook for routing commands (same as AV Matrix)
   const [, sendRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_ROUTING);
+  // Digital pulse so the backend has an explicit "source deselected / blank" signal,
+  // distinct from the serial "0:output" routing string sent alongside it.
+  const [, , sendBlankPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_SELECTION_BLANK);
 
   // Sync active state with AV Matrix sessionStorage on mount.
   // Skipped when the Air Media default is taking over this mount (handled by the effect below).
@@ -45,12 +64,8 @@ const SourceSelection = () => {
 
       // If all 3 outputs have same input, set it as active
       if (routedInputs.every(input => input === firstInput)) {
-        setActiveSources({
-          airMedia: firstInput === 0,
-          lectern: firstInput === 1,
-          codec: firstInput === 2,
-          blank: false,
-        });
+        const matched = SOURCES.find((s) => s.index === firstInput);
+        setActiveKey(matched ? matched.key : null);
       }
     } catch (error) {
       console.error('❌ Failed to sync with AV Matrix routing:', error);
@@ -58,28 +73,7 @@ const SourceSelection = () => {
   }, []);
 
   // Build routing string in "input:output" format e.g. "1:2"
-  const buildRoutingString = (input, output) => {
-    return `${input}:${output}`;
-  };
-
-  // On startup / Combined switch: Air Media is the default source —
-  // consume the one-shot flag and route it to outputs 1/2/3 (state already seeded in the initializer)
-  useEffect(() => {
-    if (!didInitAirMediaDefault.current) return;
-    safeSessionStorage.removeItem('combinedForceAirMediaSource');
-
-    const inputBackend = 1; // Air Media backend ID
-    const routings = [
-      { input: inputBackend, output: 1 }, // Boardroom Display
-      { input: inputBackend, output: 2 }, // Training Display
-      { input: inputBackend, output: 3 }, // Repeater
-    ];
-    sendMultipleRoutings(routings);
-    updateAVMatrixStorage(0, [0, 1, 2]); // Frontend uses 0-based for storage
-
-    console.log('🟢 Combined: Air Media default — routed to Boardroom, Training, Repeater');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const buildRoutingString = (input, output) => `${input}:${output}`;
 
   // Send routing command for single input → output pair
   const sendSingleRouting = (input, output) => {
@@ -122,157 +116,69 @@ const SourceSelection = () => {
     }
   };
 
-  // Handle Air Media selection (Input 1 → Outputs 1, 2, 3)
-  const handleAirMedia = () => {
-    // Don't toggle off if already active
-    if (activeSources.airMedia) {
-      console.log('ℹ️ Air Media already active - no change');
-      return;
+  // Route a source to outputs 1/2/3 (Boardroom, Training, Repeater displays)
+  const routeSource = (source) => {
+    setActiveKey(source.key);
+
+    sendMultipleRoutings([
+      { input: source.backendId, output: 1 },
+      { input: source.backendId, output: 2 },
+      { input: source.backendId, output: 3 },
+    ]);
+    updateAVMatrixStorage(source.index, [0, 1, 2]);
+
+    console.log(`✅ ${source.name} selected - Routed to Boardroom, Training, Repeater`);
+
+    if (source.navigateToAVMatrix) {
+      setTimeout(() => navigate('/av-matrix'), 500); // Wait for routing commands to send
     }
-
-    // Select Air Media and route to first 3 outputs
-    setActiveSources({ airMedia: true, lectern: false, codec: false, blank: false });
-
-    const inputBackend = 1; // Air Media backend ID
-    const routings = [
-      { input: inputBackend, output: 1 }, // Boardroom Display
-      { input: inputBackend, output: 2 }, // Training Display
-      { input: inputBackend, output: 3 }, // Repeater
-    ];
-
-    sendMultipleRoutings(routings);
-    updateAVMatrixStorage(0, [0, 1, 2]); // Frontend uses 0-based for storage
-
-    console.log('✅ Air Media selected - Routed to Boardroom, Training, Repeater');
   };
 
-  // Handle Lectern selection (Input 2 → Outputs 1, 2, 3)
-  const handleLectern = () => {
-    // Don't toggle off if already active
-    if (activeSources.lectern) {
-      console.log('ℹ️ Lectern already active - no change');
-      return;
-    }
+  // Deselect the active source: blank outputs 1/2/3 + explicit digital pulse
+  const deselectActive = () => {
+    setActiveKey(null);
 
-    // Select Lectern and route to first 3 outputs
-    setActiveSources({ airMedia: false, lectern: true, codec: false, blank: false });
-
-    const inputBackend = 2; // Lectern backend ID
-    const routings = [
-      { input: inputBackend, output: 1 }, // Boardroom Display
-      { input: inputBackend, output: 2 }, // Training Display
-      { input: inputBackend, output: 3 }, // Repeater
-    ];
-
-    sendMultipleRoutings(routings);
-    updateAVMatrixStorage(1, [0, 1, 2]); // Frontend uses 0-based for storage
-
-    console.log('✅ Lectern selected - Routed to Boardroom, Training, Repeater');
-  };
-
-  // Handle Codec selection (Input 3 → Outputs 1, 2, 3 + Navigate to AV Matrix)
-  const handleCodec = () => {
-    // Don't toggle off if already active
-    if (activeSources.codec) {
-      console.log('ℹ️ Codec already active - navigating to AV Matrix');
-      navigate('/av-matrix');
-      return;
-    }
-
-    // Select Codec and route to first 3 outputs
-    setActiveSources({ airMedia: false, lectern: false, codec: true, blank: false });
-
-    const inputBackend = 3; // Codec backend ID
-    const routings = [
-      { input: inputBackend, output: 1 }, // Boardroom Display
-      { input: inputBackend, output: 2 }, // Training Display
-      { input: inputBackend, output: 3 }, // Repeater
-    ];
-
-    sendMultipleRoutings(routings);
-    updateAVMatrixStorage(2, [0, 1, 2]); // Frontend uses 0-based for storage
-
-    console.log('✅ Codec selected - Routed to Boardroom, Training, Repeater');
-    console.log('🚀 Navigating to AV Matrix page...');
-
-    // Navigate to AV Matrix page after routing
-    setTimeout(() => {
-      navigate('/av-matrix');
-    }, 500); // Wait for all routing commands to send
-  };
-
-  // Handle Blank selection (Clear all outputs: 0 → 1, 2, 3, 4)
-  const handleBlank = () => {
-    setActiveSources({ airMedia: false, lectern: false, codec: false, blank: true });
-
-    const inputBackend = 0; // Blank/Clear backend ID
-    const routings = [
-      { input: inputBackend, output: 1 }, // Clear Boardroom
-      { input: inputBackend, output: 2 }, // Clear Training
-      { input: inputBackend, output: 3 }, // Clear Repeater
-      { input: inputBackend, output: 4 }, // Clear Codec output
-    ];
-
-    sendMultipleRoutings(routings);
+    sendMultipleRoutings([
+      { input: 0, output: 1 },
+      { input: 0, output: 2 },
+      { input: 0, output: 3 },
+    ]);
     clearAVMatrixStorage();
+    sendPulse(sendBlankPulse);
 
-    console.log('⬜ Blank selected - All outputs cleared');
-
-    // Auto-deselect blank after 500ms
-    setTimeout(() => {
-      setActiveSources({ airMedia: false, lectern: false, codec: false, blank: false });
-    }, 800);
+    console.log('⬜ Source deselected - outputs blanked');
   };
 
-  const allSources = [
-    {
-      name: "Air Media",
-      key: "airMedia",
-      icon: Wifi,
-      active: activeSources.airMedia,
-      handler: handleAirMedia,
-      description: "Wireless presentation to all displays",
-    },
-    {
-      name: "Lectern",
-      key: "lectern",
-      icon: Lectern,
-      active: activeSources.lectern,
-      handler: handleLectern,
-      description: "HDMI to all displays",
-    },
-    {
-      name: "Codec",
-      key: "codec",
-      icon: Video,
-      active: activeSources.codec,
-      handler: handleCodec,
-      description: "Video conference to all displays",
-    },
-    {
-      name: "Blank",
-      key: "blank",
-      icon: Minus,
-      active: activeSources.blank,
-      handler: handleBlank,
-      description: "Clear all display outputs",
-    },
-  ];
+  const handleSourceTap = (source) => {
+    if (activeKey === source.key) {
+      deselectActive();
+    } else {
+      routeSource(source);
+    }
+  };
 
+  // On startup / Combined switch: Air Media is the default source —
+  // consume the one-shot flag and route it to outputs 1/2/3 (state already seeded in the initializer)
+  useEffect(() => {
+    if (!didInitAirMediaDefault.current) return;
+    safeSessionStorage.removeItem('combinedForceAirMediaSource');
+    routeSource(SOURCES[1]); // Air Media
+    console.log('🟢 Combined: Air Media default — routed to Boardroom, Training, Repeater');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-3 md:space-y-4 touchPanel:space-y-5 w-full touchPanel:overflow-hidden">
-    {/* <div className="space-y-3 md:space-y-4 touchPanel:space-y-5 w-full"> */}
       {/* Source Buttons */}
       <div className="grid grid-cols-2 gap-2 md:gap-3 touchPanel:gap-4">
-        {allSources.map((source) => {
+        {SOURCES.map((source) => {
           const IconComponent = source.icon;
           return (
             <Button
-              key={source.name}
-              variant={source.active ? "primary" : "secondary"}
+              key={source.key}
+              variant={activeKey === source.key ? "primary" : "secondary"}
               size="sm"
-              onClick={source.handler}
+              onClick={() => handleSourceTap(source)}
               className="flex flex-col items-center space-y-1 md:space-y-2 touchPanel:space-y-2 h-auto py-3 md:py-4 touchPanel:py-5"
             >
               <IconComponent className="w-4 h-4 md:w-5 md:h-5 touchPanel:w-6 touchPanel:h-6" />
@@ -281,49 +187,6 @@ const SourceSelection = () => {
           );
         })}
       </div>
-
-      {/* Active Source Display */}
-      {/* {activeSource && activeSource.key !== 'blank' ? (
-        // <div className="bg-primary-50 border border-primary-200 rounded-lg p-2 md:p-3 touchPanel:p-4">
-        //   <div className="flex items-center space-x-2 mb-1">
-        //     <div className="status-indicator online"></div>
-        //     <span className="font-semibold text-primary text-xs md:text-sm touchPanel:text-base">Active Source</span>
-        //   </div>
-        //   <div className="flex items-center space-x-2">
-        //     <activeSource.icon className="w-4 h-4 md:w-5 md:h-5 touchPanel:w-6 touchPanel:h-6 text-primary" />
-        //     <div>
-        //       <div className="font-medium text-primary text-xs md:text-sm touchPanel:text-base">
-        //         {activeSource.name}
-        //       </div>
-        //       <div className="text-xs md:text-xs touchPanel:text-sm text-primary-700">
-        //         {activeSource.description}
-        //       </div>
-        //     </div>
-        //   </div>
-        // </div>
-        <div className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg p-2 md:p-3 touchPanel:p-4">
-          <div className="flex items-center space-x-2 mb-1">
-            <div className="status-indicator online"></div>
-            <span className="font-semibold text-heading text-xs md:text-sm touchPanel:text-base">Active Source</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <activeSource.icon className="w-4 h-4 md:w-5 md:h-5 touchPanel:w-6 touchPanel:h-6 text-heading" />
-            <div>
-              <div className="font-medium text-heading text-xs md:text-sm touchPanel:text-base">
-                {activeSource.name}
-              </div>
-              <div className="text-xs md:text-xs touchPanel:text-sm text-[var(--color-text-light)]">
-                {activeSource.description}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-2 md:p-3 touchPanel:p-4 text-center">
-          <div className="status-indicator offline mx-auto mb-2"></div>
-          <div className="text-xs md:text-sm touchPanel:text-base text-gray-500">No source selected</div>
-        </div>
-      )} */}
     </div>
   );
 };

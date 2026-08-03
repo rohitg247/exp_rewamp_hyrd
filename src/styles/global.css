@@ -766,6 +766,27 @@
   .sheen-once::before {
     animation: none;
   }
+  .content-hero-breath {
+    animation: none;
+  }
+}
+
+
+/* ============================================
+   CONTENT HERO BREATH — display power hero icon glow
+   ============================================ */
+
+@keyframes contentHeroBreath {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+
+.content-hero-breath {
+  animation: contentHeroBreath 2.6s ease-in-out infinite;
+}
+
+.content-status-fill {
+  transition: width 420ms ease, background-color 320ms ease, box-shadow 320ms ease;
 }
 
 

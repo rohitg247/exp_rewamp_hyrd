@@ -167,7 +167,31 @@ export const DIGITAL_JOINS = {
   PRES_LAYOUT_DUAL: 153,          // [PULSE] AVMatrixPage.jsx - Dual Window layout select
   PRES_LAYOUT_3_RIGHT: 154,       // [PULSE] AVMatrixPage.jsx - 3 Window (asymmetric left grid) layout select
   PRES_LAYOUT_3_LEFT: 155,        // [PULSE] AVMatrixPage.jsx - 3 Window (asymmetric right grid) layout select
-  // D156-199: Reserved
+  // D156-159: Reserved
+
+
+
+  // ── GROUP 16: Room Controls — Display Power, 6 Displays (D160-179) ──
+  SIDE_DISPLAY_1_ON: 160,         // [PULSE] DisplayPowerGrid.jsx - Side Display 1 power on
+  SIDE_DISPLAY_1_OFF: 161,        // [PULSE] DisplayPowerGrid.jsx - Side Display 1 power off
+  SIDE_DISPLAY_2_ON: 162,         // [PULSE] DisplayPowerGrid.jsx - Side Display 2 power on
+  SIDE_DISPLAY_2_OFF: 163,        // [PULSE] DisplayPowerGrid.jsx - Side Display 2 power off
+  SIDE_DISPLAY_3_ON: 164,         // [PULSE] DisplayPowerGrid.jsx - Side Display 3 power on
+  SIDE_DISPLAY_3_OFF: 165,        // [PULSE] DisplayPowerGrid.jsx - Side Display 3 power off
+  SIDE_DISPLAY_4_ON: 166,         // [PULSE] DisplayPowerGrid.jsx - Side Display 4 power on
+  SIDE_DISPLAY_4_OFF: 167,        // [PULSE] DisplayPowerGrid.jsx - Side Display 4 power off
+  BACK_DISPLAY_ON: 168,           // [PULSE] DisplayPowerGrid.jsx - 75" Back Display power on
+  BACK_DISPLAY_OFF: 169,          // [PULSE] DisplayPowerGrid.jsx - 75" Back Display power off
+  VIDEOWALL_ON: 170,              // [PULSE] DisplayPowerGrid.jsx - Video Wall power on
+  VIDEOWALL_OFF: 171,             // [PULSE] DisplayPowerGrid.jsx - Video Wall power off
+  // D172-179: Reserved
+
+
+
+  // ── GROUP 17: Main Source Selection — Deselect/Blank (D180-189) ──
+  SOURCE_SELECTION_BLANK: 180,    // [PULSE] SourceSelection.jsx - Active source deselected (blank)
+  // D181-189: Reserved
+  // D190-199: Reserved
 };
 
 

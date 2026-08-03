@@ -1,8 +1,8 @@
-import { Lightbulb, Blinds, Monitor } from 'lucide-react';
+import { Lightbulb, Monitor } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 import LightingControl from '../components/devices/LightingControl';
-import DisplayPowerControl from '../components/devices/DisplayPowerControl';
-import DrapesControlDevice from '../components/devices/DrapesControlDevice';
+import DisplayPowerGrid from '../components/devices/DisplayPowerGrid';
+// import DrapesControlDevice from '../components/devices/DrapesControlDevice'; // Drapes removed from this page — see commented Column 2 block below
 import RoomLayoutDisplay from '../components/devices/RoomLayoutDisplay';
 
 
@@ -50,8 +50,9 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
 
 
           {/* ========================================
-              COLUMN 2: DRAPES CONTROL (FULL HEIGHT)
-              ======================================== */}
+              COLUMN 2: DRAPES CONTROL — removed from this page (see Docs/changes.md).
+              Kept here commented out, not deleted, so it's easy to restore.
+              ========================================
           <Card variant="glass" tone="neutral" className="flex flex-col h-full overflow-hidden">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center justify-center space-x-2">
@@ -63,12 +64,15 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               <DrapesControlDevice />
             </CardContent>
           </Card>
+          */}
 
 
           {/* ========================================
-              COLUMN 3: DISPLAY POWER (FULL HEIGHT)
+              COLUMNS 2+3 MERGED: DISPLAY POWER — 6 displays
+              (4x Side Display, Back Display, Video Wall — matches AVMatrixPage's
+              real display targets, replacing the old 3-display / Drapes layout)
               ======================================== */}
-          <Card variant="glass" tone="video" className="flex flex-col h-full overflow-hidden">
+          <Card variant="glass" tone="video" className="col-span-2 flex flex-col h-full overflow-hidden">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center justify-center space-x-2">
                 <CardIcon tone="video"><Monitor className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" /></CardIcon>
@@ -76,7 +80,7 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex items-stretch px-4 py-4 touchPanel:px-6 touchPanel:py-4 overflow-hidden min-h-0">
-              <DisplayPowerControl />
+              <DisplayPowerGrid />
             </CardContent>
           </Card>
 
