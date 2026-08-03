@@ -19,7 +19,7 @@ const UnderDevelopment = ({ sidebarEnabled = false }) => {
               This feature is coming soon
             </p>
             <p className="text-base touchPanel:text-lg text-theme-text-light opacity-80">
-              We're working hard to bring you this functionality. Stay tuned for updates!
+              We&apos;re working hard to bring you this functionality. Stay tuned for updates!
             </p>
           </div>
         </div>

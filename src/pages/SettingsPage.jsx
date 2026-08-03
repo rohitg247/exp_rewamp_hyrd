@@ -6,18 +6,6 @@ import { useProcessorConnection } from '../context/ProcessorConnectionContext';
 import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 
 // Mock device data shown when processor is not connected
-const MOCK_DEVICES = [
-  { id: 1, name: 'Crestron Processor', status: 'online', ip: '192.168.1.100' },
-  { id: 2, name: 'Boardroom Display', status: 'online', ip: '192.168.1.101' },
-  { id: 3, name: 'Training Room Display', status: 'online', ip: '192.168.1.102' },
-  { id: 4, name: 'Repeater Display', status: 'offline', ip: '192.168.1.103' },
-  { id: 5, name: 'DSP Audio Processor', status: 'online', ip: '192.168.1.104' },
-  { id: 6, name: 'AV Switcher', status: 'online', ip: '192.168.1.105' },
-  { id: 7, name: 'Wireless Presenter', status: 'offline', ip: '192.168.1.106' },
-  { id: 8, name: 'Zoom Codec', status: 'online', ip: '192.168.1.107' },
-  { id: 9, name: 'Ceiling Microphone 1', status: 'online', ip: '192.168.1.108' },
-  { id: 10, name: 'Ceiling Microphone 2', status: 'online', ip: '192.168.1.109' },
-];
 
 // ─────────────────────────────────────────────────────────────
 // Global ACK/TCP log buffer — written by OrderListener.jsx,
@@ -34,7 +22,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   const [devices, setDevices] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { isConnected, lastHeartbeatTime, heartbeatLogs, clearHeartbeatLogs } = useProcessorConnection();
+  const { isConnected, heartbeatLogs, clearHeartbeatLogs } = useProcessorConnection();
 
   const isMockData = !isConnected && devices.length === 0;
   const displayDevices = isMockData ? [] : devices;
@@ -63,7 +51,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   }, [debugTab]);
 
   // ── Viewport Debug Info ──
-  const [viewportInfo, setViewportInfo] = useState({});
+  const [, setViewportInfo] = useState({});
   useEffect(() => {
     const update = () => setViewportInfo({
       innerWidth: window.innerWidth,

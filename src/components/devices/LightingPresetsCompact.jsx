@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lightbulb, Sun, Users, Video, Coffee, Power } from 'lucide-react';
+import { Sun, Users, Video, Coffee, Power } from 'lucide-react';
 import { useDigitalJoin, useAnalogJoin } from '../../hooks/useJoin';
 import { DIGITAL_JOINS, ANALOG_JOINS, PRESET_BRIGHTNESS } from '../../crestron/joins';
 import { safeSessionStorage } from '../../utils/safeStorage';

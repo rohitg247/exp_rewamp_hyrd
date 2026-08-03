@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Power, Monitor, MicOff, Volume2, Wind, Lightbulb } from 'lucide-react';
 
 // Device-shutdown messages, cycled in sync with the progress bar

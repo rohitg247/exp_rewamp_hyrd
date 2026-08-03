@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, ArrowBigUp } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ArrowBigUp } from "lucide-react";
 import Button from "./Button";
 
 const OnScreenKeyboard = ({

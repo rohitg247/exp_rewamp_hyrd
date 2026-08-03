@@ -1,4 +1,4 @@
-import { ExternalLink, Mail, Phone, Globe, Info } from 'lucide-react';
+import { Mail, Phone, Globe, Info } from 'lucide-react';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
 import Logo from '../../assets/images/Actis_logo.jpg';
@@ -8,9 +8,6 @@ import { useTheme } from '../../context/ThemeContext'; // ✅ ADDED
 const SystemInfoModal = ({ isOpen, onClose }) => {
   const { isDarkMode } = useTheme(); // ✅ ADDED
 
-  const handleSupportClick = () => {
-    window.open('https://actis.co.in/contact-us/support-contact/', '_blank');
-  };
 
   return (
     <Modal

@@ -259,7 +259,6 @@ const SourceSelection = () => {
     },
   ];
 
-  const activeSource = allSources.find((source) => source.active);
 
   return (
     <div className="space-y-3 md:space-y-4 touchPanel:space-y-5 w-full touchPanel:overflow-hidden">

@@ -10,7 +10,7 @@ const MAX_ITEM_NAME_LENGTH = 30;
 const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingValue, setEditingValue] = useState('');
-  const [isAdding, setIsAdding] = useState(false);
+  const [, setIsAdding] = useState(false);
   const [newItemValue, setNewItemValue] = useState('');
   const [localMenu, setLocalMenu] = useState([...menuItems]);
   const [showKeyboard, setShowKeyboard] = useState(false);

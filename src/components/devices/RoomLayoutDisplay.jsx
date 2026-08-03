@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { LayoutGrid, Users, GraduationCap, Layers } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { safeSessionStorage } from '../../utils/safeStorage';
@@ -91,8 +91,6 @@ const RoomLayoutDisplay = () => {
     }, 300); // wait for bar fade-out
   }, []);
 
-  const isApplying = phase === 'applying';
-  const showButtons = phase === 'idle' || phase === 'exiting';
   const showBar = phase === 'applying' || phase === 'exiting';
   const buttonsVisible = phase === 'idle';
   const barVisible = phase === 'applying';

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import {
   Power, Info, Network, Volume2, Coffee, Settings,
-  Sun, Moon, Palette, ArrowLeftRight, Radio, Thermometer,
+  Sun, Moon, Palette, Radio,
 } from "lucide-react";
 import Button from "../ui/Button";
 import Logo from "../../assets/images/Actis_logo.jpg";
@@ -24,7 +24,6 @@ const Navbar = ({ onShutdown }) => {
   const [hasOverflow, setHasOverflow] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
-  const [isACModalOpen, setIsACModalOpen] = useState(false);
 
   const scrollContainerRef = useRef(null);
   const scrollTimeoutRef = useRef(null);

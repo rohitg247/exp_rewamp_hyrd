@@ -11,7 +11,7 @@ import {
   pointerWithin,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges, snapCenterToCursor } from "@dnd-kit/modifiers";
-import { LayoutGrid, Monitor, Cast, Laptop, Video, ArrowRight, X, Check } from 'lucide-react';
+import { LayoutGrid, Cast, Laptop, Video, ArrowRight, X, Check } from 'lucide-react';
 import { useDigitalJoin, useSerialJoin } from '../hooks/useJoin';
 import { DIGITAL_JOINS, SERIAL_JOINS } from '../crestron/joins';
 import { safeSessionStorage } from '../utils/safeStorage';

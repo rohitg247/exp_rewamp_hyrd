@@ -2,7 +2,6 @@
 import { Mic, MicOff, ArrowLeft } from 'lucide-react';
 import { useDigitalJoin, useAnalogJoin } from '../hooks/useJoin';
 import { DIGITAL_JOINS, ANALOG_JOINS } from '../crestron/joins';
-import { useCall } from '../context/CallContext';
 import { safeSessionStorage } from '../utils/safeStorage';
 import VCLeftSidebar from '../components/vc/VCLeftSidebar';
 import VCLayoutModal from '../components/vc/VCLayoutModal';
@@ -21,7 +20,6 @@ const pulse = (setFn) => {
 };
 
 const VCPage = () => {
-  const { outgoingCall, incomingVCCall, formatTime } = useCall();
 
   const [micMuted, setMicMutedState] = useState(
     () => safeSessionStorage.getItem('vcMicMuted') === '1'

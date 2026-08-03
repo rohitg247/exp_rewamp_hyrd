@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // Arrow SVG component with rotation and press translation
 const ArrowTriangle = ({ direction, pressed, className = '' }) => {
