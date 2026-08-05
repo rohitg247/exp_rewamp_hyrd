@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crestron Theme Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .color-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .color-input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .color-input-wrapper input[type="color"] {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-input-wrapper input[type="color"]:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .color-input-wrapper input[type="text"] {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: border-color 0.3s;
+        }
+
+        .color-input-wrapper input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .preview {
+            background: white;
+        }
+
+        .preview h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .preview-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .preview-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .preview-section h3 {
+            margin-bottom: 1rem;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .button-preview {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.5rem;
+        }
+
+        .swatch {
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swatch .shade-label {
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .swatch .hex-label {
+            font-size: 0.65rem;
+            opacity: 0.9;
+        }
+
+        .output-section {
+            margin-top: 2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .output-section h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .css-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 500px;
+            overflow-y: auto;
+            line-height: 1.6;
+            white-space: pre;
+        }
+
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn.copied {
+            background: #5cb85c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Crestron Theme Generator</h1>
+            <p>Enter 4 hex colors to generate a complete theme with proper shades</p>
+        </div>
+
+        <div class="content">
+            <!-- Left Panel: Color Inputs -->
+            <div class="controls">
+                <div class="color-input-group">
+                    <label>Primary Color (Brand/Buttons)</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="primaryPicker" value="#003D82">
+                        <input type="text" id="primaryHex" value="#003D82" maxlength="7">
+                    </div>
+                </div>
+
+                <div class="color-input-group">
+                    <label>Danger Color (Errors/Delete)</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="dangerPicker" value="#f21212">
+                        <input type="text" id="dangerHex" value="#f21212" maxlength="7">
+                    </div>
+                </div>
+
+                <div class="color-input-group">
+                    <label>Success Color (Confirmations)</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="successPicker" value="#10b981">
+                        <input type="text" id="successHex" value="#10b981" maxlength="7">
+                    </div>
+                </div>
+
+                <div class="color-input-group">
+                    <label>Warning Color (Alerts)</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="warningPicker" value="#f59e0b">
+                        <input type="text" id="warningHex" value="#f59e0b" maxlength="7">
+                    </div>
+                </div>
+
+                <button class="generate-btn" onclick="generateTheme()">✨ Generate Theme</button>
+            </div>
+
+            <!-- Right Panel: Preview & Output -->
+            <div class="preview">
+                <h2>Live Preview</h2>
+                <div class="preview-grid">
+                    <!-- Buttons Preview -->
+                    <div class="preview-section">
+                        <h3>Button Preview</h3>
+                        <div class="button-preview">
+                            <button class="btn" id="btnPrimary">Primary Button</button>
+                            <button class="btn" id="btnDanger">Danger Button</button>
+                            <button class="btn" id="btnSuccess">Success Button</button>
+                            <button class="btn" id="btnWarning">Warning Button</button>
+                        </div>
+                    </div>
+
+                    <!-- Color Shades Preview -->
+                    <div class="preview-section">
+                        <h3>Primary Color Shades (50 → 900)</h3>
+                        <div class="color-swatches" id="primarySwatches"></div>
+                    </div>
+
+                    <div class="preview-section">
+                        <h3>Danger Color Shades</h3>
+                        <div class="color-swatches" id="dangerSwatches"></div>
+                    </div>
+
+                    <div class="preview-section">
+                        <h3>Success Color Shades</h3>
+                        <div class="color-swatches" id="successSwatches"></div>
+                    </div>
+
+                    <div class="preview-section">
+                        <h3>Warning Color Shades</h3>
+                        <div class="color-swatches" id="warningSwatches"></div>
+                    </div>
+
+                    <!-- CSS Output -->
+                    <div class="output-section">
+                        <h3>📋 Generated CSS Variables (Copy & Paste to global.css)</h3>
+                        <pre class="css-output" id="cssOutput">/* Click "Generate Theme" to see CSS output */</pre>
+                        <button class="copy-btn" onclick="copyCSSToClipboard()">📋 Copy CSS to Clipboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store plain CSS separately for copying
+        let plainCSS = '';
+
+        // Sync color picker with hex input
+        function syncColorInputs(pickerId, hexId) {
+            const picker = document.getElementById(pickerId);
+            const hex = document.getElementById(hexId);
+
+            picker.addEventListener('input', (e) => {
+                hex.value = e.target.value.toUpperCase();
+                generateTheme();
+            });
+
+            hex.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (/^#[0-9A-F]{6}$/i.test(value)) {
+                    picker.value = value;
+                    generateTheme();
+                }
+            });
+        }
+
+        syncColorInputs('primaryPicker', 'primaryHex');
+        syncColorInputs('dangerPicker', 'dangerHex');
+        syncColorInputs('successPicker', 'successHex');
+        syncColorInputs('warningPicker', 'warningHex');
+
+        // Convert hex to HSL
+        function hexToHSL(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        // Convert HSL to hex
+        function hslToHex(h, s, l) {
+            h = h / 360;
+            s = s / 100;
+            l = l / 100;
+
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            const toHex = x => {
+                const hex = Math.round(x * 255).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+        }
+
+        // Generate proper color shades
+        function generateShades(hex) {
+            const hsl = hexToHSL(hex);
+            const shades = {};
+
+            const baseLightness = hsl.l;
+
+            Object.entries({
+                50: 96, 100: 90, 200: 80, 300: 65, 400: 55,
+                500: null, 600: null, 700: null, 800: null, 900: null
+            }).forEach(([shade, targetLightness]) => {
+                if (shade === '500') {
+                    shades[shade] = hex;
+                } else if (parseInt(shade) < 500) {
+                    shades[shade] = hslToHex(hsl.h, hsl.s, targetLightness);
+                } else {
+                    const darkenFactor = (parseInt(shade) - 500) / 500;
+                    const newLightness = baseLightness * (1 - darkenFactor * 0.7);
+                    shades[shade] = hslToHex(hsl.h, hsl.s, Math.max(5, newLightness));
+                }
+            });
+
+            return shades;
+        }
+
+        function generateTheme() {
+            const primary = document.getElementById('primaryHex').value;
+            const danger = document.getElementById('dangerHex').value;
+            const success = document.getElementById('successHex').value;
+            const warning = document.getElementById('warningHex').value;
+
+            const hexPattern = /^#[0-9A-F]{6}$/i;
+            if (![primary, danger, success, warning].every(c => hexPattern.test(c))) {
+                return;
+            }
+
+            const primaryShades = generateShades(primary);
+            const dangerShades = generateShades(danger);
+            const successShades = generateShades(success);
+            const warningShades = generateShades(warning);
+
+            // Update button preview
+            document.getElementById('btnPrimary').style.backgroundColor = primary;
+            document.getElementById('btnPrimary').style.color = 'white';
+
+            document.getElementById('btnDanger').style.backgroundColor = danger;
+            document.getElementById('btnDanger').style.color = 'white';
+
+            document.getElementById('btnSuccess').style.backgroundColor = success;
+            document.getElementById('btnSuccess').style.color = 'white';
+
+            document.getElementById('btnWarning').style.backgroundColor = warning;
+            document.getElementById('btnWarning').style.color = 'white';
+
+            updateSwatches('primarySwatches', primaryShades);
+            updateSwatches('dangerSwatches', dangerShades);
+            updateSwatches('successSwatches', successShades);
+            updateSwatches('warningSwatches', warningShades);
+
+            generateCSSOutput(primaryShades, dangerShades, successShades, warningShades);
+        }
+
+        function updateSwatches(containerId, shades) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            Object.entries(shades).forEach(([shade, color]) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'swatch';
+                swatch.style.backgroundColor = color;
+
+                const rgb = parseInt(color.slice(1), 16);
+                const r = (rgb >> 16) & 0xff;
+                const g = (rgb >>  8) & 0xff;
+                const b = (rgb >>  0) & 0xff;
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                swatch.style.color = brightness > 128 ? '#000' : '#fff';
+
+                swatch.innerHTML = `
+                    <div class="shade-label">${shade}</div>
+                    <div class="hex-label">${color}</div>
+                `;
+                container.appendChild(swatch);
+            });
+        }
+
+        function generateCSSOutput(primary, danger, success, warning) {
+            // Store plain CSS for copying
+            plainCSS = `:root {
+  /* Primary Color Scale - Based on ${primary[500]} */
+  --color-primary-50: ${primary[50]};
+  --color-primary-100: ${primary[100]};
+  --color-primary-200: ${primary[200]};
+  --color-primary-300: ${primary[300]};
+  --color-primary-400: ${primary[400]};
+  --color-primary-500: ${primary[500]};
+  --color-primary-600: ${primary[600]};
+  --color-primary-700: ${primary[700]};
+  --color-primary-800: ${primary[800]};
+  --color-primary-900: ${primary[900]};
+  --color-primary: var(--color-primary-500);
+  --color-primary-light: ${primary[50]};
+  --color-primary-foreground: #ffffff;
+
+  /* Typography & Button Text Colors */
+  --color-heading: var(--color-primary-500);
+  --color-button-primary-text: #ffffff;
+  --color-button-secondary-text: var(--color-primary-500);
+
+  /* Danger/Accent Color Scale - Based on ${danger[500]} */
+  --color-danger-50: ${danger[50]};
+  --color-danger-100: ${danger[100]};
+  --color-danger-200: ${danger[200]};
+  --color-danger-300: ${danger[300]};
+  --color-danger-400: ${danger[400]};
+  --color-danger-500: ${danger[500]};
+  --color-danger-600: ${danger[600]};
+  --color-danger-700: ${danger[700]};
+  --color-danger-800: ${danger[800]};
+  --color-danger-900: ${danger[900]};
+  --color-accent: var(--color-danger-500);
+  --color-danger-foreground: #ffffff;
+
+  /* Success Color Scale */
+  --color-success-50: ${success[50]};
+  --color-success-100: ${success[100]};
+  --color-success-200: ${success[200]};
+  --color-success-300: ${success[300]};
+  --color-success-400: ${success[400]};
+  --color-success-500: ${success[500]};
+  --color-success-600: ${success[600]};
+  --color-success-700: ${success[700]};
+  --color-success-800: ${success[800]};
+  --color-success-900: ${success[900]};
+  --color-success: var(--color-success-500);
+  --color-success-foreground: #ffffff;
+
+  /* Warning Color Scale */
+  --color-warning-50: ${warning[50]};
+  --color-warning-100: ${warning[100]};
+  --color-warning-200: ${warning[200]};
+  --color-warning-300: ${warning[300]};
+  --color-warning-400: ${warning[400]};
+  --color-warning-500: ${warning[500]};
+  --color-warning-600: ${warning[600]};
+  --color-warning-700: ${warning[700]};
+  --color-warning-800: ${warning[800]};
+  --color-warning-900: ${warning[900]};
+  --color-warning: var(--color-warning-500);
+  --color-warning-foreground: #000000;
+
+  /* Gray Scale */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  /* Background & Text - LIGHT MODE */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f5f5f5;
+  --color-text: #111827;
+  --color-text-light: #6b7280;
+  --color-border: #d1d5db;
+  --color-shadow: rgba(0, 0, 0, 0.05);
+}`;
+
+            // Display in output (same text)
+            document.getElementById('cssOutput').textContent = plainCSS;
+        }
+
+        function copyCSSToClipboard() {
+            navigator.clipboard.writeText(plainCSS).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied to Clipboard!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                // Fallback: Select text
+                const output = document.getElementById('cssOutput');
+                const range = document.createRange();
+                range.selectNode(output);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+                alert('CSS selected - Press Ctrl+C (Cmd+C on Mac) to copy');
+            });
+        }
+
+        // Generate initial theme on load
+        window.addEventListener('load', () => {
+            generateTheme();
+        });
+    </script>
+</body>
+</html>
