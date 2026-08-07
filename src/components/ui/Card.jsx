@@ -31,7 +31,9 @@ const SURFACES = {
   },
   glass: {
     backgroundColor: "var(--color-bg-secondary)",
-    backgroundImage: "var(--surface-glass)",
+    // 2026-08-06: raked specular highlight layered over the base glass gradient.
+    // Order matters — the specular is the top layer or it reads as matte.
+    backgroundImage: "var(--gloss-specular), var(--surface-glass)",
     boxShadow: "var(--surface-hairline), var(--surface-edge), var(--elev-rest)",
   },
 };

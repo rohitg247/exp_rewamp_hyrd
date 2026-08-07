@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="h-screen w-screen bg-theme-bg flex items-center justify-center p-8">
-          <div className="bg-[var(--color-bg-secondary)] rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
+          <div className="bg-secondary rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
             <div className="flex items-center justify-center mb-6">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-12 h-12 text-red-600" />
@@ -58,17 +58,17 @@ class ErrorBoundary extends React.Component {
             </h1>
 
 
-            <p className="text-center text-[var(--color-text-light)] mb-6">
+            <p className="text-center text-muted-foreground mb-6">
               The application encountered an unexpected error and needs to restart.
             </p>
 
 
             {/* Error Details (for debugging) */}
-            <div className="bg-[var(--color-gray-50)] rounded-lg p-4 mb-6 max-h-64 overflow-auto">
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 max-h-64 overflow-auto">
               <p className="text-sm font-mono text-red-600 mb-2">
                 {this.state.error?.toString()}
               </p>
-              <pre className="text-xs text-[var(--color-text)] whitespace-pre-wrap">
+              <pre className="text-xs text-foreground whitespace-pre-wrap">
                 {this.state.errorInfo?.componentStack}
               </pre>
             </div>
@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
             </button>
 
 
-            <p className="text-center text-sm text-[var(--color-text-light)] mt-4">
+            <p className="text-center text-sm text-muted-foreground mt-4">
               If this problem persists, please contact technical support.
             </p>
           </div>

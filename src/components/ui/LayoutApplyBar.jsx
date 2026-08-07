@@ -39,7 +39,7 @@ const LayoutApplyBar = ({ icon: IconComponent, label, duration = 5000, onComplet
     <div className="relative w-full h-full rounded-lg overflow-hidden border-2 border-primary-200 shadow-md">
       
       {/* Background track */}
-      <div className="absolute inset-0 bg-[var(--color-bg-secondary)]" />
+      <div className="absolute inset-0 bg-secondary" />
 
       {/* Liquid fill layer */}
       <div

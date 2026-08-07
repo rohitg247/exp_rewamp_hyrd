@@ -20,6 +20,12 @@ const Sidebar = ({ className = '' }) => {
     return null;
   }
 
+  // The sidebar is a positioning wrapper ONLY — deliberately no background.
+  // SpeakerControl inside renders <Card variant="glass">, which is the same
+  // surface the page cards use, so the column already matches them. Giving the
+  // <aside> its own fill stacks a second frosted layer behind that card and the
+  // two tints fight; it also makes the 16px by which this element (w-40)
+  // overhangs the margin pages reserve for it (mr-36) paint over page content.
   return (
     <aside
       className={`

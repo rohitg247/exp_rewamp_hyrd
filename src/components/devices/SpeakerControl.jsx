@@ -176,7 +176,12 @@ const SpeakerControl = () => {
   };
 
   return (
-    <Card variant="glass" className="device-card h-full flex flex-col">
+    // 2026-08-06 UI revamp: dropped the legacy `device-card` class. It predates
+    // the Card component and was layering a 1px border + its own radius on top
+    // of the glass surface, so the sidebar card was the only card on screen with
+    // a hard outline instead of the --surface-edge ring. tone="audio" matches
+    // the Mics/Speakers cards on MainPage.
+    <Card variant="glass" tone="audio" className="h-full flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center justify-center space-x-2 text-center">
           <span className="touchPanel:text-2xl -mt-2 touchPanel:font-semibold">Speaker</span>

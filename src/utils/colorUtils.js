@@ -114,29 +114,56 @@ export function isValidHex(str) {
 }
 
 /**
- * Apply a custom primary color to the DOM by setting CSS custom properties
- * Generates full shade scale and updates all primary-related variables
+ * Pick the text colour that stays legible on top of a given background hex,
+ * using WCAG relative luminance (not a lightness threshold — lightness ignores
+ * how much each channel actually contributes, so saturated yellows and cyans
+ * come out wrong).
+ * @param {string} hex - Background hex color
+ * @returns {string} '#ffffff' or '#111827'
+ */
+export function readableTextOn(hex) {
+  const channel = (v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  const r = channel(parseInt(hex.slice(1, 3), 16));
+  const g = channel(parseInt(hex.slice(3, 5), 16));
+  const b = channel(parseInt(hex.slice(5, 7), 16));
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+  // Contrast against white vs against near-black; take whichever is higher.
+  const onWhite = 1.05 / (luminance + 0.05);
+  const onDark = (luminance + 0.05) / 0.05;
+  return onWhite > onDark ? '#ffffff' : '#111827';
+}
+
+/**
+ * Apply a custom primary color to the DOM.
+ *
+ * Sets ONLY the raw --color-primary-50..900 scale plus the two foreground
+ * colours that are a function of the picked hue. Every other derived token
+ * (--color-primary, --color-heading, --color-bg, ...) is owned by the
+ * [data-custom-color="true"] blocks in global.css.
+ *
+ * Inline styles on the root element outrank every stylesheet rule, so anything
+ * written here is invisible to the theme cascade. Writing --color-bg here used
+ * to leave dark mode with a pale background under near-white text.
+ *
  * @param {string} hex - Primary hex color
  */
 export function applyCustomColorToDOM(hex) {
   const root = document.documentElement;
   const shades = generateShades(hex);
 
-  // Apply primary shade scale
   Object.entries(shades).forEach(([shade, color]) => {
     root.style.setProperty(`--color-primary-${shade}`, color);
   });
 
-  // Update derived primary variables
-  root.style.setProperty('--color-primary', shades['500']);
-  root.style.setProperty('--color-primary-light', shades['50']);
-  root.style.setProperty('--color-primary-foreground', '#ffffff');
-  root.style.setProperty('--color-heading', shades['500']);
-  root.style.setProperty('--color-button-primary-text', '#ffffff');
-  root.style.setProperty('--color-button-secondary-text', shades['500']);
-
-  // Generate a background from primary-200
-  root.style.setProperty('--color-bg', shades['200']);
+  // Foregrounds depend on the picked colour, not on the theme, so they stay
+  // inline. Hardcoding #ffffff here is what made pale picks unreadable.
+  const onPrimary = readableTextOn(shades['500']);
+  root.style.setProperty('--color-primary-foreground', onPrimary);
+  root.style.setProperty('--color-button-primary-text', onPrimary);
 }
 
 /**
@@ -146,11 +173,38 @@ export function applyCustomColorToDOM(hex) {
 export function clearCustomColorFromDOM() {
   const root = document.documentElement;
   const props = [
-    '--color-primary', '--color-primary-light', '--color-primary-foreground',
-    '--color-heading', '--color-button-primary-text', '--color-button-secondary-text',
-    '--color-bg',
+    '--color-primary-foreground', '--color-button-primary-text',
     ...['50', '100', '200', '300', '400', '500', '600', '700', '800', '900']
-      .map(s => `--color-primary-${s}`)
+      .map(s => `--color-primary-${s}`),
+    // Written by earlier builds — cleared so a panel that ran the old code
+    // doesn't keep a stale inline override after an update.
+    '--color-primary', '--color-primary-light', '--color-heading',
+    '--color-button-secondary-text', '--color-bg',
   ];
   props.forEach(prop => root.style.removeProperty(prop));
+}
+
+/**
+ * Self-check. Not run by the app — call from a console or a node one-liner:
+ *   import('./src/utils/colorUtils.js').then(m => m.demo())
+ */
+export function demo() {
+  const assert = (cond, msg) => { if (!cond) throw new Error(`colorUtils: ${msg}`); };
+
+  const shades = generateShades('#004e7a');
+  assert(shades['500'] === '#004e7a', '500 must be the input hex verbatim');
+  const lightness = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900']
+    .map(s => hexToHSL(shades[s]).l);
+  lightness.forEach((l, i) => {
+    if (i > 0) assert(l <= lightness[i - 1] + 0.01, `shade scale must darken (broke at index ${i})`);
+  });
+
+  assert(readableTextOn('#ffffff') === '#111827', 'white bg needs dark text');
+  assert(readableTextOn('#000000') === '#ffffff', 'black bg needs light text');
+  assert(readableTextOn('#ffe08a') === '#111827', 'pale yellow needs dark text');
+  assert(readableTextOn('#004e7a') === '#ffffff', 'actis blue needs light text');
+
+  assert(isValidHex('#004e7a') && !isValidHex('#04e7a') && !isValidHex('004e7ab'), 'hex validation');
+
+  return 'colorUtils: all checks passed';
 }

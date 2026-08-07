@@ -58,9 +58,22 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
 
   return (
   <>
-    {/* Background Layer with 30% Opacity */}
-    <div className="fixed inset-0 z-50 bg-gradient-to-br from-primary via-primary/90 to-black opacity-95"></div>
-    
+    {/* 2026-08-06 UI revamp: backdrop restyle only, the rAF progress logic above
+        is untouched. Was `from-primary via-primary/90 to-black opacity-95` —
+        via-primary/90 is slash-opacity, which does not apply on the panel, so
+        the middle gradient stop silently dropped on hardware. Inline literals
+        now, plus a vignette to pull focus to the centre. */}
+    <div
+      className="fixed inset-0 z-50"
+      style={{
+        backgroundImage: `
+          radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.58) 100%),
+          linear-gradient(155deg, var(--color-primary-900) 0%, var(--color-primary-700) 48%, #05070d 100%)`,
+      }}
+    >
+      <div className="shutdown-shimmer" aria-hidden="true" />
+    </div>
+
     {/* Content Layer at Full Opacity */}
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
       <div className="text-center space-y-8 touchPanel:space-y-16 animate-fadeIn pointer-events-auto">
@@ -105,7 +118,22 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
 
         {/* Status Text */}
         <div className="space-y-4 touchPanel:space-y-8">
-          <h2 className="text-4xl touchPanel:text-7xl font-bold text-white">Putting on standby...</h2>
+          <h2
+            className="text-4xl touchPanel:text-7xl text-white"
+            style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
+          >
+            Putting on standby...
+          </h2>
+          {/* Hairline rule — the cue that separates a title from a status line
+              without adding another block of chrome. */}
+          <div
+            aria-hidden="true"
+            className="mx-auto h-px w-48 touchPanel:w-80"
+            style={{
+              backgroundImage:
+                'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0) 100%)',
+            }}
+          />
           <div
             key={stepIndex}
             className="flex items-center justify-center gap-3 touchPanel:gap-4 animate-fadeIn"
@@ -122,12 +150,16 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
           {/* Inline colors: bg-danger resolves via a nested var() chain the Crestron panel drops,
               so the fill paints nothing on the panel. Literal #f21212 matches the SVG ring. */}
           <div
-            className="w-full rounded-full h-3 touchPanel:h-6"
-            style={{ backgroundColor: "rgba(255,255,255,0.22)" }}
+            className="w-full rounded-full h-1.5 touchPanel:h-2.5 overflow-hidden"
+            style={{ backgroundColor: "rgba(255,255,255,0.16)" }}
           >
             <div
-              className="h-3 touchPanel:h-6 rounded-full"
-              style={{ width: `${progress}%`, backgroundColor: "#f21212" }}
+              className="h-full rounded-full"
+              style={{
+                width: `${progress}%`,
+                backgroundImage: "linear-gradient(90deg, #b90d0d 0%, #f21212 100%)",
+                boxShadow: "0 0 10px rgba(242,18,18,0.55)",
+              }}
             />
           </div>
         </div>

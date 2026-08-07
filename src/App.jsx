@@ -58,7 +58,10 @@ const ContentWrapper = ({ children, onShutdown }) => {
   return (
     <>
       {showNavbar && <Navbar onShutdown={onShutdown} />}
-      <div className="flex-1 overflow-hidden">
+      {/* 2026-08-06: keying on pathname remounts the subtree on every route
+          change, which replays animate-page-enter. Pages used to swap with no
+          transition at all. */}
+      <div key={location.pathname} className="flex-1 overflow-hidden animate-page-enter">
         {children}
       </div>
       {showSidebar && <Sidebar />}

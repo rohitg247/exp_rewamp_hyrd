@@ -283,11 +283,11 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
         <div className="flex items-start gap-3 touchPanel:gap-4">
           <div
             className="rounded-full p-2.5 touchPanel:p-3 flex-shrink-0"
-            style={{ backgroundColor: 'var(--color-danger-100)' }}
+            style={{ backgroundColor: 'var(--color-danger-surface)' }}
           >
             <AlertTriangle
               className="w-5 h-5 touchPanel:w-7 touchPanel:h-7"
-              style={{ color: 'var(--color-danger-600)' }}
+              style={{ color: 'var(--color-danger-on-surface)' }}
             />
           </div>
           <p className="text-base touchPanel:text-xl text-foreground pt-1">

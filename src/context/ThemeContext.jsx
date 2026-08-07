@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { safeLocalStorage } from '../utils/safeStorage';
 import { applyCustomColorToDOM, clearCustomColorFromDOM } from '../utils/colorUtils';
 
@@ -36,6 +36,23 @@ export const ThemeProvider = ({ children }) => {
     }
   });
 
+  // 2026-08-06: data-theme-switching drives the crossfade + bloom in global.css.
+  // Held only for the length of the transition — a permanent universal colour
+  // transition would tax every repaint on the panel.
+  const switchTimer = useRef(null);
+  const THEME_SWITCH_MS = 420; // keep in sync with --dur-theme
+
+  const beginThemeSwitch = useCallback(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme-switching', 'true');
+    clearTimeout(switchTimer.current);
+    switchTimer.current = setTimeout(() => {
+      root.removeAttribute('data-theme-switching');
+    }, THEME_SWITCH_MS);
+  }, []);
+
+  useEffect(() => () => clearTimeout(switchTimer.current), []);
+
   // Apply theme to DOM - sets data-theme attribute and data-dark-mode attribute
   const applyThemeToDOM = useCallback((name, dark, custom) => {
     const root = document.documentElement;
@@ -50,15 +67,21 @@ export const ThemeProvider = ({ children }) => {
       root.setAttribute('data-theme', name);
     }
 
-    // 3. If custom theme, apply custom color variables via inline styles
+    // 3. If custom theme, apply the primary scale inline and flag the root so
+    //    the [data-custom-color="true"] blocks in global.css can derive the rest
+    //    inside the normal cascade (see applyCustomColorToDOM for why).
     if (name === 'custom') {
       try {
         applyCustomColorToDOM(custom);
+        root.setAttribute('data-custom-color', 'true');
       } catch (error) {
         console.error('❌ Failed to apply custom theme color:', error);
         // Graceful fallback - stay on default theme
         root.removeAttribute('data-theme');
+        root.removeAttribute('data-custom-color');
       }
+    } else {
+      root.removeAttribute('data-custom-color');
     }
 
     // 4. Set dark mode attribute (CSS handles the rest)
@@ -78,6 +101,7 @@ export const ThemeProvider = ({ children }) => {
 
   // Public: Set theme name
   const setThemeName = useCallback((name) => {
+    beginThemeSwitch();
     try {
       setThemeNameState(name);
       safeLocalStorage.setItem(STORAGE_KEY_THEME, name);
@@ -93,10 +117,11 @@ export const ThemeProvider = ({ children }) => {
       });
       return prevDark;
     });
-  }, [applyThemeToDOM]);
+  }, [applyThemeToDOM, beginThemeSwitch]);
 
   // Public: Toggle dark mode
   const toggleDarkMode = useCallback(() => {
+    beginThemeSwitch();
     setIsDarkModeState(prevDark => {
       const newDark = !prevDark;
       try {
@@ -113,10 +138,11 @@ export const ThemeProvider = ({ children }) => {
       });
       return newDark;
     });
-  }, [applyThemeToDOM]);
+  }, [applyThemeToDOM, beginThemeSwitch]);
 
   // Public: Set custom color (auto-switches to 'custom' theme)
   const setCustomColor = useCallback((hex) => {
+    beginThemeSwitch();
     try {
       setCustomColorState(hex);
       safeLocalStorage.setItem(STORAGE_KEY_CUSTOM, hex);
@@ -131,7 +157,7 @@ export const ThemeProvider = ({ children }) => {
       applyThemeToDOM('custom', prevDark, hex);
       return prevDark;
     });
-  }, [applyThemeToDOM]);
+  }, [applyThemeToDOM, beginThemeSwitch]);
 
   return (
     <ThemeContext.Provider

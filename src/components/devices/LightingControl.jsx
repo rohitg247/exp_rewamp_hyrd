@@ -111,22 +111,22 @@ const LightingControl = () => {
     <div className="flex flex-col gap-2 touchPanel:gap-3 w-full h-full">
 
       {/* ── Status Display ── */}
-      <div className="flex-shrink-0 w-full bg-[var(--color-bg-secondary)] rounded-lg p-3 touchPanel:p-5 border-2 border-[var(--color-border)]">
+      <div className="flex-shrink-0 w-full bg-secondary rounded-lg p-3 touchPanel:p-5 border-2 border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {isLightsOn ? (
               <Lightbulb className="w-5 h-5 touchPanel:w-7 touchPanel:h-7 text-success flex-shrink-0" />
             ) : (
-              <Power className="w-5 h-5 touchPanel:w-7 touchPanel:h-7 text-[var(--color-text-light)] flex-shrink-0" />
+              <Power className="w-5 h-5 touchPanel:w-7 touchPanel:h-7 text-muted-foreground flex-shrink-0" />
             )}
             <div className="flex flex-col">
-              <span className="text-xs touchPanel:text-sm text-[var(--color-text-light)] font-medium">Current Mode</span>
+              <span className="text-xs touchPanel:text-sm text-muted-foreground font-medium">Current Mode</span>
               <span className="text-base touchPanel:text-2xl font-bold text-heading leading-tight">
                 {activePresetName}
               </span>
             </div>
           </div>
-          <span className={`text-2xl touchPanel:text-4xl font-bold ${isLightsOn ? 'text-heading' : 'text-[var(--color-text-light)]'}`}>
+          <span className={`text-2xl touchPanel:text-4xl font-bold ${isLightsOn ? 'text-heading' : 'text-muted-foreground'}`}>
             {brightness}%
           </span>
         </div>

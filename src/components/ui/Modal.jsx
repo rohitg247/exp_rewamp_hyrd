@@ -13,8 +13,8 @@ const Modal = ({
   height,
   maxHeight, // ✅ ADDED: new prop for max height cap
   // 2026-08-03 revamp: the surface colour moved to an inline style below.
-  // It used to default to `bg-[var(--color-bg-secondary)]` — an arbitrary
-  // bracket colour, which does not reliably apply on the TSW-1070.
+  // It used to default to an arbitrary bracket colour, which does not
+  // reliably apply on the TSW-1070.
   containerClassName = '',
   headerClassName = ''
 }) => {
@@ -91,7 +91,7 @@ const Modal = ({
             className={`flex items-center justify-between p-4 sm:p-6 touchPanel:p-8 flex-shrink-0 ${headerClassName}`}
             style={{ borderBottom: '1px solid var(--color-border)' }}
           >
-          {/* <div className="flex items-center justify-between p-4 sm:p-6 touchPanel:p-8 border-b border-[var(--color-border)] flex-shrink-0"> */}
+          {/* <div className="flex items-center justify-between p-4 sm:p-6 touchPanel:p-8 border-b border-border flex-shrink-0"> */}
             {title && (
               <h2 className="text-lg sm:text-xl touchPanel:text-2xl font-bold text-heading pr-4">
                 {title}

@@ -110,161 +110,6 @@
   --color-gray-900: #111827;
 }
 
-   /* :root {
-  --color-primary-50: #e6f5fc;
-  --color-primary-100: #b3e3f7;
-  --color-primary-200: #80d1f2;
-  --color-primary-300: #4dbfed;
-  --color-primary-400: #26b0e9;
-  --color-primary-500: #007CC3;
-  --color-primary-600: #0069a6;
-  --color-primary-700: #005689;
-  --color-primary-800: #00436c;
-  --color-primary-900: #00304f;
-  --color-primary: var(--color-primary-500);
-  --color-primary-light: #e6f5fc;
-  --color-primary-foreground: #ffffff;
-
-  --color-heading: var(--color-primary-500);
-  --color-button-primary-text: #ffffff;
-  --color-button-secondary-text: var(--color-primary-500);
-
-  --color-danger-50: #fef2f2;
-  --color-danger-100: #fee2e2;
-  --color-danger-200: #fecaca;
-  --color-danger-300: #fca5a5;
-  --color-danger-400: #f87171;
-  --color-danger-500: #f21212;
-  --color-danger-600: #dc1010;
-  --color-danger-700: #b90d0d;
-  --color-danger-800: #991010;
-  --color-danger-900: #7f0e0e;
-  --color-accent: var(--color-danger-500);
-  --color-danger-foreground: #ffffff;
-
-  --color-success-50: #f0fdf4;
-  --color-success-100: #dcfce7;
-  --color-success-200: #bbf7d0;
-  --color-success-300: #86efac;
-  --color-success-400: #4ade80;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
-  --color-success-800: #065f46;
-  --color-success-900: #064e3b;
-  --color-success: var(--color-success-500);
-  --color-success-foreground: #ffffff;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-100: #fef3c7;
-  --color-warning-200: #fde68a;
-  --color-warning-300: #fcd34d;
-  --color-warning-400: #fbbf24;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-  --color-warning-700: #b45309;
-  --color-warning-800: #92400e;
-  --color-warning-900: #78350f;
-  --color-warning: var(--color-warning-500);
-  --color-warning-foreground: #000000;
-
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-
-  --color-bg: #b3e3f7;
-  --color-bg-secondary: #ffffff;
-  --color-text: #111827;
-  --color-text-light: #6b7280;
-  --color-border: #e5e7eb; 
-  --color-shadow: rgba(0, 0, 0, 0.05);
-} */
-
-/* DEFAULT THEME (Alt+1) - Blue Light Mode #003D82 */
-/* :root {
-  --color-primary-50: #e0f0ff;
-  --color-primary-100: #b3d9ff;
-  --color-primary-200: #80c1ff;
-  --color-primary-300: #4da9ff;
-  --color-primary-400: #267aff;
-  --color-primary-500: #003D82;
-  --color-primary-600: #003573;
-  --color-primary-700: #002d5c;
-  --color-primary-800: #002447;
-  --color-primary-900: #001b33;
-  --color-primary: var(--color-primary-500);
-  --color-primary-light: #e0f0ff;
-  --color-primary-foreground: #ffffff;
-
-  --color-heading: var(--color-primary-500);
-  --color-button-primary-text: #ffffff;
-  --color-button-secondary-text: var(--color-primary-500);
-
-  --color-danger-50: #fef2f2;
-  --color-danger-100: #fee2e2;
-  --color-danger-200: #fecaca;
-  --color-danger-300: #fca5a5;
-  --color-danger-400: #f87171;
-  --color-danger-500: #f21212;
-  --color-danger-600: #dc1010;
-  --color-danger-700: #b90d0d;
-  --color-danger-800: #991010;
-  --color-danger-900: #7f0e0e;
-  --color-accent: var(--color-danger-500);
-  --color-danger-foreground: #ffffff;
-
-  --color-success-50: #f0fdf4;
-  --color-success-100: #dcfce7;
-  --color-success-200: #bbf7d0;
-  --color-success-300: #86efac;
-  --color-success-400: #4ade80;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
-  --color-success-800: #065f46;
-  --color-success-900: #064e3b;
-  --color-success: var(--color-success-500);
-  --color-success-foreground: #ffffff;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-100: #fef3c7;
-  --color-warning-200: #fde68a;
-  --color-warning-300: #fcd34d;
-  --color-warning-400: #fbbf24;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-  --color-warning-700: #b45309;
-  --color-warning-800: #92400e;
-  --color-warning-900: #78350f;
-  --color-warning: var(--color-warning-500);
-  --color-warning-foreground: #000000;
-
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-
-  --color-bg: #b3d9ff;
-  --color-bg-secondary: #ffffff;
-  --color-text: #111827;
-  --color-text-light: #6b7280;
-  --color-border: #e5e7eb; 
-  --color-shadow: rgba(0, 0, 0, 0.05);
-} */
-
 /* Blue Dark Mode (Alt+2) - IMPROVED DARK THEME */
 [data-theme="blue-dark"] {
   /* Primary Color Scale - BRIGHTER for better visibility */
@@ -610,6 +455,39 @@
 
 
 /* ============================================================================
+   2026-08-06 — CUSTOM COLOUR SCOPE
+   ----------------------------------------------------------------------------
+   applyCustomColorToDOM() writes ONLY the raw --color-primary-50..900 scale as
+   inline styles on <html>. Every DERIVED token lives here instead.
+
+   Why: inline styles on the root element outrank every stylesheet rule, so when
+   the picker used to write --color-bg inline, [data-dark-mode="true"] below
+   could never override it — dark mode silently kept a pale background under
+   near-white text. Deriving here keeps the picker inside the normal cascade, so
+   light/dark/theme combinations all still win in the order you'd expect.
+   ============================================================================ */
+[data-custom-color="true"] {
+  --color-primary: var(--color-primary-500);
+  --color-heading: var(--color-primary-500);
+  --color-button-secondary-text: var(--color-primary-500);
+  --color-primary-light: var(--color-primary-50);
+  --color-bg: var(--color-primary-200);
+}
+
+[data-custom-color="true"][data-dark-mode="true"] {
+  /* 400 not 500: the picked mid-tone is chosen against a light page and goes
+     muddy on a dark one. */
+  --color-primary: var(--color-primary-400);
+  --color-heading: var(--color-primary-200);
+  --color-button-secondary-text: var(--color-primary-200);
+  --color-primary-light: var(--color-primary-900);
+  /* The dark surface always wins — never a tint derived from the picked hue. */
+  --color-bg: #0f172a;
+  --color-bg-secondary: #1e293b;
+}
+
+
+/* ============================================================================
    2026-08-03 UI REVAMP — SURFACE / ELEVATION / RAIL / GRAIN TOKENS
    ----------------------------------------------------------------------------
    These are DERIVED from the existing --color-* vars above, so all four themes
@@ -645,6 +523,23 @@
   --overlay-glass: rgba(255, 255, 255, 0.72);
   --overlay-blur: 18px;
 
+  /* 2026-08-06: gloss layer. --gloss-specular sits ON TOP of --surface-glass to
+     give a raked highlight (the cue that separates "glossy" from "matte"), and
+     --gloss-sweep is the travelling band used by .gloss-sweep on :active. */
+  --gloss-specular: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  --gloss-sweep: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  --gloss-sweep-dur: 700ms;
+
   /* Accent rail across the top of a card. Tone is overridden per-card inline. */
   --rail-from: var(--color-primary-400);
   --rail-to: var(--color-primary-700);
@@ -666,6 +561,16 @@
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-press: 120ms;
   --dur-smooth: 260ms;
+  --dur-theme: 420ms;
+
+  /* 2026-08-06: error/danger used as a SURFACE (tinted panel + text on it), as
+     opposed to danger-500 used as a fill. Separate tokens because the scale
+     itself must not invert — --color-danger-700 is also the danger button's
+     hover fill, and flipping it light would wreck that. */
+  --color-danger-surface: var(--color-danger-50);
+  --color-danger-on-surface: var(--color-danger-700);
+  --color-success-surface: var(--color-success-100);
+  --color-success-on-surface: var(--color-success-700);
 }
 
 /* Dark surfaces: blue-dark is dark by design, plus every dark-mode combination.
@@ -684,6 +589,19 @@
   --surface-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   --surface-edge: 0 0 0 1px rgba(255, 255, 255, 0.07);
   --overlay-glass: rgba(15, 23, 42, 0.62);
+  /* Same raked highlight, dialled down — 0.20 white on a dark slab reads as fog. */
+  --gloss-specular: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  --gloss-sweep: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
   --rail-from: var(--color-primary-300);
   --rail-to: var(--color-primary-600);
   --mesh-bg:
@@ -691,6 +609,12 @@
     radial-gradient(900px 520px at 108% 112%, rgba(255, 255, 255, 0.04) 0%, transparent 58%),
     linear-gradient(155deg, var(--color-bg) 0%, var(--color-bg) 100%);
   --grain-opacity: 0.055;
+  /* #fef2f2 is near-white — as an error panel on a dark modal it read as a
+     blown-out rectangle. Deep red surface, pale red text. */
+  --color-danger-surface: #450a0a;
+  --color-danger-on-surface: #fecaca;
+  --color-success-surface: #064e3b;
+  --color-success-on-surface: #a7f3d0;
 }
 
 /* Page backdrop. Put .page-mesh on a page's root element (it must be a
@@ -720,6 +644,134 @@
 
 .press-fx:active {
   transform: scale(0.975);
+}
+
+/* ============================================================================
+   2026-08-06 — DARK/LIGHT SWITCH
+   ----------------------------------------------------------------------------
+   ThemeContext puts data-theme-switching on <html> for --dur-theme, then takes
+   it off. Two things happen in that window:
+
+   1. Colour properties crossfade instead of snapping. The blanket selector is
+      only tolerable BECAUSE it is temporary — the app's steady state has no
+      universal transition, and leaving one on would tax every repaint. Colour
+      properties only; no transform, no filter.
+   2. A soft bloom passes over the screen (opacity-only, one fixed element), so
+      the change reads as deliberate rather than as a flicker.
+   ============================================================================ */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: background-color var(--dur-theme) var(--ease-smooth),
+    border-color var(--dur-theme) var(--ease-smooth),
+    color var(--dur-theme) var(--ease-smooth),
+    fill var(--dur-theme) var(--ease-smooth),
+    stroke var(--dur-theme) var(--ease-smooth),
+    box-shadow var(--dur-theme) var(--ease-smooth) !important;
+}
+
+@keyframes theme-settle {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-theme-switching]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 38%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  animation: theme-settle var(--dur-theme) var(--ease-smooth) 1;
+}
+
+/* On dark surfaces a white bloom greys the screen — warm it and drop it down. */
+[data-theme-switching][data-dark-mode="true"]::after,
+[data-theme-switching][data-theme="blue-dark"]::after {
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(148, 187, 233, 0.1) 0%,
+    rgba(148, 187, 233, 0.035) 38%,
+    rgba(148, 187, 233, 0) 68%
+  );
+}
+
+/* 2026-08-06: gloss sweep on press. .sheen-once above is a one-shot ANIMATION
+   fired on mount; this is a TRANSITION driven by :active, because a touch panel
+   has no hover and a re-triggerable animation needs a key change to restart.
+   Transform-only, so it composites. */
+.gloss-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.gloss-sweep::after {
+  content: "";
+  position: absolute;
+  inset: -60% auto auto -30%;
+  width: 45%;
+  height: 220%;
+  pointer-events: none;
+  transform: rotate(18deg) translateX(0);
+  background: var(--gloss-sweep);
+  transition: transform var(--gloss-sweep-dur) var(--ease-smooth);
+}
+
+.gloss-sweep:active::after {
+  transform: rotate(18deg) translateX(320%);
+}
+
+/* 2026-08-06: slow shimmer across the shutdown backdrop. Transform-only on a
+   single fixed layer, so the infinite loop composites and never repaints. */
+@keyframes shutdown-shimmer {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(210%);
+  }
+}
+
+.shutdown-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.shutdown-shimmer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  will-change: transform;
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shutdown-shimmer 3.6s var(--ease-smooth) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shutdown-shimmer::before {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* Specular sweep — one-shot confirmation that a command landed.
@@ -769,6 +821,23 @@
   .content-hero-breath {
     animation: none;
   }
+  .gloss-sweep::after,
+  .gloss-sweep:active::after {
+    transition: none;
+    transform: rotate(18deg) translateX(0);
+  }
+  [data-theme-switching]::after {
+    animation: none;
+    opacity: 0;
+  }
+  [data-theme-switching] *,
+  [data-theme-switching] *::before,
+  [data-theme-switching] *::after {
+    transition: none !important;
+  }
+  .animate-page-enter {
+    animation: none;
+  }
 }
 
 
@@ -797,7 +866,6 @@
 body,
 nav,
 .card,
-.device-card,
 button,
 .btn-primary,
 .btn-secondary,
@@ -900,16 +968,6 @@ button,
 
   .card:hover {
     @apply shadow-xl;
-  }
-
-  .device-card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 transition-all duration-200;
-    background-color: var(--color-bg-secondary);
-    border-color: var(--color-border);
-  }
-
-  .device-card:hover {
-    @apply shadow-md;
   }
 
   .control-button {
@@ -1044,6 +1102,18 @@ button,
     background-color: rgb(209, 213, 219);
     border-radius: 3px;
   }
+
+  /* 2026-08-06: the thumb above is a light grey — invisible-adjacent on a dark
+     modal, and the only scrollbar in the app that didn't follow the theme. */
+  [data-theme="blue-dark"] .modal-content,
+  [data-dark-mode="true"] .modal-content {
+    scrollbar-color: rgb(100, 116, 139) transparent;
+  }
+
+  [data-theme="blue-dark"] .modal-content::-webkit-scrollbar-thumb,
+  [data-dark-mode="true"] .modal-content::-webkit-scrollbar-thumb {
+    background-color: rgb(100, 116, 139);
+  }
 }
 
 
@@ -1110,15 +1180,8 @@ button,
    ANIMATIONS
    ============================================ */
 
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.8); }
-  50% { box-shadow: 0 0 30px 10px rgba(249, 115, 22, 0.8); }
-  100% { box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.8); }
-}
-
-.glow-pulse {
-  animation: glowPulse 3s ease-in-out infinite;
-}
+/* 2026-08-06: .glow-pulse removed — unused, and it animated box-shadow on an
+   infinite loop, which repaints every frame instead of compositing. */
 
 @layer utilities {
   .animate-fadeIn {
@@ -1166,11 +1229,9 @@ button,
    LIGHTING CARD ANIMATIONS
    ============================================ */
 
-.device-card {
-  transition: all 0.3s ease-in-out;
-  position: relative;
-  overflow: hidden;
-}
+/* 2026-08-06: the .device-card rules are gone — the class had exactly one
+   caller (SpeakerControl), where it fought the Card component's own glass
+   surface. Card is the single source of card styling now. */
 
 @keyframes verticalWipeBackground {
   0% {
@@ -1195,10 +1256,6 @@ button,
   animation: scalePopCard 0.3s ease-out forwards;
 }
 
-.device-card:not(.lighting-welcome-active):not(.lighting-presentation-active):not(.lighting-videoconf-active):not(.lighting-meeting-active) {
-  background-color: transparent;
-  transition: all 0.5s ease-in-out;
-}
 
 
 /* ============================================
@@ -1230,24 +1287,7 @@ button,
   }
 }
 
-.glow-circle {
-  animation: glow-color 6s ease-in-out infinite;
-}
-
-@keyframes glow-color {
-  0% {
-    box-shadow: 0 0 20px 5px rgba(93, 203, 247, 0.6),
-                0 0 40px 10px rgba(93, 203, 247, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 15px 3px rgba(255, 165, 0, 0.4),
-                0 0 25px 6px rgba(255, 165, 0, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 20px 5px rgba(93, 203, 247, 0.6),
-                0 0 40px 10px rgba(93, 203, 247, 0.4);
-  }
-}
+/* 2026-08-06: .glow-circle removed — unused, same infinite box-shadow problem. */
 
 /* ── AC Thermostat Glow Pulse ─────────────────────────────────── */
 .ac-glow-pulse {
@@ -1263,10 +1303,21 @@ button,
   animation: ac-glow-pulse-kf 2.5s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
+  /* The blur is static and only opacity animates, so the layer rasterises once
+     and the loop composites. will-change makes that promotion explicit rather
+     than leaving it to the engine to notice. */
+  will-change: opacity;
 }
 @keyframes ac-glow-pulse-kf {
   0%, 100% { opacity: 0.3; }
   50%      { opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-glow-pulse::after {
+    animation: none;
+    opacity: 0.4;
+  }
 }
 
 /* ── AC Circle Enter Animation ─────────────────────────────────── */
@@ -1331,128 +1382,14 @@ button,
 }
 
 
-/* ============================================
- * PAGE TRANSITION ANIMATIONS
- * ============================================
- * Add this to src/App.css or src/index.css
- */
+/* 2026-08-06: the old page-transition block is gone. Nothing referenced
+   .page-transition-wrapper, .fade-in/.fade-out, .room-flip-in/.room-flip-out or
+   .page-transition — pages were swapping with no animation at all. Route change
+   is now animate-page-enter, keyed on pathname in App.jsx.
 
-/* Wrapper for all transitions */
-.page-transition-wrapper {
-  width: 100%;
-  height: 100%;
-  animation-duration: 400ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  animation-fill-mode: both;
-}
-
-/* ============================================
- * 1. NORMAL PAGE ENTRY (Landing → Room)
- * ============================================ */
-
-/* Fade Out (when leaving) */
-.fade-out {
-  animation-name: fadeOutNormal;
-}
-
-@keyframes fadeOutNormal {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.99);
-  }
-}
-
-/* Fade In (when entering) */
-.fade-in {
-  animation-name: fadeInNormal;
-}
-
-@keyframes fadeInNormal {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ============================================
- * 2. ROOM SWITCH (Join-triggered page flip)
- * ============================================ */
-
-/* Flip Out (when leaving) */
-.room-flip-out {
-  animation-name: flipOutRoom;
-}
-
-@keyframes flipOutRoom {
-  from {
-    opacity: 1;
-    transform: perspective(800px) rotateY(0deg);
-  }
-  to {
-    opacity: 0;
-    transform: perspective(800px) rotateY(-15deg);
-  }
-}
-
-/* Flip In (when entering) */
-.room-flip-in {
-  animation-name: flipInRoom;
-}
-
-@keyframes flipInRoom {
-  from {
-    opacity: 0;
-    transform: perspective(800px) rotateY(15deg);
-  }
-  to {
-    opacity: 1;
-    transform: perspective(800px) rotateY(0deg);
-  }
-}
-
-/* ============================================
- * 3. LANDING PAGE ANIMATIONS (Keep existing)
- * ============================================ */
-
-/* Landing page title/subtitle transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.duration-500 {
-  transition-duration: 500ms;
-}
-
-/* Landing page entry animation */
-.page-transition {
-  animation-duration: 500ms;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  animation-name: fadeInPage;
-}
-
-@keyframes fadeInPage {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.page-transition-wrapper {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  will-change: transform;
-}
+   It also redefined .transition-all and .duration-500, shadowing Tailwind's own
+   utilities of those names for every element in the app. Removing it hands
+   those two back to Tailwind. */
 
 
 /* ── Layout Apply Bar — Liquid Fill Effect ─────────────────────── */
@@ -1645,31 +1582,9 @@ button,
   );
 }
 
-/* ============================================================================
-   .panel-glass — REUSABLE Crestron-panel-safe "frosted glass" surface
-   ----------------------------------------------------------------------------
-   Crestron touch panels (e.g. TSW-1070) have NO GPU, so backdrop-filter and
-   filter:blur() are silently NOT painted. A glass card must therefore be
-   legible from its OWN background — never from a blur behind it.
-
-   Rules baked in here (see docs/crestron-panel-safe-css.md):
-     1. Opaque-ish base fill (visible with zero blur).
-     2. backdrop-filter is LAST = laptop-only enhancement, never load-bearing.
-     3. Separation = solid border + tight, higher-alpha, no-negative-spread shadow.
-   Copy this class (and the docs file) into any panel project.
-   ============================================================================ */
-.panel-glass {
-  background: rgba(10, 30, 50, 0.62);                          /* fallback — visible w/o blur */
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)),
-    color-mix(in srgb, var(--color-primary-900) 62%, transparent); /* themed */
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);                                 /* enhancement only (GPU devices) */
-}
+/* 2026-08-06: .panel-glass removed — it had no callers, and its doc comment
+   asserted the "panels have no GPU" claim that Docs/crestron-panel-safe-css.md
+   has since corrected on-device. Card variant="glass" is the supported route. */
 
 .landing-shell-subtle,
 .startup-panel-subtle {

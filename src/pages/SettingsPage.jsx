@@ -176,34 +176,37 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
         return (
           <div
             key={device.id}
-            style={{ animation: `deviceFadeIn 300ms ease-out ${globalIndex * 60}ms both` }}
-            className={`p-4 touchPanel:p-5 rounded-xl border-2 transition-all ${
-              status === 'online'
-                ? 'bg-[var(--color-bg-secondary)] border-green-400/40 hover:border-green-500/60'
-                : 'bg-[var(--color-bg-secondary)] border-red-600/40 hover:border-red-500/60'
-            }`}
+            style={{
+              animation: `deviceFadeIn 300ms ease-out ${globalIndex * 60}ms both`,
+              // Literal rgba: slash-opacity borders don't paint on the panel.
+              borderColor: status === 'online'
+                ? 'rgba(74, 222, 128, 0.45)'
+                : 'rgba(220, 38, 38, 0.45)',
+            }}
+            className="p-4 touchPanel:p-5 rounded-xl border-2 bg-secondary transition-all"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 touchPanel:space-x-4 flex-1 min-w-0">
                 {status === 'online' ? (
-                  <CheckCircle size={20} className="text-[var(--color-success)] flex-shrink-0 touchPanel:w-7 touchPanel:h-7" />
+                  <CheckCircle size={20} className="text-success flex-shrink-0 touchPanel:w-7 touchPanel:h-7" />
                 ) : (
-                  <XCircle size={20} className="text-[var(--color-accent)] flex-shrink-0 touchPanel:w-7 touchPanel:h-7" />
+                  <XCircle size={20} className="text-accent flex-shrink-0 touchPanel:w-7 touchPanel:h-7" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-sm touchPanel:text-lg text-[var(--color-text)] truncate">
+                  <div className="font-semibold text-sm touchPanel:text-lg text-foreground truncate">
                     {device.name}
                   </div>
-                  <div className="text-xs touchPanel:text-base text-[var(--color-text-light)]">
+                  <div className="text-xs touchPanel:text-base text-muted-foreground">
                     IP: {ipAddress}
                   </div>
                 </div>
               </div>
-              <div className={`text-xs touchPanel:text-sm font-bold px-2 py-1 rounded-full flex-shrink-0 ml-2 ${
-                status === 'online'
-                  ? 'bg-[var(--color-success-100)] text-[var(--color-success-700)]'
-                  : 'bg-[var(--color-danger-100)] text-[var(--color-danger-700)]'
-              }`}>
+              <div
+                className="text-xs touchPanel:text-sm font-bold px-2 py-1 rounded-full flex-shrink-0 ml-2"
+                style={status === 'online'
+                  ? { backgroundColor: 'var(--color-success-surface)', color: 'var(--color-success-on-surface)' }
+                  : { backgroundColor: 'var(--color-danger-surface)', color: 'var(--color-danger-on-surface)' }}
+              >
                 {status === 'online' ? 'ONLINE' : 'OFFLINE'}
               </div>
             </div>
@@ -251,14 +254,14 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowDebug(!showDebug)}
-                    className="p-3 touchPanel:p-4 hover:bg-[var(--color-bg-tertiary)] rounded-full transition-colors"
+                    className="p-3 touchPanel:p-4 hover:bg-gray-100 rounded-full transition-colors"
                     title="Toggle Debug Panel"
                   >
                     <Bug size={24} className="text-orange-500 touchPanel:w-8 touchPanel:h-8" />
                   </button>
                   <button
                     onClick={handleRefresh}
-                    className={`p-3 touchPanel:p-4 hover:bg-[var(--color-bg-tertiary)] rounded-full transition-colors ${
+                    className={`p-3 touchPanel:p-4 hover:bg-gray-100 rounded-full transition-colors ${
                       isRefreshing ? 'animate-spin' : ''
                     }`}
                     disabled={isRefreshing}
@@ -271,18 +274,18 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
             </CardHeader>
             <CardContent className="flex-1 flex flex-col px-6 py-4 touchPanel:px-10 touchPanel:py-6 min-h-0">
               {/* Summary */}
-              <div className="flex items-center justify-between p-4 touchPanel:p-6 bg-[var(--color-gray-50)] rounded-xl mb-4 touchPanel:mb-6">
+              <div className="flex items-center justify-between p-4 touchPanel:p-6 bg-gray-50 rounded-xl mb-4 touchPanel:mb-6">
                 <div className="flex items-center space-x-6 touchPanel:space-x-8">
                   <div className="flex items-center space-x-2 touchPanel:space-x-3">
-                    <CheckCircle size={24} className="text-[var(--color-success)] touchPanel:w-8 touchPanel:h-8" />
-                    <span className="text-base touchPanel:text-2xl font-medium text-[var(--color-text-light)]">
-                      Online: <span className="text-[var(--color-success)] font-bold">{onlineDevices}</span>
+                    <CheckCircle size={24} className="text-success touchPanel:w-8 touchPanel:h-8" />
+                    <span className="text-base touchPanel:text-2xl font-medium text-muted-foreground">
+                      Online: <span className="text-success font-bold">{onlineDevices}</span>
                     </span>
                   </div>
                   <div className="flex items-center space-x-2 touchPanel:space-x-3">
-                    <XCircle size={24} className="text-[var(--color-accent)] touchPanel:w-8 touchPanel:h-8" />
-                    <span className="text-base touchPanel:text-2xl font-medium text-[var(--color-text-light)]">
-                      Offline: <span className="text-[var(--color-accent)] font-bold">{offlineDevices}</span>
+                    <XCircle size={24} className="text-accent touchPanel:w-8 touchPanel:h-8" />
+                    <span className="text-base touchPanel:text-2xl font-medium text-muted-foreground">
+                      Offline: <span className="text-accent font-bold">{offlineDevices}</span>
                     </span>
                   </div>
                 </div>
@@ -322,52 +325,55 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto px-6 py-4 touchPanel:px-10 touchPanel:py-6 min-h-0">
               <div className="space-y-4 touchPanel:space-y-6">
-                <div className={`flex items-center gap-3 p-4 touchPanel:p-6 rounded-lg border-2 ${
-                  isConnected
-                    ? 'bg-[var(--color-bg-secondary)] border-green-500/40'
-                    : 'bg-[var(--color-bg-secondary)] border-[var(--color-accent)]'
-                }`}>
+                <div
+                  className="flex items-center gap-3 p-4 touchPanel:p-6 rounded-lg border-2 bg-secondary"
+                  style={{
+                    borderColor: isConnected
+                      ? 'rgba(34, 197, 94, 0.45)'
+                      : 'var(--color-accent)',
+                  }}
+                >
                   <Wifi size={24} className={`touchPanel:w-8 touchPanel:h-8 ${
-                    isConnected ? 'text-[var(--color-success)]' : 'text-[var(--color-accent)]'
+                    isConnected ? 'text-success' : 'text-accent'
                   }`} />
                   <div className="flex-1">
                     <h4 className={`font-medium touchPanel:text-2xl ${
-                      isConnected ? 'text-[var(--color-success)]' : 'text-[var(--color-accent)]'
+                      isConnected ? 'text-success' : 'text-accent'
                     }`}>
                       Processor
                     </h4>
                     <p className={`text-sm touchPanel:text-xl ${
-                      isConnected ? 'text-[var(--color-success)]' : 'text-[var(--color-accent)]'
+                      isConnected ? 'text-success' : 'text-accent'
                     }`}>
                       {isConnected ? 'Connected' : 'Not Connected'}
                     </p>
                   </div>
                   {isConnected && (
-                    <div className="w-3 h-3 bg-[var(--color-success)] rounded-full animate-pulse" />
+                    <div className="w-3 h-3 bg-success rounded-full animate-pulse" />
                   )}
                 </div>
 
                 {/* System Details Grid */}
                 <div className="grid grid-cols-2 gap-4 touchPanel:gap-6 text-sm touchPanel:text-lg pt-2">
                   <div>
-                    <div className="text-[var(--color-text-light)] mb-1">Last Program Update</div>
-                    <div className="text-[var(--color-text)] font-medium">March 09, 2026</div>
+                    <div className="text-muted-foreground mb-1">Last Program Update</div>
+                    <div className="text-foreground font-medium">March 09, 2026</div>
                   </div>
                   <div>
-                    <div className="text-[var(--color-text-light)] mb-1">Last UI Update</div>
-                    <div className="text-[var(--color-text)] font-medium">March 09, 2026</div>
+                    <div className="text-muted-foreground mb-1">Last UI Update</div>
+                    <div className="text-foreground font-medium">March 09, 2026</div>
                   </div>
                   <div>
                     <div className="font-medium text-heading mb-1 touchPanel:mb-2">Last Program Editor</div>
-                    <div className="text-[var(--color-text)]">{programInfo.lastProgramEditor.name}</div>
+                    <div className="text-foreground">{programInfo.lastProgramEditor.name}</div>
                   </div>
                   <div>
                     <div className="font-medium text-heading mb-1 touchPanel:mb-2">Last UI Editor</div>
-                    <div className="text-[var(--color-text)]">{programInfo.lastUIEditor.name}</div>
+                    <div className="text-foreground">{programInfo.lastUIEditor.name}</div>
                   </div>
                   <div className="col-span-2">
                     <div className="font-medium text-heading mb-1 touchPanel:mb-2">Loaded Program Path</div>
-                    <div className="text-xs touchPanel:text-base text-[var(--color-text-light)] bg-[var(--color-gray-50)] p-2 touchPanel:p-3 rounded font-mono break-all">
+                    <div className="text-xs touchPanel:text-base text-muted-foreground bg-gray-50 p-2 touchPanel:p-3 rounded font-mono break-all">
                       {programInfo.loadedPath}
                     </div>
                   </div>

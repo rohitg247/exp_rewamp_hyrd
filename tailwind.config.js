@@ -165,6 +165,9 @@ export default {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
         progress: "progress 3s ease-in-out forwards",
+        // 2026-08-06: route change. Keyed off location.pathname in App.jsx so
+        // React remounts and the animation replays — no transition library.
+        "page-enter": "pageFadeIn 0.2s ease-out both",
       },
       keyframes: {
         fadeIn: {
@@ -178,6 +181,10 @@ export default {
         progress: {
           "0%": { strokeDasharray: "0 251.2" },
           "100%": { strokeDasharray: "251.2 251.2" },
+        },
+        pageFadeIn: {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
       },
     },

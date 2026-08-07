@@ -3,9 +3,9 @@
 // 2026-08-03 UI revamp: elevation ramp + standardised press physics.
 // The variant/size API is unchanged, so no caller needs editing.
 //
-// PANEL RULE (TSW-1070): the two variants that used `bg-[var(--color-bg-secondary)]`
-// (arbitrary bracket colour) now set that surface with an inline style instead —
-// bracket colours are documented as unreliable on the panel.
+// PANEL RULE (TSW-1070): the two variants that used an arbitrary bracket colour
+// now set that surface with an inline style instead — bracket colours are
+// documented as unreliable on the panel.
 import { forwardRef } from 'react';
 
 const Button = forwardRef(({
@@ -22,9 +22,11 @@ const Button = forwardRef(({
     const baseClasses = 'font-semibold rounded-lg press-fx shadow-rest hover:shadow-raised active:shadow-pressed touch-manipulation user-select-none';
 
     // Variant definitions - Updated with brightness for universal theme support
+    // 2026-08-06: gloss-sweep on the filled variants only — a travelling
+    // highlight needs a solid fill under it to read at all.
     const variants = {
-        primary: 'bg-primary text-buttonText-primary border-2 border-transparent',
-        danger: 'bg-danger hover:bg-danger-700 text-buttonText-primary border-2 border-transparent',
+        primary: 'bg-primary text-buttonText-primary border-2 border-transparent gloss-sweep',
+        danger: 'bg-danger hover:bg-danger-700 text-buttonText-primary border-2 border-transparent gloss-sweep',
         success: 'bg-green-500 hover:bg-green-600 text-buttonText-primary border-2 border-transparent',
         // Updated: Same brightness on hover and active (press)
         secondary: 'hover:brightness-95 active:brightness-95 text-buttonText-secondary border-2 border-primary-200',
