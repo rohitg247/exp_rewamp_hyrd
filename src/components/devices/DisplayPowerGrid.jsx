@@ -1,18 +1,16 @@
-// src/components/devices/DisplayPowerGrid.jsx
-// Enhanced display power tiles — vertically stacked buttons, larger icons,
-// individual glass tile surfaces. Join logic untouched.
-
 import { useState } from 'react';
-import { Monitor, MonitorX, Power, Play } from 'lucide-react';
+import { Monitor, MonitorX, Play, Power } from 'lucide-react';
 import { useDigitalJoin } from '../../hooks/useJoin';
 import { DIGITAL_JOINS } from '../../crestron/joins';
 import { safeSessionStorage } from '../../utils/safeStorage';
+import Button from '../ui/Button';
 
 const sendPulse = (setFn) => {
   setFn(true);
   setTimeout(() => setFn(false), 100);
 };
 
+// 6 real displays for this room
 const DISPLAY_CONFIGS = [
   { key: 'side-1', label: 'Side Display 1', storageKey: 'sideDisplay1Power', onJoinKey: 'SIDE_DISPLAY_1_ON', offJoinKey: 'SIDE_DISPLAY_1_OFF' },
   { key: 'side-2', label: 'Side Display 2', storageKey: 'sideDisplay2Power', onJoinKey: 'SIDE_DISPLAY_2_ON', offJoinKey: 'SIDE_DISPLAY_2_OFF' },
@@ -21,6 +19,27 @@ const DISPLAY_CONFIGS = [
   { key: 'back', label: 'Back Display', storageKey: 'backDisplayPower', onJoinKey: 'BACK_DISPLAY_ON', offJoinKey: 'BACK_DISPLAY_OFF' },
   { key: 'videowall', label: 'Video Wall', storageKey: 'videoWallPower', onJoinKey: 'VIDEOWALL_ON', offJoinKey: 'VIDEOWALL_OFF' },
 ];
+
+const STATE_UI = {
+  on: {
+    iconColor: 'var(--color-success)',
+    glowBg: 'rgba(16, 185, 129, 0.14)',
+    glowShadow: '0 0 20px rgba(16, 185, 129, 0.24)',
+    pillBg: 'var(--color-success)',
+    pillWidth: '72%',
+    pillScale: 'scaleY(1)',
+    pillShadow: '0 0 10px rgba(16, 185, 129, 0.28)',
+  },
+  off: {
+    iconColor: 'var(--color-danger-500)',
+    glowBg: 'rgba(242, 18, 18, 0.12)',
+    glowShadow: '0 0 18px rgba(242, 18, 18, 0.18)',
+    pillBg: 'var(--color-danger-500)',
+    pillWidth: '38%',
+    pillScale: 'scaleY(0.78)',
+    pillShadow: '0 0 8px rgba(242, 18, 18, 0.18)',
+  },
+};
 
 function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
   const [powerState, setPowerState] = useState(
@@ -32,20 +51,7 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
 
   const isOn = powerState === 'on';
   const HeroIcon = isOn ? Monitor : MonitorX;
-
-  const iconColor = isOn ? 'var(--color-success)' : 'var(--color-danger-500)';
-
-  const glowBg = isOn
-    ? 'color-mix(in srgb, var(--color-success) 16%, transparent)'
-    : 'color-mix(in srgb, var(--color-danger-500) 16%, transparent)';
-
-  const glowShadow = isOn
-    ? '0 0 28px color-mix(in srgb, var(--color-success) 30%, transparent), 0 0 8px color-mix(in srgb, var(--color-success) 20%, transparent)'
-    : '0 0 28px color-mix(in srgb, var(--color-danger-500) 26%, transparent), 0 0 8px color-mix(in srgb, var(--color-danger-500) 18%, transparent)';
-
-  const statusBarShadow = isOn
-    ? '0 0 8px color-mix(in srgb, var(--color-success) 50%, transparent)'
-    : '0 0 8px color-mix(in srgb, var(--color-danger-500) 40%, transparent)';
+  const ui = isOn ? STATE_UI.on : STATE_UI.off;
 
   const handlePowerOn = () => {
     if (isOn) return;
@@ -61,100 +67,80 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
     sendPulse(sendOff);
   };
 
-  // Tile card surface — individual glass elevation per tile
   const tileStyle = {
     backgroundColor: 'var(--color-bg-secondary)',
-    backgroundImage: 'var(--surface-glass)',
+    backgroundImage: 'var(--gloss-specular), var(--surface-glass)',
     boxShadow: 'var(--surface-hairline), var(--surface-edge), var(--elev-rest)',
     borderRadius: '0.875rem',
-    borderTop: `2px solid ${isOn ? 'var(--color-success)' : 'var(--color-danger-500)'}`,
-    transition: 'border-top-color 320ms ease',
   };
 
   return (
     <div
-      className="flex flex-col items-center gap-3 w-full h-full justify-center px-3 py-4 touchPanel:px-4 touchPanel:py-5"
+      className="flex flex-col items-center justify-center gap-2 touchPanel:gap-2.5 w-full h-full px-2 py-3 touchPanel:px-3 touchPanel:py-4"
       style={tileStyle}
     >
-      {/* Hero icon with glow ring */}
+      {/* Hero icon with preserved floating motion */}
       <div
-        key={powerState}
-        className="p-4 touchPanel:p-5 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0"
-        style={{ backgroundColor: glowBg, boxShadow: glowShadow }}
-      >
-        <HeroIcon
-          className="w-10 h-10 touchPanel:w-12 touchPanel:h-12 transition-all duration-500"
-          style={{ color: iconColor }}
-        />
-      </div>
-
-      {/* Label — two-line clamp */}
-      <span
-        className="text-sm touchPanel:text-base font-semibold text-heading text-center leading-tight w-full flex-shrink-0"
+        className="p-3.5 touchPanel:p-4 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0"
         style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
+          backgroundColor: ui.glowBg,
+          boxShadow: ui.glowShadow,
         }}
       >
-        {label}
-      </span>
-
-      {/* Buttons — stacked vertically, always active, elegant ghost/solid toggle */}
-      <div className="flex flex-col gap-2 w-full flex-shrink-0">
-        <button
-          onClick={handlePowerOn}
-          aria-label={`Turn on ${label}`}
-          className="press-fx w-full flex items-center justify-center gap-2 py-2.5 touchPanel:py-3 rounded-lg font-semibold text-sm touchPanel:text-base"
-          style={{
-            backgroundColor: isOn
-              ? 'color-mix(in srgb, var(--color-success) 18%, var(--color-bg-secondary))'
-              : 'var(--color-success)',
-            color: isOn ? 'var(--color-success)' : '#ffffff',
-            boxShadow: isOn
-              ? 'inset 0 0 0 1.5px color-mix(in srgb, var(--color-success) 60%, transparent)'
-              : 'var(--elev-rest)',
-            transition: 'background-color 280ms ease, color 280ms ease, box-shadow 280ms ease',
-          }}
-        >
-          <Play className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
-          <span>ON</span>
-        </button>
-
-        <button
-          onClick={handlePowerOff}
-          aria-label={`Turn off ${label}`}
-          className="press-fx w-full flex items-center justify-center gap-2 py-2.5 touchPanel:py-3 rounded-lg font-semibold text-sm touchPanel:text-base"
-          style={{
-            backgroundColor: !isOn
-              ? 'color-mix(in srgb, var(--color-danger-500) 18%, var(--color-bg-secondary))'
-              : 'var(--color-danger-500)',
-            color: !isOn ? 'var(--color-danger-500)' : '#ffffff',
-            boxShadow: !isOn
-              ? 'inset 0 0 0 1.5px color-mix(in srgb, var(--color-danger-500) 60%, transparent)'
-              : 'var(--elev-rest)',
-            transition: 'background-color 280ms ease, color 280ms ease, box-shadow 280ms ease',
-          }}
-        >
-          <Power className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
-          <span>OFF</span>
-        </button>
+        <HeroIcon
+          className="w-8 h-8 touchPanel:w-9 touchPanel:h-9 transition-all duration-500"
+          style={{ color: ui.iconColor }}
+        />
       </div>
 
-      {/* Status bar with glow */}
-      <div
-        className="w-full rounded-full h-2 flex-shrink-0"
-        style={{ backgroundColor: 'var(--color-border)' }}
-      >
+      {/* Label */}
+      <div className="w-full min-h-[2.25rem] touchPanel:min-h-[2.5rem] flex items-center justify-center px-1">
+        <span className="text-xs touchPanel:text-sm font-semibold text-heading text-center leading-tight">
+          {label}
+        </span>
+      </div>
+
+      {/* Full-colour status pill: only size changes */}
+      <div className="w-full h-2 touchPanel:h-2.5 flex items-center justify-center flex-shrink-0">
         <div
-          className="h-full rounded-full content-status-fill"
+          className="rounded-full content-status-fill"
           style={{
-            width: '100%',
-            backgroundColor: isOn ? 'var(--color-success)' : 'var(--color-danger-500)',
-            boxShadow: statusBarShadow,
+            width: ui.pillWidth,
+            height: '100%',
+            backgroundColor: ui.pillBg,
+            boxShadow: ui.pillShadow,
+            transform: ui.pillScale,
+            transformOrigin: 'center center',
+            opacity: 1,
+            transition:
+              'width 420ms ease, transform 420ms ease, background-color 320ms ease, box-shadow 320ms ease',
           }}
         />
+      </div>
+
+      {/* Vertically stacked buttons using your Button component */}
+      <div className="flex flex-col gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
+        <Button
+          variant={isOn ? 'success' : 'secondary'}
+          size="sm"
+          onClick={handlePowerOn}
+          aria-label={`Turn on ${label}`}
+          className="w-full flex items-center justify-center gap-2 py-1.5 px-2 touchPanel:py-2"
+        >
+          <Play className="w-3.5 h-3.5 touchPanel:w-4 touchPanel:h-4 flex-shrink-0" />
+          <span className="text-xs touchPanel:text-sm">ON</span>
+        </Button>
+
+        <Button
+          variant={!isOn ? 'danger' : 'secondary'}
+          size="sm"
+          onClick={handlePowerOff}
+          aria-label={`Turn off ${label}`}
+          className="w-full flex items-center justify-center gap-2 py-1.5 px-2 touchPanel:py-2"
+        >
+          <Power className="w-3.5 h-3.5 touchPanel:w-4 touchPanel:h-4 flex-shrink-0" />
+          <span className="text-xs touchPanel:text-sm">OFF</span>
+        </Button>
       </div>
     </div>
   );

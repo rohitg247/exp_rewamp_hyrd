@@ -1,13 +1,13 @@
 // src/components/devices/AirconControl.jsx
 //
-// 2026-08-07 revamp — full-column AC control.
+// 2026-08-07 revamp — takes full column height on MainPage.
 //
-// Changes:
-//   - Power toggle ONLY on the thermostat circle (not whole widget)
-//   - Larger + / − buttons with proper elevation
-//   - Theme-aware press feedback using existing CSS variables
-//   - TSW-1070 safe: no color-mix(), no backdrop-filter reliance
-//   - Added subtle inner-circle depth shadow
+// TSW-1070 RULES:
+//   - Zero color-mix()
+//   - Zero backdrop-filter reliance (decorative only)
+//   - All colours are hex / rgba / var()
+//   - press-fx for tactile feedback
+//   - ResizeObserver for adaptive circle sizing
 
 import { useState, useRef, useEffect } from "react";
 import { CloudSnow, Fan } from "lucide-react";
@@ -127,8 +127,8 @@ const AirconControl = () => {
     };
   }, []);
 
-  // ── Circle sizing — proportional to full column height ────────
-  const circleSize = Math.max(120, Math.min(340, containerHeight * 0.55));
+  // ── Circle sizing — now more generous with full column height ──
+  const circleSize = Math.max(120, Math.min(320, containerHeight * 0.52));
   const innerSize = circleSize * 0.75;
 
   // ── Arc ring helpers ──────────────────────────────────────────
@@ -140,8 +140,8 @@ const AirconControl = () => {
   const arcColor = getTempColor(temperature);
   const glowColor = getTempColor(temperature, 0.55);
 
-  // ── Button style definitions (theme-aware, TSW-1070 safe) ─────
-  const tempBtnDefaultStyle = {
+  // ── TSW-1070 safe button styles ───────────────────────────────
+  const tempBtnStyle = {
     backgroundColor: "var(--color-bg-secondary)",
     color: "var(--color-text)",
     border: "2px solid var(--color-border)",
@@ -158,40 +158,29 @@ const AirconControl = () => {
       "0 6px 16px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
   };
 
-  // Pressed state — blends with theme via primary tint + border
-  const tempBtnPressedStyle = {
-    backgroundColor: "var(--color-primary-50)",
-    borderColor: "var(--color-primary)",
-    boxShadow:
-      "inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06)",
-  };
-
   const handleBtnEnter = (e) => {
     Object.assign(e.currentTarget.style, tempBtnHoverStyle);
   };
   const handleBtnLeave = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnDefaultStyle);
-  };
-  const handleBtnDown = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnPressedStyle);
-  };
-  const handleBtnUp = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnHoverStyle);
+    Object.assign(e.currentTarget.style, {
+      backgroundColor: tempBtnStyle.backgroundColor,
+      borderColor: tempBtnStyle.border.split(" ").pop(),
+      boxShadow: tempBtnStyle.boxShadow,
+    });
   };
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex flex-col items-center relative overflow-visible"
+      className="w-full h-full flex flex-col items-center cursor-pointer relative overflow-visible"
+      onClick={handleACToggle}
     >
-      {/* ── Thermostat Circle with SVG Arc Ring ──
-           Clicking ONLY this circle toggles power */}
+      {/* ── Thermostat Circle with SVG Arc Ring ── */}
       <div
-        className="flex-1 min-h-0 flex items-center justify-center w-full"
+        className="flex-1 min-h-0 flex items-center justify-center"
         style={{ overflow: "visible" }}
       >
         <div
-          onClick={handleACToggle}
           className={`relative flex items-center justify-center ${acPower ? "ac-glow-pulse" : ""}`}
           style={{
             width: `${circleSize}px`,
@@ -201,9 +190,8 @@ const AirconControl = () => {
             borderRadius: "50%",
             "--ac-glow-color": glowColor,
             animation: "ac-circle-enter 0.6s ease forwards",
-            transition: "transform 0.5s ease, width 0.3s ease, height 0.3s ease",
-            cursor: "pointer",
-            touchAction: "manipulation",
+            transition:
+              "transform 0.5s ease, width 0.3s ease, height 0.3s ease",
           }}
         >
           {/* SVG Arc Ring */}
@@ -234,7 +222,7 @@ const AirconControl = () => {
             />
           </svg>
 
-          {/* Inner Circle — now with depth shadow */}
+          {/* Inner Circle */}
           <div
             className="flex flex-col items-center justify-center rounded-full z-10"
             style={{
@@ -242,8 +230,6 @@ const AirconControl = () => {
               height: `${innerSize}px`,
               transition: "width 0.3s ease, height 0.3s ease",
               backgroundColor: "var(--color-bg-secondary)",
-              boxShadow:
-                "0 8px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
             }}
           >
             <span
@@ -256,10 +242,10 @@ const AirconControl = () => {
               {acPower ? "Cooling" : "Off"}
             </span>
             <span
-              className="font-bold leading-none text-6xl touchPanel:text-7xl"
+              className="font-bold leading-none text-5xl touchPanel:text-6xl"
               style={{ color: "var(--color-text)" }}
             >
-              {acPower ? temperature : "--"}
+              {temperature}
             </span>
             <span
               className="text-sm touchPanel:text-base pt-1"
@@ -273,7 +259,7 @@ const AirconControl = () => {
 
       {/* ── Temperature Controls ── */}
       <div
-        className="flex items-center justify-center gap-12 touchPanel:gap-20 flex-shrink-0"
+        className="flex items-center justify-center gap-10 touchPanel:gap-16 flex-shrink-0"
         style={{
           opacity: acPower ? 1 : 0,
           pointerEvents: acPower ? "auto" : "none",
@@ -283,12 +269,10 @@ const AirconControl = () => {
         <button
           onClick={decreaseTemp}
           disabled={temperature <= 16}
-          className="press-fx w-16 h-16 touchPanel:w-20 touchPanel:h-20 flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
-          style={tempBtnDefaultStyle}
+          className="press-fx w-14 h-14 touchPanel:w-16 touchPanel:h-16 flex items-center justify-center rounded-full font-bold text-2xl touchPanel:text-3xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={tempBtnStyle}
           onMouseEnter={handleBtnEnter}
           onMouseLeave={handleBtnLeave}
-          onMouseDown={handleBtnDown}
-          onMouseUp={handleBtnUp}
         >
           −
         </button>
@@ -296,18 +280,16 @@ const AirconControl = () => {
         <button
           onClick={increaseTemp}
           disabled={temperature >= 30}
-          className="press-fx w-16 h-16 touchPanel:w-20 touchPanel:h-20 flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
-          style={tempBtnDefaultStyle}
+          className="press-fx w-14 h-14 touchPanel:w-16 touchPanel:h-16 flex items-center justify-center rounded-full font-bold text-2xl touchPanel:text-3xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={tempBtnStyle}
           onMouseEnter={handleBtnEnter}
           onMouseLeave={handleBtnLeave}
-          onMouseDown={handleBtnDown}
-          onMouseUp={handleBtnUp}
         >
           +
         </button>
       </div>
 
-      {/* ── Bottom Icon Row ── */}
+      {/* ── Bottom Icon Row — now has room to breathe ── */}
       <div className="flex justify-between items-center w-full px-8 touchPanel:px-12 flex-shrink-0 mt-6 touchPanel:mt-8 pb-2 touchPanel:pb-4">
         <div className="relative">
           <CloudSnow

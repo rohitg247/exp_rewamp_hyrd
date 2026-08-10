@@ -1,13 +1,13 @@
 // src/components/devices/AirconControl.jsx
 //
-// 2026-08-07 revamp — full-column AC control.
+// 2026-08-07 revamp — full-column height, elevated buttons, circle-only toggle.
 //
-// Changes:
-//   - Power toggle ONLY on the thermostat circle (not whole widget)
-//   - Larger + / − buttons with proper elevation
-//   - Theme-aware press feedback using existing CSS variables
-//   - TSW-1070 safe: no color-mix(), no backdrop-filter reliance
-//   - Added subtle inner-circle depth shadow
+// TSW-1070 RULES:
+//   - Zero color-mix()
+//   - Zero backdrop-filter reliance
+//   - All colours are hex / rgba / var()
+//   - press-fx for tactile button feedback
+//   - ResizeObserver for adaptive circle sizing
 
 import { useState, useRef, useEffect } from "react";
 import { CloudSnow, Fan } from "lucide-react";
@@ -18,11 +18,11 @@ import { safeSessionStorage } from "../../utils/safeStorage";
 
 // ── 5-stop temperature color interpolation ──────────────────────────────────
 const TEMP_STOPS = [
-  { temp: 16, r: 56,  g: 189, b: 248 }, // #38bdf8 cyan-blue
-  { temp: 20, r: 52,  g: 211, b: 153 }, // #34d399 green
-  { temp: 24, r: 251, g: 191, b: 36  }, // #fbbf24 yellow
-  { temp: 27, r: 249, g: 115, b: 22  }, // #f97316 orange
-  { temp: 30, r: 239, g: 68,  b: 68  }, // #ef4444 red
+  { temp: 16, r: 56, g: 189, b: 248 },  // #38bdf8 cyan-blue
+  { temp: 20, r: 52, g: 211, b: 153 },  // #34d399 green
+  { temp: 24, r: 251, g: 191, b: 36 },  // #fbbf24 yellow
+  { temp: 27, r: 249, g: 115, b: 22 },  // #f97316 orange
+  { temp: 30, r: 239, g: 68, b: 68 },   // #ef4444 red
 ];
 
 const getTempColor = (temp, alpha = 1) => {
@@ -127,8 +127,8 @@ const AirconControl = () => {
     };
   }, []);
 
-  // ── Circle sizing — proportional to full column height ────────
-  const circleSize = Math.max(120, Math.min(340, containerHeight * 0.55));
+  // ── Circle sizing — generous with full column height ──────────
+  const circleSize = Math.max(120, Math.min(320, containerHeight * 0.50));
   const innerSize = circleSize * 0.75;
 
   // ── Arc ring helpers ──────────────────────────────────────────
@@ -140,43 +140,28 @@ const AirconControl = () => {
   const arcColor = getTempColor(temperature);
   const glowColor = getTempColor(temperature, 0.55);
 
-  // ── Button style definitions (theme-aware, TSW-1070 safe) ─────
-  const tempBtnDefaultStyle = {
+  // ── TSW-1070 safe, theme-aware button styles ──────────────────
+  const tempBtnBaseStyle = {
     backgroundColor: "var(--color-bg-secondary)",
-    color: "var(--color-text)",
-    border: "2px solid var(--color-border)",
+    color: "var(--color-heading)",
+    border: "2.5px solid var(--color-border)",
     boxShadow:
-      "0 4px 12px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7)",
+      "0 4px 14px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7)",
     transition:
       "background-color 150ms ease, box-shadow 150ms ease, border-color 150ms ease",
   };
 
-  const tempBtnHoverStyle = {
-    backgroundColor: "var(--color-bg)",
-    borderColor: "var(--color-primary)",
-    boxShadow:
-      "0 6px 16px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
-  };
-
-  // Pressed state — blends with theme via primary tint + border
-  const tempBtnPressedStyle = {
-    backgroundColor: "var(--color-primary-50)",
-    borderColor: "var(--color-primary)",
-    boxShadow:
-      "inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06)",
-  };
-
   const handleBtnEnter = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnHoverStyle);
+    e.currentTarget.style.backgroundColor = "var(--color-primary-light)";
+    e.currentTarget.style.borderColor = "var(--color-primary)";
+    e.currentTarget.style.boxShadow =
+      "0 6px 18px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)";
   };
+
   const handleBtnLeave = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnDefaultStyle);
-  };
-  const handleBtnDown = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnPressedStyle);
-  };
-  const handleBtnUp = (e) => {
-    Object.assign(e.currentTarget.style, tempBtnHoverStyle);
+    e.currentTarget.style.backgroundColor = "var(--color-bg-secondary)";
+    e.currentTarget.style.borderColor = "var(--color-border)";
+    e.currentTarget.style.boxShadow = tempBtnBaseStyle.boxShadow;
   };
 
   return (
@@ -184,15 +169,16 @@ const AirconControl = () => {
       ref={containerRef}
       className="w-full h-full flex flex-col items-center relative overflow-visible"
     >
-      {/* ── Thermostat Circle with SVG Arc Ring ──
-           Clicking ONLY this circle toggles power */}
+      {/* ── Thermostat Circle — ONLY click target for power toggle ── */}
       <div
-        className="flex-1 min-h-0 flex items-center justify-center w-full"
+        className="flex-1 min-h-0 flex items-center justify-center"
         style={{ overflow: "visible" }}
       >
         <div
           onClick={handleACToggle}
-          className={`relative flex items-center justify-center ${acPower ? "ac-glow-pulse" : ""}`}
+          className={`relative flex items-center justify-center cursor-pointer select-none ${
+            acPower ? "ac-glow-pulse" : ""
+          }`}
           style={{
             width: `${circleSize}px`,
             height: `${circleSize}px`,
@@ -201,9 +187,8 @@ const AirconControl = () => {
             borderRadius: "50%",
             "--ac-glow-color": glowColor,
             animation: "ac-circle-enter 0.6s ease forwards",
-            transition: "transform 0.5s ease, width 0.3s ease, height 0.3s ease",
-            cursor: "pointer",
-            touchAction: "manipulation",
+            transition:
+              "transform 0.5s ease, width 0.3s ease, height 0.3s ease",
           }}
         >
           {/* SVG Arc Ring */}
@@ -229,37 +214,64 @@ const AirconControl = () => {
               fill="none"
               strokeDasharray={`${arcLength} ${circumference}`}
               style={{
-                transition: "stroke-dasharray 0.45s ease, stroke 0.45s ease",
+                transition:
+                  "stroke-dasharray 0.45s ease, stroke 0.45s ease",
               }}
             />
           </svg>
 
-          {/* Inner Circle — now with depth shadow */}
+          {/* Inner Circle */}
           <div
             className="flex flex-col items-center justify-center rounded-full z-10"
             style={{
               width: `${innerSize}px`,
               height: `${innerSize}px`,
-              transition: "width 0.3s ease, height 0.3s ease",
               backgroundColor: "var(--color-bg-secondary)",
-              boxShadow:
-                "0 8px 24px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6)",
+              border: `2px solid ${
+                acPower
+                  ? getTempColor(temperature, 0.25)
+                  : "var(--color-border)"
+              }`,
+              boxShadow: "inset 0 2px 6px rgba(0, 0, 0, 0.04)",
+              transition:
+                "width 0.3s ease, height 0.3s ease, border-color 0.4s ease",
             }}
           >
+            {/* Status dot + label */}
+            <div className="flex items-center gap-1.5 pb-1">
+              <span
+                className="w-2 h-2 touchPanel:w-2.5 touchPanel:h-2.5 rounded-full flex-shrink-0"
+                style={{
+                  backgroundColor: acPower
+                    ? arcColor
+                    : "var(--color-text-light)",
+                  boxShadow: acPower
+                    ? `0 0 8px ${getTempColor(temperature, 0.4)}`
+                    : "none",
+                  transition:
+                    "background-color 0.4s ease, box-shadow 0.4s ease",
+                }}
+              />
+              <span
+                className="font-medium text-sm touchPanel:text-base"
+                style={{
+                  color: acPower ? arcColor : "var(--color-text-light)",
+                  transition: "color 0.4s ease",
+                }}
+              >
+                {acPower ? "Cooling" : "Off"}
+              </span>
+            </div>
+
+            {/* Temperature value — takes arc color when ON */}
             <span
-              className="font-light text-sm touchPanel:text-base pb-1"
+              className="font-bold leading-none text-5xl touchPanel:text-6xl"
               style={{
-                color: acPower ? arcColor : "var(--color-text-light)",
+                color: acPower ? arcColor : "var(--color-text)",
                 transition: "color 0.4s ease",
               }}
             >
-              {acPower ? "Cooling" : "Off"}
-            </span>
-            <span
-              className="font-bold leading-none text-6xl touchPanel:text-7xl"
-              style={{ color: "var(--color-text)" }}
-            >
-              {acPower ? temperature : "--"}
+              {temperature}
             </span>
             <span
               className="text-sm touchPanel:text-base pt-1"
@@ -271,7 +283,7 @@ const AirconControl = () => {
         </div>
       </div>
 
-      {/* ── Temperature Controls ── */}
+      {/* ── Temperature Controls — prominent elevated buttons ── */}
       <div
         className="flex items-center justify-center gap-12 touchPanel:gap-20 flex-shrink-0"
         style={{
@@ -283,12 +295,10 @@ const AirconControl = () => {
         <button
           onClick={decreaseTemp}
           disabled={temperature <= 16}
-          className="press-fx w-16 h-16 touchPanel:w-20 touchPanel:h-20 flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
-          style={tempBtnDefaultStyle}
+          className="press-fx w-16 h-16 touchPanel:w-[4.5rem] touchPanel:h-[4.5rem] flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={tempBtnBaseStyle}
           onMouseEnter={handleBtnEnter}
           onMouseLeave={handleBtnLeave}
-          onMouseDown={handleBtnDown}
-          onMouseUp={handleBtnUp}
         >
           −
         </button>
@@ -296,23 +306,23 @@ const AirconControl = () => {
         <button
           onClick={increaseTemp}
           disabled={temperature >= 30}
-          className="press-fx w-16 h-16 touchPanel:w-20 touchPanel:h-20 flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
-          style={tempBtnDefaultStyle}
+          className="press-fx w-16 h-16 touchPanel:w-[4.5rem] touchPanel:h-[4.5rem] flex items-center justify-center rounded-full font-bold text-3xl touchPanel:text-4xl disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={tempBtnBaseStyle}
           onMouseEnter={handleBtnEnter}
           onMouseLeave={handleBtnLeave}
-          onMouseDown={handleBtnDown}
-          onMouseUp={handleBtnUp}
         >
           +
         </button>
       </div>
 
-      {/* ── Bottom Icon Row ── */}
+      {/* ── Bottom Icon Row — room to breathe in full-height column ── */}
       <div className="flex justify-between items-center w-full px-8 touchPanel:px-12 flex-shrink-0 mt-6 touchPanel:mt-8 pb-2 touchPanel:pb-4">
         <div className="relative">
           <CloudSnow
             size={28}
-            className={`touchPanel:w-8 touchPanel:h-8 ${acPower ? "ac-icon-glow" : ""}`}
+            className={`touchPanel:w-8 touchPanel:h-8 ${
+              acPower ? "ac-icon-glow" : ""
+            }`}
             style={{
               color: acPower ? arcColor : "var(--color-text-light)",
               transition: "color 0.4s ease",
@@ -334,8 +344,12 @@ const AirconControl = () => {
         </div>
         <Fan
           size={28}
-          className={`touchPanel:w-8 touchPanel:h-8 ${acPower ? "animate-spin-slow" : ""}`}
-          style={{ color: acPower ? arcColor : "var(--color-text-light)" }}
+          className={`touchPanel:w-8 touchPanel:h-8 ${
+            acPower ? "animate-spin-slow" : ""
+          }`}
+          style={{
+            color: acPower ? arcColor : "var(--color-text-light)",
+          }}
         />
       </div>
     </div>

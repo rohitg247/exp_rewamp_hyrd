@@ -6,23 +6,20 @@
 Ver/
 │
 ├── .gitignore
-├── AircomControlsReffencewithcss.md
 ├── CAFE_MIGRATION.md
 ├── eslint.config.js
 ├── index.html
-├── Landing_Page.md
 ├── package.json
 ├── package-lock.json
 ├── postcss.config.js
+├── PROJECT_STRUCTURE.md
 ├── README.md
 ├── tailwind.config.js
-├── TECHINICAL_BRIEF_PROCESSOR_AND_AC.md
 ├── theme-generator-final.html
-├── TODO.md
-├── UI_AND_STARTUP_FIXES.md
 ├── vite.config.js
 │
 ├── Docs/
+│   ├── changes.md
 │   ├── crestron-panel-safe-css.md
 │   ├── ui-startup-fixes-generic.md
 │   └── ui-startup-fixes-sibling.md
@@ -50,12 +47,12 @@ Ver/
     │   │   └── Inter-SemiBold.woff2
     │   ├── images/
     │   │   ├── .gitkeep
-    │   │   ├── Actis_logo.jpg
     │   │   ├── Actis_logo_old.jpg
+    │   │   ├── Actis_logo.jpg
     │   │   ├── Black_logo.png
     │   │   ├── layout_combined.webp
-    │   │   ├── Townhall.webp
     │   │   ├── Townhall_Layout.webp
+    │   │   ├── Townhall.webp
     │   │   ├── training_combined.webp
     │   │   └── White_logo.png
     │   └── sounds/
@@ -65,39 +62,26 @@ Ver/
     │       └── success.mp3
     │
     ├── components/
-    │   ├── AcStatusListener 1+1.jsx
-    │   ├── AcStatusListener.jsx
-    │   ├── AcStatusListener_old.jsx
     │   ├── ErrorBoundary.jsx
     │   ├── OrderListener.jsx
-    │   ├── PageTransition.jsx
-    │   ├── RoomModeListener.jsx
-    │   ├── ShutdownScreen ref.jsx
     │   ├── ShutdownScreen.jsx
     │   │
     │   ├── devices/
     │   │   ├── AirconControl.jsx
-    │   │   ├── AirconControlBoardroom.jsx
-    │   │   ├── AirconControlTrainingRoom.jsx
     │   │   ├── AudioChannel.jsx
-    │   │   ├── BoardroomDisplayControl.jsx
-    │   │   ├── BoardroomSourceSelection.jsx
     │   │   ├── DisplayPowerControl.jsx
+    │   │   ├── DisplayPowerGrid copy 2.jsx
+    │   │   ├── DisplayPowerGrid copy.jsx
+    │   │   ├── DisplayPowerGrid.jsx
     │   │   ├── DrapesControlDevice.jsx
     │   │   ├── DrapesQuickControl.jsx
-    │   │   ├── LightingBoardroom.jsx
     │   │   ├── LightingControl.jsx
     │   │   ├── LightingPresetsCompact.jsx
     │   │   ├── MicChannel.jsx
     │   │   ├── MicrophoneControl.jsx
-    │   │   ├── MicrophoneControl.CHANGES.md
-    │   │   ├── MicrophoneControl.SNAPSHOT.md
     │   │   ├── RoomLayoutDisplay.jsx
-    │   │   ├── RoomLayoutDisplay_1st.jsx
-    │   │   ├── RoomLayoutDisplayOld.jsx
     │   │   ├── SourceSelection.jsx
     │   │   ├── SpeakerControl.jsx
-    │   │   ├── SpeakerControlBoardroom.jsx
     │   │   └── VideoWallDevice.jsx
     │   │
     │   ├── layout/
@@ -105,41 +89,32 @@ Ver/
     │   │   └── Sidebar.jsx
     │   │
     │   ├── modals/
-    │   │   ├── ACControlModal.jsx
     │   │   ├── ColorPickerModal.jsx
+    │   │   ├── EditMenuModal copy.jsx
     │   │   ├── EditMenuModal.jsx
     │   │   ├── OrderListModal.jsx
     │   │   ├── ShutdownModal.jsx
     │   │   └── SystemInfoModal.jsx
     │   │
-    │   ├── ui/
-    │   │   ├── Button.jsx
-    │   │   ├── Card.jsx
-    │   │   ├── DPad.jsx
-    │   │   ├── LayoutApplyBar.jsx
-    │   │   ├── Modal.jsx
-    │   │   ├── OnScreenKeyboard.jsx
-    │   │   ├── Select.jsx
-    │   │   ├── Slider.jsx
-    │   │   ├── Toast.jsx
-    │   │   ├── ToastContainer.jsx
-    │   │   ├── Toggle.jsx
-    │   │   └── VolumeSlider.jsx
-    │   │
-    │   └── vc/
-    │       ├── VCAudioModal.jsx
-    │       ├── VCCameraControlsModal.jsx
-    │       ├── VCContentModal.jsx
-    │       ├── VCLayoutModal.jsx
-    │       ├── VCLeftSidebar.jsx
-    │       ├── VCLightingControlsModal.jsx
-    │       ├── VCScheduleMeetingModal.jsx
-    │       └── vcLayouts.jsx
+    │   └── ui/
+    │       ├── Button.jsx
+    │       ├── Card.jsx
+    │       ├── DisplayHeroControl.jsx
+    │       ├── DPad.jsx
+    │       ├── LayoutApplyBar.jsx
+    │       ├── Modal.jsx
+    │       ├── OnScreenKeyboard.jsx
+    │       ├── Select.jsx
+    │       ├── Slider.jsx
+    │       ├── Toast.jsx
+    │       ├── ToastContainer.jsx
+    │       ├── Toggle.jsx
+    │       └── VolumeSlider.jsx
     │
     ├── context/
     │   ├── AudioContext.jsx
+    │   ├── ProcessorConnectionContext copy.jsx
     │   ├── ProcessorConnectionContext.jsx
-    │   ├── RoomModeContext.jsx
     │   └── ThemeContext.jsx
     │
     ├── crestron/
@@ -150,19 +125,26 @@ Ver/
     │   └── backend-triggered-shutdown.md
     │
     ├── hooks/
+    │   ├── useJoin copy.js
     │   └── useJoin.js
     │
     ├── pages/
     │   ├── AudioControlsPage.jsx
     │   ├── AVMatrixPage.jsx
-    │   ├── BoardRoom.jsx
+    │   ├── AVMatrixPage copy.jsx
+    │   ├── AVMatrixPage copy 2.jsx
+    │   ├── AVMatrixPage copy 3.jsx
+    │   ├── AVMatrixPage copy 4.jsx
+    │   ├── AVMatrixPage copy 5.jsx
     │   ├── CafePage.jsx
-    │   ├── CombinedRoom.jsx
+    │   ├── CafePage copy.jsx
     │   ├── EngineeringPage.jsx
     │   ├── LandingPage.jsx
+    │   ├── LandingPage copy.jsx
+    │   ├── MainPage.jsx
     │   ├── RoomControlsPage.jsx
+    │   ├── RoomControlsPage copy.jsx
     │   ├── SettingsPage.jsx
-    │   ├── SettingsPageBoardroom.jsx
     │   ├── UnderDevelopment.jsx
     │   └── VCPage.jsx
     │
@@ -179,24 +161,35 @@ Ver/
 
 | Directory | File Count |
 |-----------|-----------|
-| Root config files | 16 |
-| Docs/ | 3 |
+| Root config files | 12 |
+| Docs/ | 4 |
 | public/ (assets + fonts) | 6 |
+| src/ (top-level: App, index.css, main.jsx) | 3 |
 | src/assets/fonts/ | 5 |
 | src/assets/images/ | 9 |
 | src/assets/sounds/ | 4 |
-| src/components/ (top-level) | 9 |
-| src/components/devices/ | 22 |
+| src/components/ (top-level) | 3 |
+| src/components/devices/ | 16 |
 | src/components/layout/ | 2 |
 | src/components/modals/ | 6 |
-| src/components/ui/ | 12 |
-| src/components/vc/ | 8 |
+| src/components/ui/ | 13 |
 | src/context/ | 4 |
 | src/crestron/ | 2 |
 | src/docs/ | 1 |
-| src/hooks/ | 1 |
-| src/pages/ | 12 |
+| src/hooks/ | 2 |
+| src/pages/ | 18 |
 | src/styles/ | 1 |
 | src/utils/ | 3 |
-| **Total** | **~135 files** |
+| **Total** | **~114 files** |
 
+## Notes
+
+- Several files are **backup / work-in-progress copies** (kept in place, not wired into the build).
+  They are identified by ` copy`, ` copy 2`, ` copy 3`, etc. suffixes, e.g.:
+  - `src/pages/AVMatrixPage copy.jsx` … `copy 5.jsx`
+  - `src/pages/CafePage copy.jsx`, `src/pages/LandingPage copy.jsx`, `src/pages/RoomControlsPage copy.jsx`
+  - `src/components/devices/DisplayPowerGrid copy.jsx`, `DisplayPowerGrid copy 2.jsx`
+  - `src/components/modals/EditMenuModal copy.jsx`
+  - `src/context/ProcessorConnectionContext copy.jsx`
+  - `src/hooks/useJoin copy.js`
+- The **active** (non-copy) files are the canonical ones used by `src/App.jsx` and the build.

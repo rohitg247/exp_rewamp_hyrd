@@ -647,7 +647,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
           modifiers={[restrictToWindowEdges]}
         >
           {/* ── Column 1: Layouts ─────────────────────────────────── */}
-          <div className="flex-shrink-0 flex flex-col min-h-0" style={{ width: '16%', minWidth: '190px' }}>
+          {/* <div className="flex-shrink-0 flex flex-col min-h-0" style={{ width: '16%', minWidth: '190px' }}>
             <Card variant="glass" tone="video" className="flex-1 flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-2.5 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border)' }}>
                 <CardTitle className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--color-heading)' }}>
@@ -694,18 +694,106 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                         >
                           {layout.label}
                         </p>
-                        {/* {layout.subtitle && (
+                        {layout.subtitle && (
                           <p className="text-[10px] leading-tight mt-0.5" style={{ color: 'var(--color-text-light)' }}>
                             {layout.subtitle}
                           </p>
-                        )} */}
+                        )}
                       </div>
                     </button>
                   );
                 })}
               </CardContent>
             </Card>
-          </div>
+          </div> */}
+
+        {/* ── Column 1: Layouts ─────────────────────────────────── */}
+        <div
+          className="flex-shrink-0 flex flex-col min-h-0 overflow-visible"
+          style={{ width: '16%', minWidth: '190px' }}
+        >
+          <Card
+            variant="glass"
+            tone="video"
+            className="flex-1 flex flex-col min-h-0 overflow-visible"
+            style={{ padding: 0 }}
+          >
+            <CardHeader
+              className="px-4 py-3 touchPanel:px-5 touchPanel:py-4 border-b flex-shrink-0"
+              style={{ borderColor: 'var(--color-border)', marginBottom: 0 }}
+            >
+              <CardTitle
+                className="flex items-center gap-2 text-base font-semibold"
+                style={{ color: 'var(--color-heading)' }}
+              >
+                <LayoutGrid
+                  className="w-5 h-5 flex-shrink-0"
+                  style={{ color: 'var(--color-primary)' }}
+                />
+                <span>Layouts</span>
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="flex-1 min-h-0 px-3 py-3 touchPanel:px-4 touchPanel:py-4 overflow-visible">
+              <div className="h-full flex flex-col gap-3 touchPanel:gap-4 overflow-visible">
+                {LAYOUTS.map((layout) => {
+                  const active = activeLayoutKey === layout.key;
+
+                  return (
+                    <div
+                      key={layout.key}
+                      className="relative flex-1 min-h-0 overflow-visible"
+                      style={{ zIndex: active ? 3 : 1 }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleLayoutSelect(layout.key)}
+                        className="relative w-full h-full flex flex-col justify-center rounded-2xl border-2 p-2 text-left transition-all duration-200 whitespace-nowrap"
+                        style={{
+                          zIndex: active ? 3 : 1,
+                          background: active
+                            ? 'linear-gradient(160deg, color-mix(in srgb, var(--color-primary) 26%, var(--color-bg-secondary)), color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary)))'
+                            : 'var(--color-bg)',
+                          borderColor: active ? 'var(--color-primary)' : 'var(--color-border)',
+                          boxShadow: active
+                            ? '0 0 0 2px color-mix(in srgb, var(--color-primary) 34%, transparent), 0 14px 34px color-mix(in srgb, var(--color-primary) 30%, transparent)'
+                            : '0 6px 18px color-mix(in srgb, var(--color-shadow) 8%, transparent)',
+                          transform: active ? 'translateY(-2px) scale(1.01)' : 'none',
+                        }}
+                      >
+                        {active && (
+                          <span
+                            className="absolute top-2 right-2 z-20 w-5 h-5 touchPanel:w-6 touchPanel:h-6 rounded-full flex items-center justify-center ring-2 ring-white shadow"
+                            style={{ backgroundColor: 'var(--color-primary)' }}
+                          >
+                            <Check
+                              className="w-3 h-3 touchPanel:w-3.5 touchPanel:h-3.5"
+                              style={{ color: '#ffffff' }}
+                              strokeWidth={3}
+                            />
+                          </span>
+                        )}
+
+                        <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+                          <LayoutMiniPreview layout={layout} active={active} />
+                        </div>
+
+                        <div className="mt-1.5 flex-shrink-0 text-center">
+                          <p
+                            className="text-xs touchPanel:text-sm font-semibold leading-tight"
+                            style={{ color: active ? 'var(--color-primary)' : 'var(--color-heading)' }}
+                          >
+                            {layout.label}
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>          
 
           {/* ── Column 2: Inputs (20%) stacked over Outputs (80%) ──── */}
           <div className="flex-1 min-w-0 flex flex-col gap-6 touchPanel:gap-8 h-full">
