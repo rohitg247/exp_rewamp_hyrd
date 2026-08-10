@@ -22,7 +22,7 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               ======================================== */}
           <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
             {/* Row 1: Lighting Control (60% height = flex-[3]) */}
-            <Card variant="glass" tone="lighting" className="flex-[2] flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="lighting" className="flex-[2] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="lighting"><Lightbulb className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" /></CardIcon>
@@ -40,7 +40,7 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               <RoomLayoutDisplay />
             </div>
             {/* Row 2: Room Layout Display (40% height) */}
-            {/* <Card variant="glass" className="flex-[3] flex flex-col min-h-0 overflow-hidden">
+            {/* <Card variant="gradient" className="flex-[3] flex flex-col min-h-0 overflow-hidden">
               <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
                 <RoomLayoutDisplay />
               </CardContent>
@@ -53,7 +53,7 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               (4x Side Display, Back Display, Video Wall — matches AVMatrixPage's
               real display targets, replacing the old 3-display / Drapes layout)
               ======================================== */}
-          <Card variant="glass" tone="video" className="col-span-2 flex flex-col h-full overflow-hidden">
+          <Card variant="gradient" tone="video" className="col-span-2 flex flex-col h-full overflow-hidden">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center justify-center space-x-2">
                 <CardIcon tone="video"><Monitor className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" /></CardIcon>

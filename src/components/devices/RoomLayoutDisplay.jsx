@@ -96,7 +96,7 @@ const RoomLayoutDisplay = () => {
   const barVisible = phase === 'applying';
 
   return (
-    <Card variant="glass" className="flex flex-col h-full overflow-hidden">
+    <Card variant="gradient" className="flex flex-col h-full overflow-hidden">
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="flex items-center justify-center space-x-2 text-heading">
           <LayoutGrid className="w-5 h-5 md:w-5 md:h-6 touchPanel:w-7 touchPanel:h-7" />

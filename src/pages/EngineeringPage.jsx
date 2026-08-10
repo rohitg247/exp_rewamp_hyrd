@@ -226,7 +226,7 @@ const EngineeringPage = () => {
         <div className="w-full max-w-5xl grid grid-cols-2 gap-6 touchPanel:gap-8 h-full max-h-[600px] touchPanel:max-h-[750px]">
 
           {/* ── LEFT CARD: Ghost Images ── */}
-          <Card variant="glass" className="flex flex-col">
+          <Card variant="gradient" className="flex flex-col">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center space-x-2">
                 <Layers className="w-5 h-5 touchPanel:w-6 touchPanel:h-6" />
@@ -272,7 +272,7 @@ const EngineeringPage = () => {
           </Card>
 
           {/* ── RIGHT CARD: Voice & Camera ── */}
-          <Card variant="glass" className="flex flex-col">
+          <Card variant="gradient" className="flex flex-col">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center space-x-2">
                 <Mic className="w-5 h-5 touchPanel:w-6 touchPanel:h-6" />

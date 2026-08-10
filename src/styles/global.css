@@ -519,6 +519,41 @@
   /* Edge definition as a SHADOW ring, never a border (borders band on panel). */
   --surface-edge: 0 0 0 1px rgba(15, 23, 42, 0.07);
 
+  /* Primary-tinted diagonal card surface, ported from the Experience Center
+     projects' `gradientone` variant. Stops copied verbatim, so light mode is
+     identical to those panels. --color-primary-50/100 are rewritten by
+     colorUtils.js for the custom picker, so this follows theme AND picker. */
+  --surface-gradient: linear-gradient(
+    135deg,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-secondary) 20%,
+    var(--color-primary-50) 55%,
+    var(--color-primary-100) 70%,
+    var(--color-bg-secondary) 100%
+  );
+
+  /* Translucent twin of the above, for the experimental gradientGlass card
+     surface — the opaque version would hide the frosted wash and make the
+     backdrop blur a no-op. */
+  --surface-tint-soft: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 20%,
+    color-mix(in srgb, var(--color-primary-50) 85%, transparent) 55%,
+    color-mix(in srgb, var(--color-primary-100) 85%, transparent) 70%,
+    transparent 100%
+  );
+
+  /* Hover/settled background for the round +/− control buttons (Aircon temp,
+     Lighting brightness). These used --color-bg directly, which is the
+     saturated PAGE backdrop (#80c2d8 in the default light theme). A touch panel
+     has no real hover — a tap fires mousedown then mouseup, and mouseleave
+     often never arrives — so the button stayed in that state and read as a dark
+     slab after every press. A soft tint over the card surface instead.
+     NOTE: deliberately still --color-bg in the dark block below, because dark
+     mode already looked right and must not change. */
+  --control-active-bg: color-mix(in srgb, var(--color-primary-200) 18%, var(--color-bg-secondary));
+
   /* Overlay surfaces — these DO get real backdrop-filter. */
   --overlay-glass: rgba(255, 255, 255, 0.72);
   --overlay-blur: 18px;
@@ -593,6 +628,31 @@
   --surface-hairline: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   --surface-edge: 0 0 0 1px rgba(255, 255, 255, 0.07);
   --overlay-glass: rgba(15, 23, 42, 0.62);
+
+  /* --color-primary-50/100 are near-white in EVERY theme and are deliberately
+     not inverted for dark mode, so the light recipe would paint a bright band
+     straight across a dark card. Mix the theme's primary-400 into the card
+     surface instead: same diagonal, same colour response, readable slab. */
+  --surface-gradient: linear-gradient(
+    135deg,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-secondary) 20%,
+    color-mix(in srgb, var(--color-primary-400) 22%, var(--color-bg-secondary)) 55%,
+    color-mix(in srgb, var(--color-primary-400) 32%, var(--color-bg-secondary)) 70%,
+    var(--color-bg-secondary) 100%
+  );
+  --surface-tint-soft: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 20%,
+    color-mix(in srgb, var(--color-primary-400) 26%, transparent) 55%,
+    color-mix(in srgb, var(--color-primary-400) 36%, transparent) 70%,
+    transparent 100%
+  );
+
+  /* Unchanged from the previous hard-coded value — dark mode already read
+     correctly (#0f172a against the #1e293b card) and must stay identical. */
+  --control-active-bg: var(--color-bg);
   /* Same raked highlight, dialled down — 0.20 white on a dark slab reads as fog. */
   --gloss-specular: linear-gradient(
     105deg,

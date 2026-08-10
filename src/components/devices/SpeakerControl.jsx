@@ -198,7 +198,7 @@ const SpeakerControl = () => {
     // of the glass surface, so the sidebar card was the only card on screen with
     // a hard outline instead of the --surface-edge ring. tone="audio" matches
     // the Mics/Speakers cards on MainPage.
-    <Card variant="glass" tone="audio" className="h-full flex flex-col">
+    <Card variant="gradient" tone="audio" className="h-full flex flex-col">
       <CardHeader>
         <CardTitle className="flex items-center justify-center space-x-2 text-center">
           <span className="touchPanel:text-2xl -mt-2 touchPanel:font-semibold">Speaker</span>

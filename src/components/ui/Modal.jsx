@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import Button from './Button';
 
@@ -48,7 +49,24 @@ const Modal = ({
     ? { height: '90vh' }
     : undefined;
 
-  return (
+  // 🔴 2026-08-10 — rendered through a portal into <body>, NOT in place.
+  //
+  // App.jsx wraps every routed page in `animate-page-enter`, whose Tailwind
+  // definition is `pageFadeIn 0.2s ease-out both`. The `both` fill-mode keeps
+  // the final keyframe applied permanently, so that div permanently carries
+  // `transform: translateY(0)` — and a non-none transform makes an element the
+  // containing block for `position: fixed` descendants.
+  //
+  // Any modal rendered from inside a page (EditMenuModal is the only one) was
+  // therefore positioned against that div rather than the viewport: it started
+  // below the navbar, got clipped by the wrapper's `overflow-hidden`, and its
+  // z-50 sat inside a nested stacking context so the fixed z-40 Sidebar painted
+  // over it. Modals opened from App.jsx or the Navbar sit outside that div and
+  // never showed the bug, which is why this one looked different.
+  //
+  // Portalling to document.body escapes the containing block entirely, so
+  // placement no longer depends on where a modal happens to be rendered.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 touchPanel:p-8"
       role="dialog"
@@ -116,7 +134,8 @@ const Modal = ({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

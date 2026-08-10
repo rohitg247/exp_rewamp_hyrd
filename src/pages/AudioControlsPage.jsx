@@ -71,7 +71,7 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
           {micChannels.map((channel) => (
             <Card
               key={channel.id}
-              variant="glass"
+              variant="gradient"
               tone="audio"
               className="flex flex-col"
             >

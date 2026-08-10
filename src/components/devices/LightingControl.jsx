@@ -107,6 +107,40 @@ const LightingControl = () => {
   const activePresetName = getActivePresetName();
   const isLightsOn = brightness > 0;
 
+  // ── Button style definitions ──────────────────────────────────
+  // Same three-state treatment as the Aircon +/− buttons (see
+  // AirconControl.jsx) so the two controls match. Only the styling is shared —
+  // the SHAPE stays as it was here: full-height flex-1 rectangles with
+  // rounded-lg, not the Aircon's circles.
+  const dimBtnDefaultStyle = {
+    backgroundColor: 'var(--color-bg-secondary)',
+    color: 'var(--color-text)',
+    border: '2px solid var(--color-border)',
+    boxShadow:
+      '0 4px 12px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+    transition:
+      'background-color 150ms ease, box-shadow 150ms ease, border-color 150ms ease',
+  };
+
+  const dimBtnHoverStyle = {
+    backgroundColor: 'var(--control-active-bg)',
+    borderColor: 'var(--color-primary)',
+    boxShadow:
+      '0 6px 16px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+  };
+
+  const dimBtnPressedStyle = {
+    backgroundColor: 'var(--color-primary-50)',
+    borderColor: 'var(--color-primary)',
+    boxShadow:
+      'inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06)',
+  };
+
+  const handleBtnEnter = (e) => Object.assign(e.currentTarget.style, dimBtnHoverStyle);
+  const handleBtnLeave = (e) => Object.assign(e.currentTarget.style, dimBtnDefaultStyle);
+  const handleBtnDown = (e) => Object.assign(e.currentTarget.style, dimBtnPressedStyle);
+  const handleBtnUp = (e) => Object.assign(e.currentTarget.style, dimBtnHoverStyle);
+
   return (
     <div className="flex flex-col gap-2 touchPanel:gap-3 w-full h-full">
 
@@ -149,28 +183,24 @@ const LightingControl = () => {
         <button
           onClick={handleDecrease}
           disabled={brightness <= 0}
-          className="flex-1 h-full flex items-center justify-center font-semibold text-2xl touchPanel:text-4xl rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: 'var(--color-bg-glass-light)',
-            color: 'var(--color-text)',
-            border: '1px solid var(--color-border-glass)',
-          }}
-          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-bg-glass-hover)'}
-          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--color-bg-glass-light)'}
+          className="press-fx flex-1 h-full flex items-center justify-center font-bold text-2xl touchPanel:text-4xl rounded-lg disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={dimBtnDefaultStyle}
+          onMouseEnter={handleBtnEnter}
+          onMouseLeave={handleBtnLeave}
+          onMouseDown={handleBtnDown}
+          onMouseUp={handleBtnUp}
         >
           −
         </button>
         <button
           onClick={handleIncrease}
           disabled={brightness >= 100}
-          className="flex-1 h-full flex items-center justify-center font-semibold text-2xl touchPanel:text-4xl rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: 'var(--color-bg-glass-light)',
-            color: 'var(--color-text)',
-            border: '1px solid var(--color-border-glass)',
-          }}
-          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-bg-glass-hover)'}
-          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--color-bg-glass-light)'}
+          className="press-fx flex-1 h-full flex items-center justify-center font-bold text-2xl touchPanel:text-4xl rounded-lg disabled:opacity-40 disabled:cursor-not-allowed select-none"
+          style={dimBtnDefaultStyle}
+          onMouseEnter={handleBtnEnter}
+          onMouseLeave={handleBtnLeave}
+          onMouseDown={handleBtnDown}
+          onMouseUp={handleBtnUp}
         >
           +
         </button>

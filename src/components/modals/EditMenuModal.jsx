@@ -7,6 +7,26 @@ import OnScreenKeyboard from '../ui/OnScreenKeyboard';
 const MAX_MENU_ITEMS = 20;
 const MAX_ITEM_NAME_LENGTH = 30;
 
+// Surface vocabulary shared with CafePage — this modal opens from that page, so
+// it uses the same tokens rather than its own. Everything mixes against
+// --color-bg-secondary (the card surface); the previous version used
+// --color-bg, which is the saturated PAGE backdrop (#80c2d8 in the default
+// light theme), so the wells read as strong teal slabs next to the Cafe card's
+// soft tint. See CafePage.jsx for the matching definitions.
+const softBorder = 'color-mix(in srgb, var(--color-primary-200) 40%, var(--color-bg-secondary))';
+
+const wellStyle = {
+  backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+  border: `1px solid ${softBorder}`,
+  boxShadow: 'inset 0 2px 4px var(--color-shadow)',
+};
+
+const rowStyle = {
+  backgroundColor: 'var(--color-bg-secondary)',
+  border: `1px solid ${softBorder}`,
+  boxShadow: '0 1px 2px var(--color-shadow)',
+};
+
 const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingValue, setEditingValue] = useState('');
@@ -133,11 +153,16 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
       <span>Edit Menu</span>
       {/* 2026-08-03: was bg-gray-100 + text-gray-400 — ~2.6:1 contrast, and grey-on-grey
           in every theme. Primary tint reads as a badge and stays legible on all four. */}
+      {/* 2026-08-10: was --color-primary-50 as the surface. That token is
+          near-white in EVERY theme and is deliberately not inverted for dark
+          mode, so the badge rendered as a white block on a dark modal — the
+          same trap already fixed on CafePage. Mix against the card surface
+          instead so it tracks light and dark. */}
       <span
         className="text-sm touchPanel:text-lg px-3 py-1 rounded-full font-medium"
         style={{
-          backgroundColor: 'var(--color-primary-50)',
-          color: 'var(--color-primary-700)',
+          backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+          color: 'var(--color-primary)',
         }}
       >
         {localMenu.length}/{MAX_MENU_ITEMS} items
@@ -152,68 +177,75 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
         onClose={handleClose}
         title={modalTitle}
         maxWidth="max-w-5xl touchPanel:max-w-7xl"
-        height="90vh"
+        // maxHeight, not height: `height` pinned the dialog to a fixed ~720px
+        // on this 800px-tall panel, leaving dead space under the buttons when
+        // the menu is short. maxHeight lets it hug its content and still cap.
+        maxHeight="90vh"
       >
-        <div className="mb-4 touchPanel:mb-6">
-          {/* Recessed "well": the list sits INTO the modal surface, so the item
-              rows can sit ON it. Previously the container (bg-gray-50) and the
-              rows (bg-secondary) resolved to near-identical values in every
-              theme — identical in dark mode — so the list read as one flat blob. */}
-          <div
-            className="grid grid-cols-2 gap-2 touchPanel:gap-3 max-h-[400px] touchPanel:min-h-[700px] overflow-y-auto p-3 touchPanel:p-4 rounded-lg"
-            style={{
-              backgroundColor: 'var(--color-bg)',
-              boxShadow: 'var(--elev-pressed), var(--surface-edge)',
-            }}
-          >
-            {localMenu.map((item, index) => (
+        {/* 🔴 The item list and Add button are hidden while the on-screen
+            keyboard is open. This panel's viewport is only 800px tall, so the
+            dialog has roughly 596px of content area — the list alone claims up
+            to 400px of that, which left the keyboard nowhere to go and pushed
+            it below the fold (the content wrapper scrolls rather than clips).
+            Neither control is actionable mid-edit anyway. This mirrors the
+            Cancel/Save row further down, already gated on !showKeyboard. */}
+        {!showKeyboard && (
+          <>
+            <div className="mb-4 touchPanel:mb-6">
+              {/* Recessed "well": the list sits INTO the modal surface, so the item
+                  rows can sit ON it. Previously the container (bg-gray-50) and the
+                  rows (bg-secondary) resolved to near-identical values in every
+                  theme — identical in dark mode — so the list read as one flat blob. */}
               <div
-                key={`${item}-${index}`}
-                className="flex items-center justify-between gap-2 p-3 touchPanel:p-4 rounded-lg"
-                style={{
-                  backgroundColor: 'var(--color-bg-secondary)',
-                  backgroundImage: 'var(--surface-glass)',
-                  boxShadow: 'var(--surface-hairline), var(--surface-edge), var(--elev-rest)',
-                }}
+                className="grid grid-cols-2 gap-2 touchPanel:gap-3 max-h-[400px] touchPanel:min-h-[700px] overflow-y-auto no-scrollbar p-3 touchPanel:p-4 rounded-lg"
+                style={wellStyle}
               >
-                <span className="text-sm touchPanel:text-lg font-medium flex-1 truncate text-foreground">
-                  {item}
-                </span>
-                <div className="flex gap-1 touchPanel:gap-2 flex-shrink-0">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleEditClick(index)}
-                    className="px-2 py-1 touchPanel:px-5 touchPanel:py-3"
-                    aria-label={`Edit ${item}`}
+                {localMenu.map((item, index) => (
+                  <div
+                    key={`${item}-${index}`}
+                    className="flex items-center justify-between gap-2 p-3 touchPanel:p-4 rounded-lg"
+                    style={rowStyle}
                   >
-                    <Edit2 className="w-3.5 h-3.5 touchPanel:w-5 touchPanel:h-5" />
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDeleteClick(index)}
-                    className="px-2 py-1 touchPanel:px-5 touchPanel:py-3"
-                    aria-label={`Delete ${item}`}
-                  >
-                    <Trash2 className="w-3.5 h-3.5 touchPanel:w-5 touchPanel:h-5" />
-                  </Button>
-                </div>
+                    <span className="text-sm touchPanel:text-lg font-medium flex-1 truncate text-foreground">
+                      {item}
+                    </span>
+                    <div className="flex gap-1 touchPanel:gap-2 flex-shrink-0">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleEditClick(index)}
+                        className="px-2 py-1 touchPanel:px-5 touchPanel:py-3"
+                        aria-label={`Edit ${item}`}
+                      >
+                        <Edit2 className="w-3.5 h-3.5 touchPanel:w-5 touchPanel:h-5" />
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeleteClick(index)}
+                        className="px-2 py-1 touchPanel:px-5 touchPanel:py-3"
+                        aria-label={`Delete ${item}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 touchPanel:w-5 touchPanel:h-5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={handleAddNewClick}
-          disabled={localMenu.length >= MAX_MENU_ITEMS}
-          className="w-full flex items-center justify-center gap-2 touchPanel:py-5 touchPanel:text-xl"
-        >
-          <Plus className="w-5 h-5 touchPanel:w-6 touchPanel:h-6" />
-          <span>Add New Item {localMenu.length >= MAX_MENU_ITEMS && '(Limit Reached)'}</span>
-        </Button>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={handleAddNewClick}
+              disabled={localMenu.length >= MAX_MENU_ITEMS}
+              className="w-full flex items-center justify-center gap-2 touchPanel:py-5 touchPanel:text-xl"
+            >
+              <Plus className="w-5 h-5 touchPanel:w-6 touchPanel:h-6" />
+              <span>Add New Item {localMenu.length >= MAX_MENU_ITEMS && '(Limit Reached)'}</span>
+            </Button>
+          </>
+        )}
 
         {showKeyboard && (
           <div className="mt-4 touchPanel:mt-6 space-y-3 touchPanel:space-y-4">
@@ -222,8 +254,9 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
             <div
               className="rounded-lg p-3 touchPanel:p-4"
               style={{
-                backgroundColor: 'var(--color-bg)',
-                boxShadow: 'var(--elev-pressed), 0 0 0 2px var(--color-primary)',
+                ...wellStyle,
+                // Same well as the list, plus the primary focus ring.
+                boxShadow: 'inset 0 2px 4px var(--color-shadow), 0 0 0 2px var(--color-primary)',
               }}
             >
               <div className="flex items-center justify-between mb-2">
@@ -236,7 +269,10 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
                   {currentInputLength}/{MAX_ITEM_NAME_LENGTH}
                 </span>
               </div>
-              <div className="bg-secondary border border-border rounded-lg p-3 touchPanel:p-4 text-base touchPanel:text-xl min-h-[50px] touchPanel:min-h-[60px] break-words text-foreground">
+              <div
+                className="rounded-lg p-3 touchPanel:p-4 text-base touchPanel:text-xl min-h-[50px] touchPanel:min-h-[60px] break-words text-foreground"
+                style={rowStyle}
+              >
                 {keyboardMode === 'edit' ? editingValue : newItemValue}
               </div>
             </div>

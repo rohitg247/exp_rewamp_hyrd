@@ -295,7 +295,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
 
         {/* ── LEFT: Select Item ─────────────────────────────────── */}
         <Card
-          variant="glass"
+          variant="gradient"
           tone="brand"
           className="flex-[1.3] min-w-0 flex flex-col overflow-hidden"
           style={{ padding: 0 }}
@@ -323,9 +323,11 @@ const CafePage = ({ sidebarEnabled = false }) => {
           </CardHeader>
 
           <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4 px-4 py-4 touchPanel:px-6 touchPanel:py-5">
-            {/* Menu grid */}
+            {/* Menu grid. `no-scrollbar` (global.css @layer utilities) hides the
+                bar without disabling scrolling — a visible scrollbar has no
+                place on a touch panel. */}
             <div
-              className="flex-1 min-h-0 overflow-y-auto rounded-xl p-3 touchPanel:p-4"
+              className="flex-1 min-h-0 overflow-y-auto no-scrollbar rounded-xl p-3 touchPanel:p-4"
               style={wellStyle}
             >
               <div className="grid grid-cols-2 touchPanel:grid-cols-3 gap-3 touchPanel:gap-4">
@@ -384,64 +386,73 @@ const CafePage = ({ sidebarEnabled = false }) => {
               </div>
             </div>
 
-            {/* Selected-item quantity strip */}
+            {/* Selected-item quantity strip.
+                🔴 Both states MUST render the same structure. This strip is a
+                flex-shrink-0 sibling of the flex-1 menu grid above it, so any
+                change in its height resizes the grid. The empty state used to
+                be a single centred <p> while the active state was two stacked
+                lines plus a button row — so the very first tap grew this strip
+                and shifted the whole card. The button row is now always laid
+                out and merely hidden with `invisible`, which still reserves its
+                exact box, so the height cannot change. */}
             <div
               className="flex-shrink-0 rounded-xl px-3 py-2.5 touchPanel:px-4 touchPanel:py-3.5 flex items-center justify-between gap-3"
               style={stripStyle}
             >
-              {selectedQty > 0 ? (
-                <>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] touchPanel:text-xs uppercase tracking-wide" style={{ color: 'var(--color-text-light)' }}>
-                      Adjust quantity
-                    </p>
-                    <p className="text-sm touchPanel:text-lg font-semibold truncate text-heading">
-                      {selectedItem}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-2 touchPanel:gap-3 flex-shrink-0">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty - 1)}
-                      className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
-                    >
-                      <Minus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
-                    </Button>
-                    <span className="text-lg touchPanel:text-2xl font-bold text-heading w-8 touchPanel:w-12 text-center">
-                      {selectedQty}
-                    </span>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty + 1)}
-                      className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
-                    >
-                      <Plus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteFromOrder(selectedItem)}
-                      className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
-                    >
-                      <Trash2 className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <p className="text-xs touchPanel:text-base text-center w-full" style={{ color: 'var(--color-text-light)' }}>
-                  Tap an item to add it — tap again for more
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] touchPanel:text-xs uppercase tracking-wide" style={{ color: 'var(--color-text-light)' }}>
+                  {/* nbsp keeps the two-line block at a constant height */}
+                  {selectedQty > 0 ? 'Adjust quantity' : ' '}
                 </p>
-              )}
+                <p
+                  className="text-sm touchPanel:text-lg font-semibold truncate text-heading"
+                  style={selectedQty > 0 ? undefined : { color: 'var(--color-text-light)' }}
+                >
+                  {selectedQty > 0 ? selectedItem : 'Tap an item to add it — tap again for more'}
+                </p>
+              </div>
+
+              <div
+                className={`flex items-center gap-2 touchPanel:gap-3 flex-shrink-0 ${
+                  selectedQty > 0 ? '' : 'invisible pointer-events-none'
+                }`}
+                aria-hidden={selectedQty === 0}
+              >
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty - 1)}
+                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                >
+                  <Minus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                </Button>
+                <span className="text-lg touchPanel:text-2xl font-bold text-heading w-8 touchPanel:w-12 text-center">
+                  {selectedQty}
+                </span>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty + 1)}
+                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                >
+                  <Plus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDeleteFromOrder(selectedItem)}
+                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                >
+                  <Trash2 className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* ── RIGHT: Order Summary ──────────────────────────────── */}
         <Card
-          variant="glass"
+          variant="gradient"
           tone="climate"
           className="flex-[1] min-w-0 flex flex-col overflow-hidden"
           style={{ padding: 0 }}

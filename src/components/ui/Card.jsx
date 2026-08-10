@@ -36,6 +36,48 @@ const SURFACES = {
     backgroundImage: "var(--gloss-specular), var(--surface-glass)",
     boxShadow: "var(--surface-hairline), var(--surface-edge), var(--elev-rest)",
   },
+  // 2026-08-10: primary-tinted diagonal, ported from the Experience Center
+  // panels' `gradientone`. Unlike `glass` (a neutral white wash) this carries
+  // the theme's own colour through the card. Dark mode is handled entirely by
+  // the --surface-gradient override in global.css.
+  gradient: {
+    backgroundColor: "var(--color-bg-secondary)",
+    // Specular kept on top of the tint so gradient cards keep the same raked
+    // highlight as the rest of the app. Drop it for the reference's flatter look.
+    backgroundImage: "var(--gloss-specular), var(--surface-gradient)",
+    boxShadow: "var(--surface-hairline), var(--surface-edge), var(--elev-rest)",
+  },
+  // EXPERIMENTAL — intentionally not wired to any call site. Stacks all three
+  // effects at once: primary tint (bottom) → frosted white wash → raked
+  // specular → grain (top), over a live backdrop blur. Set a single card to
+  // variant="gradientGlass" to compare it against a neighbouring `gradient`.
+  //
+  // Two known limitations, both deliberate:
+  //   1. --grain-opacity (0.045 light / 0.055 dark) CANNOT be applied to a
+  //      background layer from an inline style, so that token is not respected
+  //      here — grain strength comes from backgroundBlendMode instead. Honouring
+  //      it would need a real CSS class with an ::after.
+  //   2. This is the one card surface using live backdrop-filter, which the
+  //      header comment above explains was kept off cards on purpose (six
+  //      live-blur cards on one screen is the FPS risk on panel hardware).
+  //      Measure on the TSW-1070 before promoting this to real call sites.
+  gradientGlass: {
+    // Must stay translucent — behind an opaque background, backdrop-filter
+    // has nothing to blur and silently does nothing.
+    backgroundColor: "color-mix(in srgb, var(--color-bg-secondary) 62%, transparent)",
+    backgroundImage: [
+      "var(--grain)", // 1 · noise, topmost
+      "var(--gloss-specular)", // 2 · raked highlight
+      "var(--surface-glass)", // 3 · frosted white wash
+      "var(--surface-tint-soft)", // 4 · primary diagonal, bottom
+    ].join(", "),
+    backgroundBlendMode: "soft-light, normal, normal, normal",
+    backgroundRepeat: "repeat, no-repeat, no-repeat, no-repeat",
+    backgroundSize: "140px 140px, cover, cover, cover",
+    backdropFilter: "blur(var(--overlay-blur)) saturate(1.15)",
+    WebkitBackdropFilter: "blur(var(--overlay-blur)) saturate(1.15)",
+    boxShadow: "var(--surface-hairline), var(--surface-edge), var(--elev-rest)",
+  },
 };
 
 const Card = ({

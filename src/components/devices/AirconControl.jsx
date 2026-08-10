@@ -81,11 +81,55 @@ const AirconControl = () => {
     );
   };
 
+  // 🔴 2026-08-10 — the thermostat used to render 0°C instead of 21.
+  //
+  // The 21 below is only the useState seed inside useAnalogJoin. On mount the
+  // hook subscribes to the join and CrComLib fires that callback immediately
+  // with the join's CURRENT value — 0 when the processor has not published a
+  // setpoint yet — which overwrote the 21 before it was ever seen.
+  //
+  // Contract now: the panel is the source of truth at startup, a genuine
+  // backend value overrides it, and whichever wins is persisted. Only the
+  // unset reading is filtered out, identifiable because it falls outside the
+  // valid 16-30 setpoint band.
   const storedTemp = safeSessionStorage.getItem("acTemperature");
-  const [temperature, setTemperature] = useAnalogJoin(
-    ANALOG_JOINS.AIRCON_TEMP,
+  const lastValidTempRef = useRef(
     storedTemp !== null ? parseInt(storedTemp, 10) : 21
   );
+
+  const [temperature, setTemperature] = useAnalogJoin(
+    ANALOG_JOINS.AIRCON_TEMP,
+    lastValidTempRef.current,
+    null, // sendTransform — unchanged
+    (v) => {
+      if (v >= 16 && v <= 30) {
+        lastValidTempRef.current = v; // genuine backend setpoint — it wins
+        return v;
+      }
+      return lastValidTempRef.current; // unset/invalid join reading — ignore it
+    }
+  );
+
+  // Single write path: persists whichever source won — the +/− buttons below
+  // OR a push from the processor. Backend-driven changes were never persisted
+  // before, so they were lost on navigation.
+  useEffect(() => {
+    if (temperature >= 16 && temperature <= 30) {
+      safeSessionStorage.setItem("acTemperature", String(temperature));
+    }
+  }, [temperature]);
+
+  // Publish the default once, so the processor agrees with the panel rather
+  // than the panel silently adopting an unset join. Mirrors how acPower is
+  // primed above.
+  const primedRef = useRef(false);
+  useEffect(() => {
+    if (primedRef.current) return;
+    if (safeSessionStorage.getItem("acTemperature") === null) {
+      primedRef.current = true;
+      setTemperature(21); // publishes to the join + sets state; effect above persists it
+    }
+  }, [setTemperature]);
 
   const handleTempChange = (newTemp) => {
     const clampedTemp = Math.max(16, Math.min(30, newTemp));
@@ -93,7 +137,7 @@ const AirconControl = () => {
       `🌡️ Combined Room AC: Setting temperature to ${clampedTemp}°C`
     );
     setTemperature(clampedTemp);
-    safeSessionStorage.setItem("acTemperature", String(clampedTemp));
+    // Persisted by the effect above — deliberately not written here too.
   };
 
   const increaseTemp = (e) => {
@@ -152,7 +196,10 @@ const AirconControl = () => {
   };
 
   const tempBtnHoverStyle = {
-    backgroundColor: "var(--color-bg)",
+    // See --control-active-bg in global.css: was --color-bg, the saturated page
+    // backdrop, which a touch tap left the button sitting in. Dark mode value
+    // is unchanged.
+    backgroundColor: "var(--control-active-bg)",
     borderColor: "var(--color-primary)",
     boxShadow:
       "0 6px 16px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)",

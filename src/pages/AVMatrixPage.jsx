@@ -634,7 +634,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
         >
           {/* ── Column 1: Layouts ─────────────────────────────────── */}
           {/* <div className="flex-shrink-0 flex flex-col min-h-0" style={{ width: '16%', minWidth: '190px' }}>
-            <Card variant="glass" tone="video" className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="video" className="flex-1 flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-2.5 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border)' }}>
                 <CardTitle className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--color-heading)' }}>
                   <LayoutGrid className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
@@ -699,7 +699,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
           style={{ width: '16%', minWidth: '190px' }}
         >
           <Card
-            variant="glass"
+            variant="gradient"
             tone="video"
             className="flex-1 flex flex-col min-h-0 overflow-visible"
             style={{ padding: 0 }}
@@ -787,7 +787,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
             {/* Row 1 — Input Sources (20% height) */}
             {/* padding set inline (0.75rem ≈ p-3) so it beats Card's baked-in p-6 */}
             <Card
-              variant="glass"
+              variant="gradient"
               tone="video"
               className="flex flex-col overflow-hidden relative will-change-transform"
               style={{ flex: '0 0 20%', minHeight: 0, padding: '0.75rem' }}
@@ -834,7 +834,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
 
             {/* Row 2 — Displays / Live Layout (80% height) */}
             <Card
-              variant="glass"
+              variant="gradient"
               tone="video"
               className="flex flex-col overflow-hidden relative will-change-transform"
               style={{ flex: '1 1 80%', minHeight: 0 }}

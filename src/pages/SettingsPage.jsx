@@ -244,7 +244,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
         <div className="flex-1 grid grid-cols-[5fr_3fr] gap-6 touchPanel:gap-8">
 
           {/* LEFT: Device Status */}
-          <Card variant="glass" tone="video" className="flex flex-col overflow-hidden">
+          <Card variant="gradient" tone="video" className="flex flex-col overflow-hidden">
             <CardHeader className="pb-3 flex-shrink-0">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-3 touchPanel:space-x-4 text-heading">
@@ -316,7 +316,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
           </Card>
 
           {/* RIGHT: System Information */}
-          <Card variant="glass" tone="neutral" className="flex flex-col">
+          <Card variant="gradient" tone="neutral" className="flex flex-col">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center space-x-3 touchPanel:space-x-4 text-heading">
                 <Info size={28} className="text-heading touchPanel:w-10 touchPanel:h-10" />

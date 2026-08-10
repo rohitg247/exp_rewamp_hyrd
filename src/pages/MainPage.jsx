@@ -22,7 +22,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
               ══════════════════════════════════════════════════════ */}
           <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
             {/* Row 1: Mics (50% height) */}
-            <Card variant="glass" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="audio"><Mic className={ICON_CLS} /></CardIcon>
@@ -35,7 +35,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
             </Card>
 
             {/* Row 2: Speakers (50% height) */}
-            <Card variant="glass" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="audio"><Volume2 className={ICON_CLS} /></CardIcon>
@@ -54,7 +54,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
               ══════════════════════════════════════════════════════ */}
           <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
             {/* Row 1: Source Selection (50% height) */}
-            <Card variant="glass" tone="video" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="video" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="video"><Laptop className={ICON_CLS} /></CardIcon>
@@ -67,7 +67,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
             </Card>
 
             {/* Row 2: Lighting Presets (50% height) */}
-            <Card variant="glass" tone="lighting" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
+            <Card variant="gradient" tone="lighting" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="lighting"><Lightbulb className={ICON_CLS} /></CardIcon>
@@ -85,7 +85,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
               COLUMN 3: Climate Control — FULL HEIGHT
               Drapes removed. AC now spans both rows for breathing room.
               ══════════════════════════════════════════════════════ */}
-          <Card variant="glass" tone="climate" className="flex flex-col min-h-0 overflow-visible h-full">
+          <Card variant="gradient" tone="climate" className="flex flex-col min-h-0 overflow-visible h-full">
             <CardHeader className="pb-3 flex-shrink-0">
               <CardTitle className="flex items-center justify-center space-x-2">
                 <CardIcon tone="climate"><Thermometer className={ICON_CLS} /></CardIcon>
