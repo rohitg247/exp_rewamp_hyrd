@@ -40,7 +40,11 @@ export const ThemeProvider = ({ children }) => {
   // Held only for the length of the transition — a permanent universal colour
   // transition would tax every repaint on the panel.
   const switchTimer = useRef(null);
-  const THEME_SWITCH_MS = 420; // keep in sync with --dur-theme
+  // Must be LONGER than --dur-theme (240ms), not equal to it. This attribute is
+  // what creates the crossfade; removing it at the exact moment the transition
+  // ends means any timer lag strips the rule while colours are still moving,
+  // and the remainder snaps. The 80ms buffer guarantees the fade completes.
+  const THEME_SWITCH_MS = 320;
 
   const beginThemeSwitch = useCallback(() => {
     const root = document.documentElement;

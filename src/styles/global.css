@@ -561,7 +561,11 @@
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-press: 120ms;
   --dur-smooth: 260ms;
-  --dur-theme: 420ms;
+  --dur-theme: 240ms;
+  /* Ease-OUT for the theme crossfade: colour moves immediately on press and
+     settles, instead of the slow-in of --ease-smooth which made 420ms read as
+     sluggish. Most of the change lands in the first ~90ms. */
+  --ease-theme: cubic-bezier(0.22, 0.85, 0.3, 1);
 
   /* 2026-08-06: error/danger used as a SURFACE (tinted panel + text on it), as
      opposed to danger-500 used as a fill. Separate tokens because the scale
@@ -662,13 +666,17 @@
 [data-theme-switching] *,
 [data-theme-switching] *::before,
 [data-theme-switching] *::after {
-  transition: background-color var(--dur-theme) var(--ease-smooth),
-    border-color var(--dur-theme) var(--ease-smooth),
-    color var(--dur-theme) var(--ease-smooth),
-    fill var(--dur-theme) var(--ease-smooth),
-    stroke var(--dur-theme) var(--ease-smooth),
-    box-shadow var(--dur-theme) var(--ease-smooth) !important;
+  transition: background-color var(--dur-theme) var(--ease-theme),
+    border-color var(--dur-theme) var(--ease-theme),
+    color var(--dur-theme) var(--ease-theme),
+    fill var(--dur-theme) var(--ease-theme),
+    stroke var(--dur-theme) var(--ease-theme) !important;
 }
+/* box-shadow is deliberately NOT transitioned here. This selector hits every
+   element plus ::before/::after, and shadows repaint instead of compositing —
+   with a 3-layer shadow on every card that was the most expensive work in the
+   switch and the main stutter risk on the panel. Shadow colour barely differs
+   between themes, so it snaps imperceptibly. */
 
 @keyframes theme-settle {
   0% {
@@ -690,8 +698,8 @@
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 42%,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.05) 38%,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.025) 38%,
     rgba(255, 255, 255, 0) 68%
   );
   animation: theme-settle var(--dur-theme) var(--ease-smooth) 1;
@@ -702,8 +710,8 @@
 [data-theme-switching][data-theme="blue-dark"]::after {
   background: radial-gradient(
     circle at 50% 42%,
-    rgba(148, 187, 233, 0.1) 0%,
-    rgba(148, 187, 233, 0.035) 38%,
+    rgba(148, 187, 233, 0.05) 0%,
+    rgba(148, 187, 233, 0.018) 38%,
     rgba(148, 187, 233, 0) 68%
   );
 }

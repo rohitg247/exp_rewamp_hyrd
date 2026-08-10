@@ -2,7 +2,6 @@ import { Lightbulb, Monitor } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 import LightingControl from '../components/devices/LightingControl';
 import DisplayPowerGrid from '../components/devices/DisplayPowerGrid';
-// import DrapesControlDevice from '../components/devices/DrapesControlDevice'; // Drapes removed from this page — see commented Column 2 block below
 import RoomLayoutDisplay from '../components/devices/RoomLayoutDisplay';
 
 
@@ -47,24 +46,6 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               </CardContent>
             </Card> */}
           </div>
-
-
-          {/* ========================================
-              COLUMN 2: DRAPES CONTROL — removed from this page (see Docs/changes.md).
-              Kept here commented out, not deleted, so it's easy to restore.
-              ========================================
-          <Card variant="glass" tone="neutral" className="flex flex-col h-full overflow-hidden">
-            <CardHeader className="pb-3 flex-shrink-0">
-              <CardTitle className="flex items-center justify-center space-x-2">
-                <CardIcon tone="neutral"><Blinds className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" /></CardIcon>
-                <span className="text-base md:text-lg touchPanel:text-xl">Drapes Control</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 flex items-start justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
-              <DrapesControlDevice />
-            </CardContent>
-          </Card>
-          */}
 
 
           {/* ========================================

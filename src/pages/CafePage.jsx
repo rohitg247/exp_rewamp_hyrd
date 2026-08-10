@@ -221,65 +221,48 @@ const CafePage = ({ sidebarEnabled = false }) => {
     }, SUBMIT_LOCK_MS);
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // TSW-1070 SAFE STYLES — no color-mix(), no backdrop-filter,
-  // no complex radial-gradients. All colours are hex/rgba using
-  // the theme tokens that are already defined in :root / [data-theme].
-  // ═══════════════════════════════════════════════════════════════
+  // Everything below mixes against --color-bg-secondary (the Card surface),
+  // never against a `-50` tint or a literal white. Those are near-white in
+  // EVERY theme including the dark ones — the same trap Docs/changes.md hit
+  // on 2026-08-06 — so using them as a surface makes these panels white slabs
+  // in dark mode. Mixing against --color-bg-secondary tracks light AND dark.
 
-  // Card override: semi-transparent tint so the card blends with the
-  // page mesh instead of reading as a stark white rectangle.
-  //
-  // TSW-1070 note: `rgba(128, 194, 216, 0.35)` is the default teal
-  // (--color-bg = #80c2d8) at 35% opacity over an opaque white base.
-  // The result is a soft blue-tinted surface that feels connected to
-  // the page background without relying on color-mix().
-  const cardStyle = {
-    backgroundColor: '#ffffff',
-    backgroundImage:
-      'linear-gradient(160deg, rgba(128, 194, 216, 0.18) 0%, rgba(128, 194, 216, 0.06) 45%, rgba(128, 194, 216, 0.02) 100%)',
-    boxShadow:
-      'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(0, 78, 122, 0.08), 0 6px 16px -6px rgba(0, 78, 122, 0.08)',
-  };
+  // Shared soft blue-tinted border — lands on ~#ccdfe9 in the default light
+  // theme (the original hardcoded #d1e3ed) and darkens correctly in dark mode.
+  const softBorder = 'color-mix(in srgb, var(--color-primary-200) 40%, var(--color-bg-secondary))';
 
-  // Inset well: slightly darker than the card, creating a recessed feel.
-  // The teal tint is stronger here to read clearly as "below" the surface.
+  // Inset well: a shade different from the Card's own surface, reading as
+  // recessed. ~#e3f0f6 in the default light theme (the original #e6f2f8).
   const wellStyle = {
-    backgroundColor: '#e6f2f8', // rgb(230, 242, 248) — muted blue-tint
-    border: '1px solid #d1e3ed',
-    boxShadow:
-      'inset 0 2px 4px rgba(0, 78, 122, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.7)',
+    backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+    border: `1px solid ${softBorder}`,
+    boxShadow: 'inset 0 2px 4px var(--color-shadow)',
   };
 
   // The bottom quantity strip shares the same well aesthetic.
-  const stripStyle = {
-    ...wellStyle,
-    // No extra inset shadow — the well already communicates "this is a cut-in"
-    boxShadow:
-      'inset 0 2px 4px rgba(0, 78, 122, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.7)',
-  };
+  const stripStyle = { ...wellStyle };
 
   // Header divider: stronger than the default --color-border so it
   // anchors the header visually against the tinted card.
   const headerBorderStyle = {
-    borderColor: '#c8dce6', // a slightly darker tint than the card
+    borderColor: 'color-mix(in srgb, var(--color-primary-200) 45%, var(--color-bg-secondary))',
   };
 
   // ── Tile states ───────────────────────────────────────────────
   //
   // unselected tile: sits on the well, needs to read as interactive
   const tileBaseStyle = {
-    backgroundColor: '#ffffff',
-    borderColor: '#d1e3ed',
-    boxShadow: '0 1px 3px rgba(0, 78, 122, 0.06)',
+    backgroundColor: 'var(--color-bg-secondary)',
+    borderColor: softBorder,
+    boxShadow: '0 1px 3px var(--color-shadow)',
   };
 
-  // in-order tile: subtle blue wash so the user knows "this item
+  // in-order tile: subtle primary-tinted wash so the user knows "this item
   // is already on the list"
   const tileInOrderStyle = {
-    backgroundColor: '#eef6fa',
-    borderColor: '#95c4d9',
-    boxShadow: '0 1px 4px rgba(0, 78, 122, 0.10)',
+    backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 8%, var(--color-bg-secondary))',
+    borderColor: 'var(--color-primary-200)',
+    boxShadow: '0 1px 4px var(--color-shadow)',
   };
 
   // selected tile: the primary gradient stays — it's the most
@@ -289,16 +272,19 @@ const CafePage = ({ sidebarEnabled = false }) => {
 
   // Summary list row — matches the well, slightly lifted
   const summaryRowStyle = {
-    backgroundColor: '#ffffff',
-    border: '1px solid #d1e3ed',
-    boxShadow: '0 1px 2px rgba(0, 78, 122, 0.04)',
+    backgroundColor: 'var(--color-bg-secondary)',
+    border: `1px solid ${softBorder}`,
+    boxShadow: '0 1px 2px var(--color-shadow)',
   };
 
-  // Badge / chip background for "Total items" counter
+  // Badge / chip background for "Total items" counter.
+  // --color-gray-50 is safe here: the gray scale IS inverted for dark mode.
   const badgeStyle = (active) => ({
-    backgroundColor: active ? '#e6f2f8' : '#f8fafc',
+    backgroundColor: active
+      ? 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))'
+      : 'var(--color-gray-50)',
     color: active ? 'var(--color-primary)' : 'var(--color-text-light)',
-    border: `1px solid ${active ? '#95c4d9' : '#d1e3ed'}`,
+    border: `1px solid ${active ? 'var(--color-primary-200)' : softBorder}`,
   });
 
   return (
@@ -312,7 +298,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
           variant="glass"
           tone="brand"
           className="flex-[1.3] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0, ...cardStyle }}
+          style={{ padding: 0 }}
         >
           <CardHeader
             className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"
@@ -458,7 +444,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
           variant="glass"
           tone="climate"
           className="flex-[1] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0, ...cardStyle }}
+          style={{ padding: 0 }}
         >
           <CardHeader
             className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"

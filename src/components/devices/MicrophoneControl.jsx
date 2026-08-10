@@ -11,10 +11,10 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
     setCeiling1Muted,
     ceiling2Muted,
     setCeiling2Muted,
-    headworn1Muted,
-    setHeadworn1Muted,
-    headworn2Muted,
-    setHeadworn2Muted,
+    programAudioMuted,
+    setProgramAudioMuted,
+    vcAudioMuted,
+    setVcAudioMuted,
   } = useAudioContext();
 
   // ✅ Single serial join for all mic channel data
@@ -40,16 +40,16 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
     {
       id: 3,
       name: 'Program Audio',
-      muted: headworn1Muted,
-      setMuted: setHeadworn1Muted,
+      muted: programAudioMuted,
+      setMuted: setProgramAudioMuted,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
     {
       id: 4,
       name: 'VC Audio',
-      muted: headworn2Muted,
-      setMuted: setHeadworn2Muted,
+      muted: vcAudioMuted,
+      setMuted: setVcAudioMuted,
       icon: Volume2,
       mutedIcon: VolumeX,
     },

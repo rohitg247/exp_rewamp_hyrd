@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Power, Monitor, MicOff, Volume2, Wind, Lightbulb } from 'lucide-react';
 
 // Device-shutdown messages, cycled in sync with the progress bar
@@ -13,6 +13,18 @@ const SHUTDOWN_STEPS = [
 
 const ShutdownScreen = ({ isVisible, onComplete }) => {
   const [progress, setProgress] = useState(0);
+
+  // 🔴 Bug fix: `onComplete` used to be a dependency of the rAF effect below.
+  // The parent redefines that callback every render, and it DOES re-render
+  // mid-shutdown (the delayed mic-mute writes to AudioContext, which the
+  // parent consumes). The dep changed, the effect tore down and re-ran, `start`
+  // reset to undefined — and the progress bar visibly restarted from 0.
+  // Holding the latest callback in a ref keeps the effect keyed on `isVisible`
+  // alone, so no parent re-render can ever restart the animation again.
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   useEffect(() => {
     if (!isVisible) {
@@ -36,7 +48,7 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
       if (elapsed < FILL_MS) {
         rafId = requestAnimationFrame(tick);
       } else {
-        completeTimer = setTimeout(() => onComplete(), 500); // hold at 100% before leaving
+        completeTimer = setTimeout(() => onCompleteRef.current(), 500); // hold at 100% before leaving
       }
     };
     rafId = requestAnimationFrame(tick);
@@ -45,7 +57,7 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
       cancelAnimationFrame(rafId);
       clearTimeout(completeTimer);
     };
-  }, [isVisible, onComplete]);
+  }, [isVisible]);
 
   if (!isVisible) return null;
 

@@ -1,7 +1,13 @@
 // src/pages/MainPage.jsx
-import { Mic, Volume2, Laptop, Lightbulb, Thermometer } from 'lucide-react';
+//
+// 2026-08-07 layout update:
+//   - Column 1 consolidated: single "Audio Control" card with Mics + Speakers sections
+//   - Column 3 already consolidated: full-height Climate Control (Drapes removed)
+//   - Column 2 unchanged: Source Selection + Lighting
+
+import { Volume2, Laptop, Lightbulb, Thermometer } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
-import MicrophoneControl from '../components/devices/MicrophoneControl';
+import AudioControls from '../components/devices/AudioControls';
 import SourceSelection from '../components/devices/SourceSelection';
 import LightingPresetsCompact from '../components/devices/LightingPresetsCompact';
 import AirconControl from '../components/devices/AirconControl';
@@ -18,35 +24,20 @@ const MainPage = ({ sidebarEnabled = false }) => {
         <div className="grid grid-cols-3 auto-rows-fr gap-6 touchPanel:gap-8 flex-1 h-full min-h-0">
 
           {/* ══════════════════════════════════════════════════════
-              COLUMN 1: Mics (Top) + Speakers (Bottom)
+              COLUMN 1: Audio Control — FULL HEIGHT
+              Consolidated Mics + Speakers into one card.
               ══════════════════════════════════════════════════════ */}
-          <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
-            {/* Row 1: Mics (50% height) */}
-            <Card variant="glass" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
-              <CardHeader className="pb-3 flex-shrink-0">
-                <CardTitle className="flex items-center justify-center space-x-2">
-                  <CardIcon tone="audio"><Mic className={ICON_CLS} /></CardIcon>
-                  <span className={LABEL_CLS}>Mics</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
-                <MicrophoneControl variant="mics" />
-              </CardContent>
-            </Card>
-
-            {/* Row 2: Speakers (50% height) */}
-            <Card variant="glass" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
-              <CardHeader className="pb-3 flex-shrink-0">
-                <CardTitle className="flex items-center justify-center space-x-2">
-                  <CardIcon tone="audio"><Volume2 className={ICON_CLS} /></CardIcon>
-                  <span className={LABEL_CLS}>Speakers</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
-                <MicrophoneControl variant="speakers" />
-              </CardContent>
-            </Card>
-          </div>
+          <Card variant="glass" tone="audio" className="flex flex-col min-h-0 overflow-hidden h-full">
+            <CardHeader className="pb-3 flex-shrink-0">
+              <CardTitle className="flex items-center justify-center space-x-2">
+                <CardIcon tone="audio"><Volume2 className={ICON_CLS} /></CardIcon>
+                <span className={LABEL_CLS}>Audio Control</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-hidden min-h-0">
+              <AudioControls />
+            </CardContent>
+          </Card>
 
 
           {/* ══════════════════════════════════════════════════════
@@ -58,7 +49,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="video"><Laptop className={ICON_CLS} /></CardIcon>
-                  <span className={LABEL_CLS}>Mode Selection</span>
+                  <span className={LABEL_CLS}>Source Selection</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto touchPanel:overflow-hidden min-h-0">
@@ -83,7 +74,6 @@ const MainPage = ({ sidebarEnabled = false }) => {
 
           {/* ══════════════════════════════════════════════════════
               COLUMN 3: Climate Control — FULL HEIGHT
-              Drapes removed. AC now spans both rows for breathing room.
               ══════════════════════════════════════════════════════ */}
           <Card variant="glass" tone="climate" className="flex flex-col min-h-0 overflow-visible h-full">
             <CardHeader className="pb-3 flex-shrink-0">

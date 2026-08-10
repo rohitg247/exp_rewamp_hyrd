@@ -30,16 +30,11 @@
 // DIGITAL JOINS (1–199)
 // ============================================
 export const DIGITAL_JOINS = {
-  // ── GROUP 1: Room Mode & System Control (D1-9) ──
-  ROOM_MODE_COMBINED: 1,          // [PULSE] RoomModeListener.jsx - Backend pulse → Navigate to Combined Room
-  ROOM_MODE_BOARDROOM: 2,         // [PULSE] RoomModeListener.jsx - Backend pulse → Navigate to Boardroom
-  SYSTEM_STARTUP_COMBINED: 3,     // [PULSE] LandingPage.jsx - Send pulse on Combined Room startup
-  SYSTEM_STARTUP_BOARDROOM: 4,    // [PULSE] LandingPage.jsx - Send pulse on Boardroom startup
-  SYSTEM_SHUTDOWN_COMBINED: 5,    // [PULSE] ShutdownModal.jsx - Send pulse on Combined Room shutdown
-  SYSTEM_SHUTDOWN_BOARDROOM: 6,   // [PULSE] ShutdownModal.jsx - Send pulse on Boardroom shutdown
-  BACKEND_SHUTDOWN_COMBINED: 7,   // [FEEDBACK] App.jsx - Backend-triggered combined room shutdown
-  BACKEND_SHUTDOWN_BOARDROOM: 8,  // [FEEDBACK] App.jsx - Backend-triggered boardroom shutdown
-  // D9: Reserved
+  // ── GROUP 1: System Control (D1-9) ──
+  SYSTEM_STARTUP: 3,              // [PULSE] LandingPage.jsx - Send pulse on system startup
+  SYSTEM_SHUTDOWN: 5,             // [PULSE] ShutdownModal.jsx - Send pulse on system shutdown
+  BACKEND_SHUTDOWN: 7,            // [FEEDBACK] App.jsx - Backend-triggered shutdown
+  // D1-2, D4, D6, D9: Reserved
 
 
 
@@ -73,7 +68,7 @@ export const DIGITAL_JOINS = {
 
 
 
-  // ── GROUP 6: Display 3 — Boardroom Display (D50-59) ──
+  // ── GROUP 6: Display 3 (D50-59) ──
   DISPLAY3_ON: 50,                // [PULSE] DisplayPowerControl.jsx - Display 3 power on
   DISPLAY3_OFF: 51,               // [PULSE] DisplayPowerControl.jsx - Display 3 power off
   // D52-59: Reserved
@@ -81,9 +76,8 @@ export const DIGITAL_JOINS = {
 
 
   // ── GROUP 7: Device Status (D60-69) ──
-  DEVICE_STATUS_REFRESH: 60,          // [PULSE] DeviceStatusPage.jsx - Refresh device status (Combined)
-  DEVICE_STATUS_REFRESH_BOARDROOM: 61, // [PULSE] SettingsPage.jsx (Boardroom) - Refresh boardroom device status
-  // D62-69: Reserved
+  DEVICE_STATUS_REFRESH: 60,          // [PULSE] SettingsPage.jsx - Refresh device status
+  // D61-69: Reserved
 
 
 
@@ -104,32 +98,11 @@ export const DIGITAL_JOINS = {
 
 
 
-  // ── GROUP 10: Drapes Controls (D90-109) ──
-  DRAPES_UP: 90,                  // [PULSE] DrapesControlDevice.jsx - All drapes up
-  DRAPES_STOP: 91,                // [PULSE] DrapesControlDevice.jsx - All drapes stop
-  DRAPES_DOWN: 92,                // [PULSE] DrapesControlDevice.jsx - All drapes down
-
-  DRAPES_LEFT_UP: 93,             // [PULSE] DrapesControlDevice.jsx - Left drapes up
-  DRAPES_LEFT_STOP: 94,           // [PULSE] DrapesControlDevice.jsx - Left drapes stop
-  DRAPES_LEFT_DOWN: 95,           // [PULSE] DrapesControlDevice.jsx - Left drapes down
-
-  DRAPES_CENTER_UP: 96,           // [PULSE] DrapesControlDevice.jsx - Center drapes up
-  DRAPES_CENTER_STOP: 97,         // [PULSE] DrapesControlDevice.jsx - Center drapes stop
-  DRAPES_CENTER_DOWN: 98,         // [PULSE] DrapesControlDevice.jsx - Center drapes down
-
-  DRAPES_RIGHT_UP: 99,            // [PULSE] DrapesControlDevice.jsx - Right drapes up
-  DRAPES_RIGHT_STOP: 100,         // [PULSE] DrapesControlDevice.jsx - Right drapes stop
-  DRAPES_RIGHT_DOWN: 101,         // [PULSE] DrapesControlDevice.jsx - Right drapes down
-  // D102-109: Reserved
+  // D90-109: Reserved — Drapes hardware removed from the room (was GROUP 10: Drapes Controls)
 
 
 
-  // ── GROUP 11: Boardroom Source Selection (D110-119) ──
-  BOARDROOM_SOURCE_LOCAL: 110,    // [PULSE] BoardroomSourceSelection.jsx - Wireless source
-  BOARDROOM_SOURCE_VC: 111,       // [PULSE] BoardroomSourceSelection.jsx - Zoom source
-  VC_START_SHARE: 112,            // [PULSE] BoardroomSourceSelection.jsx - Start video call content share
-  VC_STOP_SHARE: 113,             // [PULSE] BoardroomSourceSelection.jsx - Stop video call content share
-  // D114-119: Reserved
+  // D110-119: Reserved — Boardroom Source Selection removed (single-room UI, component no longer exists)
 
 
 
@@ -145,9 +118,7 @@ export const DIGITAL_JOINS = {
   SYSTEM_HEARTBEAT_RECEIVE: 131,  // [FEEDBACK] ProcessorConnectionContext.jsx - Backend response pulse
   CAFE_ORDER_COMPLETE: 132,       // [FEEDBACK] OrderListener.jsx - Processor pulses when order completed
   CAFE_ORDER_CANCEL: 133,         // [FEEDBACK] OrderListener.jsx - Processor pulses when order cancelled
-  DISABLE_VIDEO_CALL: 134,  // [FEEDBACK] BoardroomSourceSelection.jsx - Processor disables VC button
-  ENABLE_VIDEO_CALL: 135,   // [FEEDBACK] BoardroomSourceSelection.jsx - Processor re-enables VC button
-  // D136-139: Reserved
+  // D134-139: Reserved
 
   // ── GROUP 14: Engineering Page (D140-149) ──
   // ── GROUP 14: Ghost Images (D140-149) ──
@@ -161,13 +132,17 @@ export const DIGITAL_JOINS = {
   // D147-149: Reserved
 
   // ── GROUP 15: AV Matrix — Presentation Layouts (D150-159) ──
-  PRES_LAYOUT_DISCUSSION: 150,    // [PULSE] AVMatrixPage.jsx - Discussion Mode layout select
+  // D150, D152: Reserved (Discussion/Center layouts removed — unused)
   PRES_LAYOUT_FULL: 151,          // [PULSE] AVMatrixPage.jsx - Full Window layout select
-  PRES_LAYOUT_CENTER: 152,        // [PULSE] AVMatrixPage.jsx - Center Window layout select
   PRES_LAYOUT_DUAL: 153,          // [PULSE] AVMatrixPage.jsx - Dual Window layout select
   PRES_LAYOUT_3_RIGHT: 154,       // [PULSE] AVMatrixPage.jsx - 3 Window (asymmetric left grid) layout select
   PRES_LAYOUT_3_LEFT: 155,        // [PULSE] AVMatrixPage.jsx - 3 Window (asymmetric right grid) layout select
-  // D156-159: Reserved
+  // ⚠️ TODO: PRES_LAYOUT_QUAD is referenced by AVMatrixPage.jsx but has no real
+  // join yet (it currently falls back to PRES_LAYOUT_3_LEFT — see the ⚠️ comment
+  // there). Provisionally reserved at D156 pending confirmation with the
+  // Crestron processor programmer — do not wire until confirmed.
+  // D156: PRES_LAYOUT_QUAD (provisional, unconfirmed)
+  // D157-159: Reserved
 
 
 
@@ -188,10 +163,7 @@ export const DIGITAL_JOINS = {
 
 
 
-  // ── GROUP 17: Main Source Selection — Deselect/Blank (D180-189) ──
-  SOURCE_SELECTION_BLANK: 180,    // [PULSE] SourceSelection.jsx - Active source deselected (blank)
-  // D181-189: Reserved
-  // D190-199: Reserved
+  // D180-199: Reserved (Group 17, Main Source Selection Deselect/Blank — unused)
 };
 
 
@@ -208,23 +180,15 @@ export const ANALOG_JOINS = {
 
 
 
-  // ── GROUP 2: Speaker / Mic — Boardroom (A210-219) ──
-  SPEAKER_VOLUME_BOARDROOM: 210,  // [ANALOG 0-100%] SpeakerControlBoardroom.jsx - Boardroom volume level
-  MIC_BOARDROOM: 211,             // [ANALOG 0/1] SpeakerControlBoardroom.jsx - Boardroom mic (1=on, 0=off)
-  SPEAKER_ON_OFF_BOARDROOM_ANALOG: 212, // [ANALOG 0/1] SpeakerControlBoardroom.jsx - Speaker power (1=on, 0=off)
-  // A213-219: Reserved
+  // A210-219: Reserved (Group 2, Speaker/Mic Boardroom — single-room UI, unused)
 
 
 
   // ── GROUP 3: Aircon Temperature & Power (A220-229) ──
-  AIRCON_TEMP: 220,               // [ANALOG 16-30] AirconControl.jsx - Combined Room temperature (16-30°C)
-  AIRCON_TEMP_BOARDROOM: 221,     // [ANALOG 16-30] AirconControlBoardroom.jsx - Boardroom temperature (16-30°C)
+  AIRCON_TEMP: 220,               // [ANALOG 16-30] AirconControl.jsx - Room temperature (16-30°C)
   AC_ON_OFF_ANALOG: 222,          // [ANALOG 0/1] AirconControl.jsx - AC power (1=on, 0=off)
-  AC_ON_OFF_BOARDROOM_ANALOG: 223,// [ANALOG 0/1] AirconControlBoardroom.jsx - Boardroom AC power (1=on, 0=off)
   MIC_MASTER_MANUAL: 224,         // [ANALOG 0/1] SpeakerControl.jsx - Master mic manual button press (1=on, 0=off)
-  AC_ON_OFF_TRAINING_ANALOG: 510, // [ANALOG 0/1] AirconControlTrainingRoom.jsx - Training Room AC power (1=on, 0=off)
-  AIRCON_TEMP_TRAINING: 511,      // [ANALOG 16-30] AirconControlTrainingRoom.jsx - Training Room temperature (16-30°C)
-  // A227-229: Reserved
+  // A221, A223, A225-229: Reserved (Boardroom/Training Room AC — single-room UI, unused)
 
 
 
@@ -267,9 +231,8 @@ export const SERIAL_JOINS = {
 
 
   // ── GROUP 2: Device Status (S310-319) ──
-  DEVICE_STATUS_LIST: 310,            // [SERIAL] SettingsPage.jsx - Receive JSON device list (Combined)
-  DEVICE_STATUS_LIST_BOARDROOM: 311,  // [SERIAL] SettingsPage.jsx (Boardroom) - Receive JSON device list (Boardroom)
-  // S312-319: Reserved
+  DEVICE_STATUS_LIST: 310,            // [SERIAL] SettingsPage.jsx - Receive JSON device list
+  // S311-319: Reserved
 
 
 
@@ -283,8 +246,5 @@ export const SERIAL_JOINS = {
 
   // ── GROUP 4: Mic Channel Data (S330-339) ──
   MIC_CHANNEL_DATA: 330,          // [SERIAL JSON] MicChannel.jsx - Format: {"id":1,"value":45,"muted":0}
-  // S331-399: Reserved
-
-  // ── GROUP 5: AC Status (S340-349) ──
-  AC_STATUS_FEEDBACK: 340,        // [SERIAL] AcStatusListener.jsx - Format: "1,0" (index0=boardroom, index1=training room) 1=on 0=off
+  // S331-399: Reserved (Group 5, AC Status Feedback — single-room UI, unused)
 };

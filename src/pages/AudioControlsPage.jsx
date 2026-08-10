@@ -12,10 +12,10 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
     setCeiling1Muted,
     ceiling2Muted,
     setCeiling2Muted,
-    headworn1Muted,
-    setHeadworn1Muted,
-    headworn2Muted,
-    setHeadworn2Muted,
+    programAudioMuted,
+    setProgramAudioMuted,
+    vcAudioMuted,
+    setVcAudioMuted,
   } = useAudioContext();
 
 
@@ -44,8 +44,8 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
     {
       id: 3,
       name: 'Program Audio',
-      contextMutedState: headworn1Muted,
-      contextMutedSetter: setHeadworn1Muted,
+      contextMutedState: programAudioMuted,
+      contextMutedSetter: setProgramAudioMuted,
       serialJoinSetter: sendMicSerial,
       icon: Volume2,
       mutedIcon: VolumeX,
@@ -53,8 +53,8 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
     {
       id: 4,
       name: 'VC Audio',
-      contextMutedState: headworn2Muted,
-      contextMutedSetter: setHeadworn2Muted,
+      contextMutedState: vcAudioMuted,
+      contextMutedSetter: setVcAudioMuted,
       serialJoinSetter: sendMicSerial,
       icon: Volume2,
       mutedIcon: VolumeX,

@@ -521,20 +521,6 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
     safeSessionStorage.setItem('avmatrix_layout_routing', JSON.stringify(layoutRoutingMap));
   }, [layoutRoutingMap]);
 
-  // Listen for external sessionStorage changes (e.g. SourceSelection.jsx quick-select)
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'avmatrix_routing_map' && e.newValue) {
-        setRoutingMap(JSON.parse(e.newValue));
-      }
-      if (e.key === 'avmatrix_selected_input') {
-        setSelectedInputIdx(e.newValue !== null ? parseInt(e.newValue, 10) : null);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
   // --- Direct display routing (Displays tab) — serial: "input:display" ---
   const sendRouting = (inputIdx, outputIdx) => {
     const routingCommand = `${inputIdx + 1}:${outputIdx + 1}`;

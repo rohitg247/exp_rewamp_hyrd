@@ -78,7 +78,7 @@ const LandingPage = () => {
   }, []);
 
   // Startup join hook
-  const [, , sendStartupCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_STARTUP_COMBINED);
+  const [, , sendStartupCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_STARTUP);
 
   // Pulse helper (100ms true→false)
   const sendPulse = (setFunction, joinNumber, name) => {
@@ -169,7 +169,7 @@ const LandingPage = () => {
     console.log('💡 Lights primed to Welcome for startup (UI only, no pulse)');
 
     // Send startup pulse (navigation happens at the end of the boot sequence)
-    sendPulse(sendStartupCombined, DIGITAL_JOINS.SYSTEM_STARTUP_COMBINED, 'SYSTEM_STARTUP_COMBINED');
+    sendPulse(sendStartupCombined, DIGITAL_JOINS.SYSTEM_STARTUP, 'SYSTEM_STARTUP');
   };
 
   const msgTransformClass =

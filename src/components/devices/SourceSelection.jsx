@@ -65,17 +65,18 @@ const SourceSelection = () => {
       const routedInputs = Object.values(routingMap).slice(0, 3);
       const firstInput = routedInputs[0];
 
-      if (
-        routedInputs.length > 0 &&
-        routedInputs.every((input) => input === firstInput)
-      ) {
+      if (routedInputs.length === 0) return;
+
+      if (routedInputs.every((input) => input === firstInput)) {
         if (firstInput === 0) {
           setActiveKey("presentation");
         } else if (firstInput === 1) {
           setActiveKey("byod");
         } else {
-          setActiveKey(null);
+          setActiveKey("custom");
         }
+      } else {
+        setActiveKey("custom");
       }
     } catch (error) {
       console.error("❌ Failed to sync with AV Matrix routing:", error);
@@ -177,6 +178,15 @@ const SourceSelection = () => {
           );
         })}
       </div>
+
+      {activeKey === "custom" && (
+        <p
+          className="mt-2 text-center text-xs md:text-sm touchPanel:text-base font-semibold"
+          style={{ color: "var(--color-text-light)" }}
+        >
+          Custom routing active (set on AV Matrix)
+        </p>
+      )}
     </div>
   );
 };

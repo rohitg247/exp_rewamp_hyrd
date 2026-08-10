@@ -61,10 +61,14 @@ const ContentWrapper = ({ children, onShutdown }) => {
       {/* 2026-08-06: keying on pathname remounts the subtree on every route
           change, which replays animate-page-enter. Pages used to swap with no
           transition at all. */}
-      <div key={location.pathname} className="flex-1 overflow-hidden animate-page-enter">
+      <div key={`page-${location.pathname}`} className="flex-1 overflow-hidden animate-page-enter">
         {children}
       </div>
-      {showSidebar && <Sidebar />}
+      {/* Keyed separately from the page div above — two siblings sharing a key
+          makes React omit one of them (the sidebar) and accumulate the other. */}
+      {showSidebar && (
+        <Sidebar key={`sidebar-${location.pathname}`} className="animate-page-enter" />
+      )}
     </>
   );
 };
@@ -77,7 +81,7 @@ const AppContent = () => {
   // Backend-triggered shutdown hooks
   const { setCeiling1Muted, setCeiling2Muted, setHeadworn1Muted,
           setHeadworn2Muted, setHandheldMuted, setLapelMuted } = useAudioContext();
-  const [, , sendShutdownCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_SHUTDOWN_COMBINED);
+  const [, , sendShutdownCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_SHUTDOWN);
 
   // ============================================
   // ⌨️ THEME SWITCHING SHORTCUTS (Alt+1-4, Alt+D, Alt+Shift+T)
@@ -161,15 +165,15 @@ const AppContent = () => {
     const cr = window.CrComLib?.CrComLib || window.CrComLib;
     if (!cr) return;
 
-    const subCombined = cr.subscribeState('b', String(DIGITAL_JOINS.BACKEND_SHUTDOWN_COMBINED), (value) => {
+    const subCombined = cr.subscribeState('b', String(DIGITAL_JOINS.BACKEND_SHUTDOWN), (value) => {
       if (value === true) {
-        console.log(`📥 BACKEND_SHUTDOWN_COMBINED (D${DIGITAL_JOINS.BACKEND_SHUTDOWN_COMBINED}) — triggering shutdown`);
+        console.log(`📥 BACKEND_SHUTDOWN (D${DIGITAL_JOINS.BACKEND_SHUTDOWN}) — triggering shutdown`);
         triggerBackendShutdown();
       }
     });
 
     return () => {
-      cr.unsubscribeState('b', String(DIGITAL_JOINS.BACKEND_SHUTDOWN_COMBINED), subCombined);
+      cr.unsubscribeState('b', String(DIGITAL_JOINS.BACKEND_SHUTDOWN), subCombined);
     };
   }, []);
 

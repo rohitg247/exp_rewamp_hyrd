@@ -17,14 +17,8 @@ const DEFAULT_MENU_ITEMS = [
   'Ginger Tea', 'Black Tea', 'Lemon Tea', 'Masala Tea', 'Green Tea'
 ];
 
-// Keep the stored order history bounded — a panel that never gets cleared
-// would otherwise grow this array forever.
 const MAX_STORED_ORDERS = 100;
-
-// Double-tap guard on the Order button (panel taps register twice easily)
 const SUBMIT_LOCK_MS = 1200;
-
-// How long the "Undo clear" affordance stays available
 const UNDO_WINDOW_SECONDS = 8;
 
 
@@ -205,7 +199,6 @@ const CafePage = ({ sidebarEnabled = false }) => {
       const saved = safeLocalStorage.getItem('cafe_orders');
       const orders = saved ? JSON.parse(saved) : [];
       orders.push(newOrder);
-      // Keep only the most recent N orders
       const trimmed = orders.slice(-MAX_STORED_ORDERS);
       safeLocalStorage.setItem('cafe_orders', JSON.stringify(trimmed));
     } catch (error) {
@@ -228,14 +221,88 @@ const CafePage = ({ sidebarEnabled = false }) => {
     }, SUBMIT_LOCK_MS);
   };
 
-  const headerBorder = { borderColor: 'var(--color-border)' };
-  const insetSurface = {
-    backgroundColor: 'var(--color-bg)',
-    border: '1px solid var(--color-border)',
+  // ═══════════════════════════════════════════════════════════════
+  // TSW-1070 SAFE STYLES — no color-mix(), no backdrop-filter,
+  // no complex radial-gradients. All colours are hex/rgba using
+  // the theme tokens that are already defined in :root / [data-theme].
+  // ═══════════════════════════════════════════════════════════════
+
+  // Card override: semi-transparent tint so the card blends with the
+  // page mesh instead of reading as a stark white rectangle.
+  //
+  // TSW-1070 note: `rgba(128, 194, 216, 0.35)` is the default teal
+  // (--color-bg = #80c2d8) at 35% opacity over an opaque white base.
+  // The result is a soft blue-tinted surface that feels connected to
+  // the page background without relying on color-mix().
+  const cardStyle = {
+    backgroundColor: '#ffffff',
+    backgroundImage:
+      'linear-gradient(160deg, rgba(128, 194, 216, 0.18) 0%, rgba(128, 194, 216, 0.06) 45%, rgba(128, 194, 216, 0.02) 100%)',
+    boxShadow:
+      'inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(0, 78, 122, 0.08), 0 6px 16px -6px rgba(0, 78, 122, 0.08)',
   };
 
+  // Inset well: slightly darker than the card, creating a recessed feel.
+  // The teal tint is stronger here to read clearly as "below" the surface.
+  const wellStyle = {
+    backgroundColor: '#e6f2f8', // rgb(230, 242, 248) — muted blue-tint
+    border: '1px solid #d1e3ed',
+    boxShadow:
+      'inset 0 2px 4px rgba(0, 78, 122, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.7)',
+  };
+
+  // The bottom quantity strip shares the same well aesthetic.
+  const stripStyle = {
+    ...wellStyle,
+    // No extra inset shadow — the well already communicates "this is a cut-in"
+    boxShadow:
+      'inset 0 2px 4px rgba(0, 78, 122, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.7)',
+  };
+
+  // Header divider: stronger than the default --color-border so it
+  // anchors the header visually against the tinted card.
+  const headerBorderStyle = {
+    borderColor: '#c8dce6', // a slightly darker tint than the card
+  };
+
+  // ── Tile states ───────────────────────────────────────────────
+  //
+  // unselected tile: sits on the well, needs to read as interactive
+  const tileBaseStyle = {
+    backgroundColor: '#ffffff',
+    borderColor: '#d1e3ed',
+    boxShadow: '0 1px 3px rgba(0, 78, 122, 0.06)',
+  };
+
+  // in-order tile: subtle blue wash so the user knows "this item
+  // is already on the list"
+  const tileInOrderStyle = {
+    backgroundColor: '#eef6fa',
+    borderColor: '#95c4d9',
+    boxShadow: '0 1px 4px rgba(0, 78, 122, 0.10)',
+  };
+
+  // selected tile: the primary gradient stays — it's the most
+  // important cue on the page and already reads well on the panel.
+  const tileSelectedBg =
+    'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))';
+
+  // Summary list row — matches the well, slightly lifted
+  const summaryRowStyle = {
+    backgroundColor: '#ffffff',
+    border: '1px solid #d1e3ed',
+    boxShadow: '0 1px 2px rgba(0, 78, 122, 0.04)',
+  };
+
+  // Badge / chip background for "Total items" counter
+  const badgeStyle = (active) => ({
+    backgroundColor: active ? '#e6f2f8' : '#f8fafc',
+    color: active ? 'var(--color-primary)' : 'var(--color-text-light)',
+    border: `1px solid ${active ? '#95c4d9' : '#d1e3ed'}`,
+  });
+
   return (
-    <div className="h-[calc(100vh-72px)] touchPanel:h-[calc(100vh-110px)] w-full bg-theme-bg flex overflow-hidden">
+    <div className="page-mesh h-[calc(100vh-72px)] touchPanel:h-[calc(100vh-110px)] w-full bg-theme-bg flex overflow-hidden">
       <div className={`flex-1 p-6 touchPanel:p-8 flex h-full items-stretch gap-6 touchPanel:gap-8 overflow-hidden ${
         sidebarEnabled ? 'mr-36 touchPanel:mr-44' : 'mr-0'
       }`}>
@@ -243,12 +310,13 @@ const CafePage = ({ sidebarEnabled = false }) => {
         {/* ── LEFT: Select Item ─────────────────────────────────── */}
         <Card
           variant="glass"
+          tone="brand"
           className="flex-[1.3] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0 }}
+          style={{ padding: 0, ...cardStyle }}
         >
           <CardHeader
             className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"
-            style={{ ...headerBorder, marginBottom: 0 }}
+            style={{ ...headerBorderStyle, marginBottom: 0 }}
           >
             <div className="flex items-center justify-between gap-3 w-full">
               <CardTitle className="flex items-center gap-2 text-base touchPanel:text-2xl font-bold">
@@ -272,7 +340,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
             {/* Menu grid */}
             <div
               className="flex-1 min-h-0 overflow-y-auto rounded-xl p-3 touchPanel:p-4"
-              style={insetSurface}
+              style={wellStyle}
             >
               <div className="grid grid-cols-2 touchPanel:grid-cols-3 gap-3 touchPanel:gap-4">
                 {menuItems.map((item) => {
@@ -286,30 +354,31 @@ const CafePage = ({ sidebarEnabled = false }) => {
                       key={item}
                       type="button"
                       onClick={() => handleTileTap(item)}
-                      className="relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 touchPanel:p-6 min-h-[92px] touchPanel:min-h-[132px] transition-all duration-200 active:scale-[0.97] select-none"
-                      style={{
-                        background: isSelected
-                          ? 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))'
+                      className="relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 touchPanel:p-6 min-h-[92px] touchPanel:min-h-[132px] transition-all duration-150 active:scale-[0.97] select-none"
+                      style={
+                        isSelected
+                          ? {
+                              background: tileSelectedBg,
+                              borderColor: 'transparent',
+                              color: '#ffffff',
+                              boxShadow:
+                                '0 8px 22px rgba(0, 56, 86, 0.30)',
+                            }
                           : inOrder
-                            ? 'color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary))'
-                            : 'var(--color-bg-secondary)',
-                        borderColor: isSelected
-                          ? 'transparent'
-                          : inOrder
-                            ? 'color-mix(in srgb, var(--color-primary) 45%, var(--color-border))'
-                            : 'var(--color-border)',
-                        color: isSelected ? '#ffffff' : 'var(--color-heading)',
-                        boxShadow: isSelected
-                          ? '0 8px 22px color-mix(in srgb, var(--color-primary) 30%, transparent)'
-                          : '0 4px 14px color-mix(in srgb, var(--color-shadow) 10%, transparent)',
-                      }}
+                            ? { ...tileInOrderStyle, color: 'var(--color-heading)' }
+                            : { ...tileBaseStyle, color: 'var(--color-heading)' }
+                      }
                     >
                       {count > 0 && (
                         <span
                           className="absolute top-2 right-2 min-w-[24px] h-6 touchPanel:min-w-[30px] touchPanel:h-8 px-1.5 rounded-full flex items-center justify-center text-xs touchPanel:text-base font-bold"
                           style={{
-                            backgroundColor: isSelected ? '#ffffff' : 'var(--color-primary)',
-                            color: isSelected ? 'var(--color-primary)' : '#ffffff',
+                            backgroundColor: isSelected
+                              ? '#ffffff'
+                              : 'var(--color-primary)',
+                            color: isSelected
+                              ? 'var(--color-primary)'
+                              : '#ffffff',
                           }}
                         >
                           {count}
@@ -332,7 +401,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
             {/* Selected-item quantity strip */}
             <div
               className="flex-shrink-0 rounded-xl px-3 py-2.5 touchPanel:px-4 touchPanel:py-3.5 flex items-center justify-between gap-3"
-              style={insetSurface}
+              style={stripStyle}
             >
               {selectedQty > 0 ? (
                 <>
@@ -387,12 +456,13 @@ const CafePage = ({ sidebarEnabled = false }) => {
         {/* ── RIGHT: Order Summary ──────────────────────────────── */}
         <Card
           variant="glass"
+          tone="climate"
           className="flex-[1] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0 }}
+          style={{ padding: 0, ...cardStyle }}
         >
           <CardHeader
             className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"
-            style={{ ...headerBorder, marginBottom: 0 }}
+            style={{ ...headerBorderStyle, marginBottom: 0 }}
           >
             <div className="flex items-center justify-between gap-3 w-full">
               <CardTitle className="flex items-center gap-2 text-base touchPanel:text-2xl font-bold">
@@ -402,15 +472,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
 
               <span
                 className="text-[11px] touchPanel:text-sm font-semibold px-3 py-1 touchPanel:px-4 touchPanel:py-1.5 rounded-full whitespace-nowrap"
-                style={{
-                  backgroundColor: totalItems > 0
-                    ? 'color-mix(in srgb, var(--color-primary) 12%, var(--color-bg))'
-                    : 'var(--color-bg)',
-                  color: totalItems > 0 ? 'var(--color-primary)' : 'var(--color-text-light)',
-                  border: `1px solid ${totalItems > 0
-                    ? 'color-mix(in srgb, var(--color-primary) 25%, transparent)'
-                    : 'var(--color-border)'}`,
-                }}
+                style={badgeStyle(totalItems > 0)}
               >
                 {totalItems > 0 ? `Total · ${totalItems} item${totalItems > 1 ? 's' : ''}` : 'Empty'}
               </span>
@@ -420,7 +482,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
           <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4 px-4 py-4 touchPanel:px-6 touchPanel:py-5">
             <div
               className="flex-1 min-h-0 overflow-y-auto rounded-xl p-3 touchPanel:p-4"
-              style={insetSurface}
+              style={wellStyle}
             >
               {orderSummary.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center gap-3 text-center px-4">
@@ -453,10 +515,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
                       <div
                         key={item.name}
                         className="p-2.5 touchPanel:p-4 rounded-xl flex items-center gap-2 touchPanel:gap-3"
-                        style={{
-                          backgroundColor: 'var(--color-bg-secondary)',
-                          border: '1px solid var(--color-border)',
-                        }}
+                        style={summaryRowStyle}
                       >
                         <ItemIcon
                           className="w-4 h-4 touchPanel:w-6 touchPanel:h-6 flex-shrink-0"

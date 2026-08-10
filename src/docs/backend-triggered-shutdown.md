@@ -4,23 +4,24 @@ This document explains how the Crestron processor can remotely trigger a full sy
 
 ---
 
-## 1. Backend-Triggered Shutdown (D7 + D8)
+## 1. Backend-Triggered Shutdown (D7)
 
 ### What it does
-When the Crestron processor sends a HIGH pulse on digital join D7 (combined room) or D8 (boardroom), the frontend executes the exact same shutdown sequence as when the user manually confirms shutdown via the modal — no user interaction required.
+When the Crestron processor sends a HIGH pulse on digital join D7, the frontend executes the exact same shutdown sequence as when the user manually confirms shutdown via the modal — no user interaction required.
+
+> This project is single-room (no separate Combined/Boardroom modes) — `BACKEND_SHUTDOWN_COMBINED`/`BACKEND_SHUTDOWN_BOARDROOM` (D7/D8) were renamed/removed to `BACKEND_SHUTDOWN` (D7 only) accordingly. A sibling multi-room project may still want the two-join pattern — adapt as needed.
 
 ### Digital joins
 
 | Join | Name | Direction | File |
 |------|------|-----------|------|
-| D7 | `BACKEND_SHUTDOWN_COMBINED` | Backend → Frontend (FEEDBACK) | `App.jsx` |
-| D8 | `BACKEND_SHUTDOWN_BOARDROOM` | Backend → Frontend (FEEDBACK) | `App.jsx` |
+| D7 | `BACKEND_SHUTDOWN` | Backend → Frontend (FEEDBACK) | `App.jsx` |
 
 ### Shutdown sequence (mirrors ShutdownModal exactly)
 1. Close the shutdown modal if it happens to be open
 2. Clear all session storage (`safeSessionStorage.clear()`) — resets all UI state
-3. Dispatch `window` event `'system-shutdown'` — any component listening (e.g. `BoardroomSourceSelection`) resets its in-memory state immediately
-4. Send the shutdown pulse **back** to the processor (D5 for combined, D6 for boardroom) — 100ms HIGH→LOW pulse
+3. Dispatch `window` event `'system-shutdown'` — any component listening resets its in-memory state immediately
+4. Send the shutdown pulse **back** to the processor (D5) — 100ms HIGH→LOW pulse
 5. After 2000ms: mute all six microphones
 6. After 500ms: show the `ShutdownScreen` component (progress animation)
 7. `ShutdownScreen.onComplete` → navigate to landing page (`/`)
@@ -29,19 +30,14 @@ When the Crestron processor sends a HIGH pulse on digital join D7 (combined room
 **File:** `src/App.jsx` inside the `AppContent` component
 
 ```js
-// triggerBackendShutdown function — called when D7 or D8 fires
-const triggerBackendShutdown = (roomType) => {
+// triggerBackendShutdown function — called when D7 fires
+const triggerBackendShutdown = () => {
   setShowShutdownModal(false);
   safeSessionStorage.clear();
   window.dispatchEvent(new Event('system-shutdown'));
 
-  if (roomType === 'boardroom') {
-    sendShutdownBoardroom(true);
-    setTimeout(() => sendShutdownBoardroom(false), 100);
-  } else {
-    sendShutdownCombined(true);
-    setTimeout(() => sendShutdownCombined(false), 100);
-  }
+  sendShutdownCombined(true);
+  setTimeout(() => sendShutdownCombined(false), 100);
 
   setTimeout(() => { /* mute all mics */ }, 2000);
   setTimeout(() => setShowShutdown(true), 500);
@@ -55,10 +51,11 @@ const triggerBackendShutdown = (roomType) => {
 ### Why direct CrComLib (not useDigitalJoin)?
 The `useDigitalJoin` hook routes values through React state. React batches state updates, which means a 100ms HIGH pulse from the processor may be processed after it has already gone LOW — the component never sees `value === true`. Direct CrComLib subscription bypasses React batching and fires the callback synchronously as the signal arrives.
 
-This same pattern is used in three places in this project:
-- `BoardroomSourceSelection.jsx` — `DISABLE_VIDEO_CALL` (D134) / `ENABLE_VIDEO_CALL` (D135)
+This pattern is used in this project by:
 - `ProcessorConnectionContext.jsx` — `SYSTEM_HEARTBEAT_RECEIVE` (D131)
-- `App.jsx` — `BACKEND_SHUTDOWN_COMBINED` (D7) / `BACKEND_SHUTDOWN_BOARDROOM` (D8)
+- `App.jsx` — `BACKEND_SHUTDOWN` (D7)
+
+(An earlier example, `DISABLE_VIDEO_CALL`/`ENABLE_VIDEO_CALL`, was removed along with the Boardroom Source Selection UI in this project's single-room consolidation — see §3 below, which still documents the generic pattern for sibling projects.)
 
 ### Pattern template
 ```js
@@ -88,7 +85,7 @@ useEffect(() => {
 
 ## 3. Processor-Feedback Disable/Enable Pattern (Generic)
 
-This pattern lets the Crestron processor disable or re-enable a UI button from the backend. In this project it controls the Video Call button; in a sibling project it might control a BYOD button or any other toggleable control.
+This pattern lets the Crestron processor disable or re-enable a UI button from the backend. This project previously used it for the Video Call button (removed along with the Boardroom Source Selection UI in a single-room consolidation); a sibling project might use it for a BYOD button or any other toggleable control — the pattern below is still generically correct.
 
 ### How it works
 The processor sends HIGH pulses on two separate digital joins:

@@ -12,7 +12,7 @@ const ShutdownModal = ({ isOpen, onConfirm, onCancel }) => {
   const [isShuttingDown, setIsShuttingDown] = useState(false);
 
   // Get set function for sending the shutdown pulse
-  const [, , sendShutdownCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_SHUTDOWN_COMBINED);
+  const [, , sendShutdownCombined] = useDigitalJoin(DIGITAL_JOINS.SYSTEM_SHUTDOWN);
 
   // Send momentary pulse (true → false) on join
   const sendPulse = (setFunction, joinNumber, name) => {
@@ -53,7 +53,7 @@ const ShutdownModal = ({ isOpen, onConfirm, onCancel }) => {
     }, 2000);    
 
     // 🔥 Send shutdown pulse
-    sendPulse(sendShutdownCombined, DIGITAL_JOINS.SYSTEM_SHUTDOWN_COMBINED, 'SYSTEM_SHUTDOWN_COMBINED');
+    sendPulse(sendShutdownCombined, DIGITAL_JOINS.SYSTEM_SHUTDOWN, 'SYSTEM_SHUTDOWN');
 
     // Navigate to landing page after animation
     setTimeout(() => {

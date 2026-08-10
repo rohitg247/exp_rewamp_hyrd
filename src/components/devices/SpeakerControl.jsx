@@ -19,20 +19,15 @@ const SpeakerControl = () => {
     setHeadworn2Muted,
     setHandheldMuted,
     setLapelMuted,
+    setProgramAudioMuted,
+    setVcAudioMuted,
+    masterSpeakerOn,
+    setMasterSpeakerOn,
   } = useAudioContext();
 
-  // Local speaker state with persistence
-  const [speakerOnLocal, setSpeakerOnLocal] = useState(() => {
-    try {
-      const saved = safeSessionStorage.getItem('speakerOnLocal');
-      if (saved === null) return true;
-      return saved === 'true';
-    } catch (error) {
-      console.error('❌ Failed to restore speaker state:', error);
-      safeSessionStorage.removeItem('speakerOnLocal');
-      return true;
-    }
-  });
+  // Speaker state lives in AudioContext (persisted there), derived from the
+  // Program Audio / VC Audio channels — that derivation is what makes this
+  // button and the Main page Speakers card two-way synced, exactly like mics.
 
   const [volumePercent, setVolumePercent] = useState(() => {
     try {
@@ -60,7 +55,7 @@ const SpeakerControl = () => {
   const [, setMasterMicJoin] = useAnalogJoin(ANALOG_JOINS.MIC_MASTER, masterMicOn ? 1 : 0);
 
   // Analog join for speaker ON/OFF (persistent state) — 1=on, 0=off
-  const [, setSpeakerAnalog] = useAnalogJoin(ANALOG_JOINS.SPEAKER_ON_OFF_ANALOG, speakerOnLocal ? 1 : 0);
+  const [, setSpeakerAnalog] = useAnalogJoin(ANALOG_JOINS.SPEAKER_ON_OFF_ANALOG, masterSpeakerOn ? 1 : 0);
 
   // Analog join for master mic MANUAL button press (separate from auto-sync A1) — 1=on, 0=off
   const [, setMasterMicManual] = useAnalogJoin(ANALOG_JOINS.MIC_MASTER_MANUAL, masterMicOn ? 1 : 0);
@@ -77,21 +72,43 @@ const SpeakerControl = () => {
     console.log(`📤 Master Mic Analog synced: ${masterMicOn ? 'ON (1)' : 'OFF (0)'} (Join: ${ANALOG_JOINS.MIC_MASTER})`);
   }, [masterMicOn]);
 
-  // Persist states
+  // Send speaker analog join ONLY on auto-sync (not manual click) — mirrors the
+  // master-mic effect above. This is what fires when the user changes Program
+  // Audio / VC Audio from the Main page card: the context re-derives
+  // masterSpeakerOn, this button re-renders, and the join goes out.
   useEffect(() => {
-    safeSessionStorage.setItem('speakerOnLocal', speakerOnLocal);
-  }, [speakerOnLocal]);
+    const isManual = safeSessionStorage.getItem('masterSpeakerManualClick') === 'true';
+    if (isManual) {
+      console.log(`⏭️ Master Speaker auto-sync skipped (manual click in progress)`);
+      return;
+    }
+    setSpeakerAnalog(masterSpeakerOn ? 1 : 0);
+    console.log(`📤 Speaker Analog synced: ${masterSpeakerOn ? 'ON (1)' : 'OFF (0)'} (Join: ${ANALOG_JOINS.SPEAKER_ON_OFF_ANALOG})`);
+  }, [masterSpeakerOn]);
 
   useEffect(() => {
     safeSessionStorage.setItem('speakerVolume', volumePercent);
   }, [volumePercent]);
 
-  // Speaker toggle handler
+  // Speaker toggle handler — mirrors handleMasterMicToggle below: this button
+  // is the "master speaker" control, so it also drives Program Audio/VC Audio
+  // on the Main page's Speakers card (kept fully independent of mic state —
+  // see AudioContext.jsx).
   const handleSpeakerToggle = () => {
-    const newState = !speakerOnLocal;
-    setSpeakerOnLocal(newState);
+    const newState = !masterSpeakerOn;
+
+    safeSessionStorage.setItem('masterSpeakerManualClick', 'true');
+
+    setMasterSpeakerOn(newState);
     setSpeakerAnalog(newState ? 1 : 0);
     console.log(`📤 Speaker Analog: ${newState ? 'ON (1)' : 'OFF (0)'} (Join: ${ANALOG_JOINS.SPEAKER_ON_OFF_ANALOG})`);
+
+    const speakerChannelState = newState ? 1 : 0;
+    setProgramAudioMuted(speakerChannelState);
+    setVcAudioMuted(speakerChannelState);
+    console.log(`🔊 Speaker channels UI updated to: ${newState ? 'UNMUTED (1)' : 'MUTED (0)'}`);
+
+    safeSessionStorage.removeItem('masterSpeakerManualClick');
   };
 
   // // ✅ Master mic toggle - Send ONLY analog join, update UI state for all 6 mics
@@ -206,21 +223,13 @@ const SpeakerControl = () => {
 
 
         <Button
-          variant={speakerOnLocal ? 'success' : 'danger'}
+          variant={masterSpeakerOn ? 'success' : 'danger'}
           size="sm"
           onClick={handleSpeakerToggle}
           className="min-w-[40px] flex items-center justify-center space-x-2 py-3 px-6 h-auto font-semibold flex-shrink-0 touchPanel:py-4 touchPanel:px-10"
         >
-          {speakerOnLocal ? <Volume2 size={20} /> : <VolumeX size={20} />}
+          {masterSpeakerOn ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </Button>
-        {/* <Button
-          variant={speakerOnLocal ? 'success' : 'danger'}
-          size="sm"
-          onClick={handleSpeakerToggle}
-          className="min-w-[48px] flex items-center justify-center space-x-2 py-2 h-auto font-semibold flex-shrink-0 touchPanel:py-4 touchPanel:px-10"
-        >
-          <Volume2 size={20} />
-        </Button> */}
 
         <Button
           variant={masterMicOn ? 'success' : 'danger'}

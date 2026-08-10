@@ -41,6 +41,28 @@ export function AudioProvider({ children }) {
     return saved !== null ? parseInt(saved, 10) : 0;
   });
 
+  // Master speaker state (derived from the 2 speaker channels below) — kept
+  // fully independent from the 6-mic master-mic aggregation above, so the
+  // Sidebar's Mic button never touches these.
+  // Defaults to ON — speakers were previously ON by default in the sidebar
+  // (the old local `speakerOnLocal` state), so the channels default unmuted
+  // to keep that startup behaviour now that the two are one system.
+  const [masterSpeakerOn, setMasterSpeakerOn] = useState(() => {
+    const saved = safeSessionStorage.getItem('masterSpeakerOnGlobal');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  // Speaker channel mute states (0=muted, 1=unmuted in UI), same convention as mics
+  const [programAudioMuted, setProgramAudioMuted] = useState(() => {
+    const saved = safeSessionStorage.getItem('speaker_program_muted');
+    return saved !== null ? parseInt(saved, 10) : 1;
+  });
+
+  const [vcAudioMuted, setVcAudioMuted] = useState(() => {
+    const saved = safeSessionStorage.getItem('speaker_vc_muted');
+    return saved !== null ? parseInt(saved, 10) : 1;
+  });
+
   // Persist master mic state
   useEffect(() => {
     safeSessionStorage.setItem('masterMicOnGlobal', masterMicOn);
@@ -70,6 +92,36 @@ export function AudioProvider({ children }) {
   useEffect(() => {
     safeSessionStorage.setItem('mic_lapel_muted', lapelMuted);
   }, [lapelMuted]);
+
+  // Persist master speaker + speaker channel states
+  useEffect(() => {
+    safeSessionStorage.setItem('masterSpeakerOnGlobal', masterSpeakerOn);
+  }, [masterSpeakerOn]);
+
+  useEffect(() => {
+    safeSessionStorage.setItem('speaker_program_muted', programAudioMuted);
+  }, [programAudioMuted]);
+
+  useEffect(() => {
+    safeSessionStorage.setItem('speaker_vc_muted', vcAudioMuted);
+  }, [vcAudioMuted]);
+
+  // ✅ Auto-sync master speaker based on the 2 speaker channels (mirrors master mic below)
+  useEffect(() => {
+    const isManualClick = safeSessionStorage.getItem('masterSpeakerManualClick') === 'true';
+    if (isManualClick) return;
+
+    const allMuted = programAudioMuted === 0 && vcAudioMuted === 0;
+    const anyUnmuted = programAudioMuted === 1 || vcAudioMuted === 1;
+
+    if (allMuted && masterSpeakerOn) {
+      setMasterSpeakerOn(false);
+      console.log('🔊 Master Speaker AUTO-MUTED (all speaker channels muted)');
+    } else if (anyUnmuted && !masterSpeakerOn) {
+      setMasterSpeakerOn(true);
+      console.log('🔊 Master Speaker AUTO-UNMUTED (speaker activity detected)');
+    }
+  }, [programAudioMuted, vcAudioMuted, masterSpeakerOn]);
 
   // ✅ Auto-sync master mic based on individual mics (ONLY if not manual click)
   useEffect(() => {
@@ -121,6 +173,13 @@ export function AudioProvider({ children }) {
     setHandheldMuted,
     lapelMuted,
     setLapelMuted,
+
+    masterSpeakerOn,
+    setMasterSpeakerOn,
+    programAudioMuted,
+    setProgramAudioMuted,
+    vcAudioMuted,
+    setVcAudioMuted,
   };
 
   return (
