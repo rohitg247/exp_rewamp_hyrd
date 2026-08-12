@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Monitor, CheckCircle, XCircle, RefreshCw, Bug, Info, Wifi } from 'lucide-react';
+import { Monitor, CheckCircle, XCircle, RefreshCw, Bug, Info, Wifi, Droplets } from 'lucide-react';
 import { useSerialJoinCallback, useDigitalJoin } from '../hooks/useJoin';
 import { SERIAL_JOINS, DIGITAL_JOINS } from '../crestron/joins';
 import { useProcessorConnection } from '../context/ProcessorConnectionContext';
+import { useTheme } from '../context/ThemeContext';
 import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import Toggle from '../components/ui/Toggle';
 
 // Mock device data shown when processor is not connected
 
@@ -23,6 +25,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { isConnected, heartbeatLogs, clearHeartbeatLogs } = useProcessorConnection();
+  const { isLiquid, toggleLiquid } = useTheme();
 
   const isMockData = !isConnected && devices.length === 0;
   const displayDevices = isMockData ? [] : devices;
@@ -325,6 +328,29 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto px-6 py-4 touchPanel:px-10 touchPanel:py-6 min-h-0">
               <div className="space-y-4 touchPanel:space-y-6">
+                {/* Appearance — Liquid Glass. Sets data-liquid on <html>; every
+                    liquid rule in global.css is scoped under it, so switching
+                    off restores the original surfaces exactly. */}
+                <div
+                  className="flex items-center gap-3 p-4 touchPanel:p-6 rounded-lg border-2 bg-secondary"
+                  style={{ borderColor: 'var(--color-border)' }}
+                >
+                  <Droplets size={24} className="touchPanel:w-8 touchPanel:h-8 text-heading" />
+                  <div className="flex-1">
+                    <h4 className="font-medium touchPanel:text-2xl text-heading">
+                      Liquid Glass
+                    </h4>
+                    <p className="text-sm touchPanel:text-xl text-muted-foreground">
+                      Translucent surfaces and a container-free navbar
+                    </p>
+                  </div>
+                  <Toggle
+                    checked={isLiquid}
+                    onChange={toggleLiquid}
+                    aria-label="Liquid Glass appearance"
+                  />
+                </div>
+
                 <div
                   className="flex items-center gap-3 p-4 touchPanel:p-6 rounded-lg border-2 bg-secondary"
                   style={{

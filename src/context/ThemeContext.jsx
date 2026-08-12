@@ -7,6 +7,7 @@ const ThemeContext = createContext();
 const STORAGE_KEY_THEME = 'crestron_theme_name';
 const STORAGE_KEY_DARK = 'crestron_dark_mode';
 const STORAGE_KEY_CUSTOM = 'crestron_custom_color';
+const STORAGE_KEY_LIQUID = 'crestron_liquid_glass';
 
 export const ThemeProvider = ({ children }) => {
   // Initialize theme name from storage
@@ -33,6 +34,19 @@ export const ThemeProvider = ({ children }) => {
       return safeLocalStorage.getItem(STORAGE_KEY_CUSTOM) || '#004e7a';
     } catch {
       return '#004e7a';
+    }
+  });
+
+  // Liquid Glass appearance mode. Deliberately a THIRD attribute rather than a
+  // fifth data-theme value: data-theme carries colour and data-dark-mode carries
+  // light/dark, so folding glass into either would cost the user their colour
+  // choice every time they switched it on. Orthogonal means all themes × dark ×
+  // liquid keep working, and off is byte-identical to the pre-liquid UI.
+  const [isLiquid, setIsLiquidState] = useState(() => {
+    try {
+      return safeLocalStorage.getItem(STORAGE_KEY_LIQUID) === 'true';
+    } catch {
+      return false;
     }
   });
 
@@ -98,9 +112,22 @@ export const ThemeProvider = ({ children }) => {
     console.log(`🎨 Theme applied: ${name} | Dark: ${dark}${name === 'custom' ? ` | Color: ${custom}` : ''}`);
   }, []);
 
+  // Kept OUT of applyThemeToDOM on purpose — that function clears and rewrites
+  // data-theme / data-custom-color / data-dark-mode, and liquid must survive
+  // every one of those switches untouched.
+  const applyLiquidToDOM = useCallback((liquid) => {
+    const root = document.documentElement;
+    if (liquid) {
+      root.setAttribute('data-liquid', 'true');
+    } else {
+      root.removeAttribute('data-liquid');
+    }
+  }, []);
+
   // Apply on mount
   useEffect(() => {
     applyThemeToDOM(themeName, isDarkMode, customColor);
+    applyLiquidToDOM(isLiquid);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Public: Set theme name
@@ -163,6 +190,22 @@ export const ThemeProvider = ({ children }) => {
     });
   }, [applyThemeToDOM, beginThemeSwitch]);
 
+  // Public: Toggle Liquid Glass appearance
+  const toggleLiquid = useCallback(() => {
+    beginThemeSwitch();
+    setIsLiquidState(prev => {
+      const next = !prev;
+      try {
+        safeLocalStorage.setItem(STORAGE_KEY_LIQUID, String(next));
+      } catch (error) {
+        console.warn('⚠️ Error saving liquid glass mode to storage:', error);
+      }
+      applyLiquidToDOM(next);
+      console.log(`🫧 Liquid Glass ${next ? 'ON' : 'OFF'}`);
+      return next;
+    });
+  }, [applyLiquidToDOM, beginThemeSwitch]);
+
   return (
     <ThemeContext.Provider
       value={{
@@ -172,6 +215,8 @@ export const ThemeProvider = ({ children }) => {
         toggleDarkMode,
         customColor,
         setCustomColor,
+        isLiquid,
+        toggleLiquid,
       }}
     >
       {children}
