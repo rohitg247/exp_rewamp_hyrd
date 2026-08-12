@@ -171,7 +171,7 @@ const Navbar = ({ onShutdown }) => {
   return (
     <>
       <nav
-        className="relative z-20 px-6 touchPanel:px-8 py-3 touchPanel:py-4
+        className="ui-navbar relative z-20 px-6 touchPanel:px-8 py-3 touchPanel:py-4
                       grid grid-cols-[auto_1fr_auto] items-center gap-4 touchPanel:gap-6
                       min-h-[72px] touchPanel:min-h-[110px] [&_*]:!transition-none
                       [&_button]:!shadow-nav-button"
@@ -215,7 +215,7 @@ const Navbar = ({ onShutdown }) => {
             <div
               ref={scrollContainerRef}
               onWheel={handleWheel}
-              className={`flex space-x-3 touchPanel:space-x-6 w-full
+              className={`ui-nav-cluster flex space-x-3 touchPanel:space-x-6 w-full
                           overflow-x-scroll overflow-y-hidden px-2 no-scrollbar
                           ${hasOverflow ? "justify-start" : "justify-center"}
                           transition-all duration-300`}
@@ -230,7 +230,7 @@ const Navbar = ({ onShutdown }) => {
         </div>
 
         {/* RIGHT: Controls */}
-        <div className="flex items-center justify-end space-x-2 touchPanel:space-x-2 flex-shrink-0">
+        <div className="ui-nav-actions flex items-center justify-end space-x-2 touchPanel:space-x-2 flex-shrink-0">
 
           {/* Main Page — Settings button */}
           <Button
