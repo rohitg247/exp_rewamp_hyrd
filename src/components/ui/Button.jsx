@@ -19,7 +19,9 @@ const Button = forwardRef(({
 }, ref) => {
     // Base classes applied to all buttons. press-fx carries the 120ms
     // scale/shadow response defined once in global.css.
-    const baseClasses = 'font-semibold rounded-lg press-fx shadow-rest hover:shadow-raised active:shadow-pressed touch-manipulation user-select-none';
+    // `ui-btn` + the data-variant below are inert hooks: nothing styles them
+    // unless <html data-liquid="true"> is set (see global.css → LIQUID GLASS).
+    const baseClasses = 'ui-btn font-semibold rounded-lg press-fx shadow-rest hover:shadow-raised active:shadow-pressed touch-manipulation user-select-none';
 
     // Variant definitions - Updated with brightness for universal theme support
     // 2026-08-06: gloss-sweep on the filled variants only — a travelling
@@ -57,6 +59,7 @@ const Button = forwardRef(({
         <button
             ref={ref}
             disabled={disabled}
+            data-variant={variant}
             className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${disabledClasses} ${className}`}
             style={{ ...variantStyle, ...style }}
             {...props}

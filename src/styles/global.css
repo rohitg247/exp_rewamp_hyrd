@@ -1878,3 +1878,166 @@ button,
     border-radius: 2rem;
   }
 }
+
+/* ============================================================================
+   LIQUID GLASS — opt-in appearance mode
+   ----------------------------------------------------------------------------
+   Everything below is scoped under [data-liquid="true"], set on <html> by
+   ThemeContext.toggleLiquid() and driven from the Settings page. With the
+   attribute absent NOTHING here matches, so the original UI is untouched —
+   that is the whole point of the mode.
+
+   Orthogonal to data-theme (colour) and data-dark-mode (light/dark): every
+   value below derives from the existing --color-* / --elev-* tokens, so all
+   themes, dark mode and the custom colour picker keep working.
+
+   PANEL NOTE (TSW-1070): src/docs/crestron-panel-safe-css.md supersedes the
+   old "panels have no GPU" claim — backdrop-filter, blur, mix-blend-mode and
+   box-shadow all render on the panel. What does NOT survive is Tailwind
+   slash-opacity (bg-white/20) and arbitrary bracket colours, so every colour
+   here is a real rgba()/color-mix() in a stylesheet rule.
+
+   This block sits after `@tailwind utilities` (line 3), so it wins ties on
+   specificity order. !important appears only where a component sets the same
+   property with an INLINE style, which no stylesheet can outrank otherwise.
+   ============================================================================ */
+[data-liquid="true"] {
+  /* Cards blur lower than chrome: there can be six on one screen, and this is
+     the only cost that scales with card count. Drop to 0px if the panel drags —
+     surfaces fall back to their static gradient and chrome keeps its blur. */
+  --liquid-blur: 16px;
+  --liquid-chrome-blur: 22px;
+
+  /* Fill is what the blur shows through. Must stay translucent — behind an
+     opaque background backdrop-filter silently does nothing. */
+  --liquid-fill: rgba(255, 255, 255, 0.18);
+  --liquid-fill-strong: rgba(255, 255, 255, 0.30);
+  --liquid-card-fill: color-mix(in srgb, var(--color-bg-secondary) 58%, transparent);
+
+  /* Rim light: bright top edge, faint bottom bounce. The two-edge version is
+     what separates "liquid glass" from a flat translucent panel. */
+  --liquid-rim: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.10);
+  --liquid-edge: 0 0 0 1px rgba(255, 255, 255, 0.28);
+  --liquid-radius: 1.25rem;
+}
+
+[data-liquid="true"][data-theme="blue-dark"],
+[data-liquid="true"][data-dark-mode="true"],
+[data-liquid="true"][data-theme="purple"][data-dark-mode="true"],
+[data-liquid="true"][data-theme="dark-blue"][data-dark-mode="true"] {
+  /* Same recipe, dialled down. A 0.55 white rim on a dark slab reads as chalk —
+     the existing --surface-hairline override makes the same correction. */
+  --liquid-fill: rgba(255, 255, 255, 0.09);
+  --liquid-fill-strong: rgba(255, 255, 255, 0.16);
+  --liquid-card-fill: color-mix(in srgb, var(--color-bg-secondary) 62%, transparent);
+  --liquid-rim: inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  --liquid-edge: 0 0 0 1px rgba(255, 255, 255, 0.10);
+}
+
+/* ── Page backdrop ──────────────────────────────────────────────────────────
+   .page-mesh sits on each page root, which starts BELOW the navbar. Once the
+   navbar goes transparent its radial pools would restart at the bar's bottom
+   edge and show a seam straight across the screen. Moving the mesh to <body>
+   makes it one continuous field. Done in CSS so none of the six page files
+   need editing, and so switching liquid off restores them untouched. */
+[data-liquid="true"] body {
+  background-image: var(--mesh-bg);
+  background-attachment: fixed;
+}
+
+[data-liquid="true"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: var(--grain);
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+}
+
+[data-liquid="true"] .page-mesh {
+  background-image: none;
+}
+
+[data-liquid="true"] .page-mesh::after {
+  display: none;
+}
+
+/* The app shell paints bg-theme-bg, which would hide the body mesh. */
+[data-liquid="true"] .bg-theme-bg {
+  background-color: transparent !important;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────────────────
+   Card.jsx sets backgroundColor / backgroundImage / boxShadow inline per
+   variant, so these need !important. The translucent fill is mandatory: an
+   opaque background makes the blur a no-op (the trap already documented on
+   Card's gradientGlass variant). */
+[data-liquid="true"] .ui-card {
+  background-color: var(--liquid-card-fill) !important;
+  background-image: var(--gloss-specular), var(--surface-glass) !important;
+  box-shadow: var(--liquid-rim), var(--liquid-edge), var(--elev-raised) !important;
+  border-radius: var(--liquid-radius);
+  backdrop-filter: blur(var(--liquid-blur)) saturate(1.25);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(1.25);
+}
+
+/* The `gradient` variant carries the theme's own colour through the card —
+   keep that tint, just make it translucent so the blur still reads. */
+[data-liquid="true"] .ui-card[data-variant="gradient"] {
+  background-image: var(--gloss-specular), var(--surface-tint-soft) !important;
+}
+
+/* Card's accent rail is an absolutely-positioned span with an inline
+   border-radius matched to the old rounded-xl. Follow the new radius. */
+[data-liquid="true"] .ui-card > span[aria-hidden="true"] {
+  border-radius: var(--liquid-radius) var(--liquid-radius) 0 0 !important;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────────
+   Pills, per the reference. Filled variants (primary/danger/success) keep
+   their solid fill — a control that commits an action must not be see-through,
+   and Shutdown especially must stay unambiguous. */
+[data-liquid="true"] .ui-btn {
+  border-radius: 9999px;
+}
+
+[data-liquid="true"] .ui-btn[data-variant="secondary"] {
+  background-color: var(--liquid-fill) !important;
+  border-color: transparent !important;
+  box-shadow: var(--liquid-rim), var(--liquid-edge);
+  backdrop-filter: blur(var(--liquid-blur)) saturate(1.2);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(1.2);
+}
+
+[data-liquid="true"] .ui-btn[data-variant="secondary"]:active {
+  background-color: var(--liquid-fill-strong) !important;
+}
+
+/* ── Toggle ─────────────────────────────────────────────────────────────────
+   Track colour comes from a Tailwind class (bg-primary / bg-gray-300), so the
+   OFF state needs overriding to glass while ON keeps the theme fill. */
+[data-liquid="true"] .ui-toggle {
+  box-shadow: var(--liquid-rim), var(--liquid-edge);
+}
+
+[data-liquid="true"] .ui-toggle[data-checked="false"] {
+  background-color: var(--liquid-fill-strong) !important;
+  backdrop-filter: blur(var(--liquid-blur));
+  -webkit-backdrop-filter: blur(var(--liquid-blur));
+}
+
+[data-liquid="true"] .ui-toggle-knob {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9),
+              0 1px 2px rgba(0, 0, 0, 0.20),
+              0 4px 10px -2px rgba(0, 0, 0, 0.30);
+}
+
+/* ── Modals ─────────────────────────────────────────────────────────────────
+   Already frosted via --overlay-glass; liquid just deepens it. */
+[data-liquid="true"] .modal-content {
+  border-radius: var(--liquid-radius);
+}

@@ -94,9 +94,12 @@ const Card = ({
 
   return (
     <div
-      className={`relative rounded-xl p-6 touchPanel:p-8 ${
+      // `ui-card` + data-variant are inert hooks — only <html data-liquid="true">
+      // styles them (global.css → LIQUID GLASS).
+      className={`ui-card relative rounded-xl p-6 touchPanel:p-8 ${
         interactive ? "press-fx" : ""
       } ${className}`}
+      data-variant={variant}
       style={{ ...surface, ...style }}
       {...props}
     >
