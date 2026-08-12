@@ -22,7 +22,7 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               ======================================== */}
           <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
             {/* Row 1: Lighting Control (60% height = flex-[3]) */}
-            <Card variant="gradient" tone="lighting" className="flex-[2] flex flex-col min-h-0 overflow-hidden">
+            {/* <Card variant="gradient" tone="lighting" className="flex-[2] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
                   <CardIcon tone="lighting"><Lightbulb className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" /></CardIcon>
@@ -32,11 +32,11 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
               <CardContent className="flex-1 flex items-start justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
                 <LightingControl />
               </CardContent>
-            </Card>
+            </Card> */}
 
 
             {/* Row 2: Room Layout Display (40% height = flex-[2]) */}
-            <div className="flex-[3] min-h-0">
+            <div className="flex-1 min-h-0">
               <RoomLayoutDisplay />
             </div>
             {/* Row 2: Room Layout Display (40% height) */}

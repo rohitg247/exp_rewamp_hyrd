@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Laptop, Cast } from "lucide-react";
-import { useSerialJoin } from "../../hooks/useJoin";
-import { SERIAL_JOINS } from "../../crestron/joins";
+import { useSerialJoin, useDigitalJoin } from "../../hooks/useJoin";
+import { SERIAL_JOINS, DIGITAL_JOINS } from "../../crestron/joins";
 import { safeSessionStorage } from "../../utils/safeStorage";
 import Button from "../ui/Button";
+
+const sendPulse = (setFn) => {
+  if (typeof setFn !== "function") return;
+  setFn(true);
+  setTimeout(() => setFn(false), 100);
+};
 
 // Two simplified modes for the main page.
 // Keep outputs 1/2/3 for both for now — easy to update later.
@@ -16,6 +22,7 @@ const MODES = [
     index: 0,
     backendId: 1,
     navigateToAVMatrix: false,
+    digitalJoin: DIGITAL_JOINS.SOURCE_MODE_PRESENTATION,
   },
   {
     key: "byod",
@@ -24,6 +31,7 @@ const MODES = [
     index: 1,
     backendId: 2,
     navigateToAVMatrix: true,
+    digitalJoin: DIGITAL_JOINS.SOURCE_MODE_BYOD,
   },
 ];
 
@@ -51,6 +59,14 @@ const SourceSelection = () => {
   });
 
   const [, sendRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_ROUTING);
+
+  // One digital pulse join per selectable mode
+  const [, , sendPresentationPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_PRESENTATION);
+  const [, , sendByodPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_BYOD);
+  const modeJoinSenders = {
+    presentation: sendPresentationPulse,
+    byod: sendByodPulse,
+  };
 
   // Sync active state with AV Matrix sessionStorage on mount.
   // Skipped when startup default-BYOD flow takes over this mount.
@@ -120,6 +136,9 @@ const SourceSelection = () => {
 
   const routeMode = (mode, { navigateAfterRoute = true } = {}) => {
     setActiveKey(mode.key);
+
+    // Pulse the digital join marking which mode was selected
+    sendPulse(modeJoinSenders[mode.key]);
 
     // Keep outputs 1/2/3 for now
     sendMultipleRoutings([

@@ -1,7 +1,7 @@
 import { Volume2, VolumeX } from 'lucide-react';
-import { SERIAL_JOINS } from '../crestron/joins';
+import { ANALOG_JOINS } from '../crestron/joins';
 import { useAudioContext } from '../context/AudioContext';
-import { useSerialJoin } from '../hooks/useJoin';
+import { useAnalogJoin } from '../hooks/useJoin';
 import MicChannel from '../components/devices/MicChannel';
 import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 
@@ -19,8 +19,15 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
   } = useAudioContext();
 
 
-  // ✅ Single serial join for all mic channel data
-  const [, sendMicSerial] = useSerialJoin(SERIAL_JOINS.MIC_CHANNEL_DATA);
+  // ✅ Two analog joins per channel: volume (0-100%) + on/off (1=on, 0=muted)
+  const [, setMic1Volume] = useAnalogJoin(ANALOG_JOINS.MIC1_VOLUME);
+  const [, setMic1OnOff] = useAnalogJoin(ANALOG_JOINS.MIC1_ON_OFF_ANALOG);
+  const [, setMic2Volume] = useAnalogJoin(ANALOG_JOINS.MIC2_VOLUME);
+  const [, setMic2OnOff] = useAnalogJoin(ANALOG_JOINS.MIC2_ON_OFF_ANALOG);
+  const [, setProgramAudioVolume] = useAnalogJoin(ANALOG_JOINS.PROGRAM_AUDIO_VOLUME);
+  const [, setProgramAudioOnOff] = useAnalogJoin(ANALOG_JOINS.PROGRAM_AUDIO_ON_OFF_ANALOG);
+  const [, setVcAudioVolume] = useAnalogJoin(ANALOG_JOINS.VC_AUDIO_VOLUME);
+  const [, setVcAudioOnOff] = useAnalogJoin(ANALOG_JOINS.VC_AUDIO_ON_OFF_ANALOG);
 
 
   // 4 channels: 2 mics + 2 speaker zones
@@ -30,14 +37,16 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
       name: 'Ceiling Mic 1',
       contextMutedState: ceiling1Muted,
       contextMutedSetter: setCeiling1Muted,
-      serialJoinSetter: sendMicSerial,
+      volumeSetter: setMic1Volume,
+      onOffSetter: setMic1OnOff,
     },
     {
       id: 2,
       name: 'Ceiling Mic 2',
       contextMutedState: ceiling2Muted,
       contextMutedSetter: setCeiling2Muted,
-      serialJoinSetter: sendMicSerial,
+      volumeSetter: setMic2Volume,
+      onOffSetter: setMic2OnOff,
     },
 
     // speaker controls
@@ -46,7 +55,8 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
       name: 'Program Audio',
       contextMutedState: programAudioMuted,
       contextMutedSetter: setProgramAudioMuted,
-      serialJoinSetter: sendMicSerial,
+      volumeSetter: setProgramAudioVolume,
+      onOffSetter: setProgramAudioOnOff,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
@@ -55,7 +65,8 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
       name: 'VC Audio',
       contextMutedState: vcAudioMuted,
       contextMutedSetter: setVcAudioMuted,
-      serialJoinSetter: sendMicSerial,
+      volumeSetter: setVcAudioVolume,
+      onOffSetter: setVcAudioOnOff,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
@@ -90,7 +101,8 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
                   channelId={channel.id}
                   contextMutedState={channel.contextMutedState}
                   contextMutedSetter={channel.contextMutedSetter}
-                  serialJoinSetter={channel.serialJoinSetter}
+                  volumeSetter={channel.volumeSetter}
+                  onOffSetter={channel.onOffSetter}
                   icon={channel.icon}
                   mutedIcon={channel.mutedIcon}
                 />

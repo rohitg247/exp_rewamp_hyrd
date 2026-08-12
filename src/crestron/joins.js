@@ -102,7 +102,10 @@ export const DIGITAL_JOINS = {
 
 
 
-  // D110-119: Reserved — Boardroom Source Selection removed (single-room UI, component no longer exists)
+  // ── GROUP 11: Source Mode Selection (D110-119) ──
+  SOURCE_MODE_PRESENTATION: 110,  // [PULSE] SourceSelection.jsx - Presentation mode selected
+  SOURCE_MODE_BYOD: 111,          // [PULSE] SourceSelection.jsx - BYOD mode selected
+  // D112-119: Reserved
 
 
 
@@ -180,7 +183,16 @@ export const ANALOG_JOINS = {
 
 
 
-  // A210-219: Reserved (Group 2, Speaker/Mic Boardroom — single-room UI, unused)
+  // ── GROUP 2: Mic Channels — Audio Controls Page (A210-219) ──
+  MIC1_VOLUME: 210,               // [ANALOG 0-100%] MicChannel.jsx - Ceiling Mic 1 volume
+  MIC1_ON_OFF_ANALOG: 211,        // [ANALOG 0/1] MicChannel.jsx - Ceiling Mic 1 (1=on, 0=muted)
+  MIC2_VOLUME: 212,               // [ANALOG 0-100%] MicChannel.jsx - Ceiling Mic 2 volume
+  MIC2_ON_OFF_ANALOG: 213,        // [ANALOG 0/1] MicChannel.jsx - Ceiling Mic 2 (1=on, 0=muted)
+  PROGRAM_AUDIO_VOLUME: 214,      // [ANALOG 0-100%] MicChannel.jsx - Program Audio volume
+  PROGRAM_AUDIO_ON_OFF_ANALOG: 215, // [ANALOG 0/1] MicChannel.jsx - Program Audio (1=on, 0=muted)
+  VC_AUDIO_VOLUME: 216,           // [ANALOG 0-100%] MicChannel.jsx - VC Audio volume
+  VC_AUDIO_ON_OFF_ANALOG: 217,    // [ANALOG 0/1] MicChannel.jsx - VC Audio (1=on, 0=muted)
+  // A218-219: Reserved
 
 
 
@@ -245,6 +257,6 @@ export const SERIAL_JOINS = {
 
 
   // ── GROUP 4: Mic Channel Data (S330-339) ──
-  MIC_CHANNEL_DATA: 330,          // [SERIAL JSON] MicChannel.jsx - Format: {"id":1,"value":45,"muted":0}
+  MIC_CHANNEL_DATA: 330,          // [SERIAL JSON] MicrophoneControl.jsx, AudioControls.jsx - Format: {"id":1,"value":45,"muted":0}
   // S331-399: Reserved (Group 5, AC Status Feedback — single-room UI, unused)
 };

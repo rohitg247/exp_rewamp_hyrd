@@ -9,7 +9,8 @@ const MicChannel = ({
   channelId,
   contextMutedState,
   contextMutedSetter,
-  serialJoinSetter,
+  volumeSetter,
+  onOffSetter,
   step = 1,
   icon: ActiveIcon = Mic,
   mutedIcon: MutedIcon = MicOff,
@@ -28,30 +29,15 @@ const MicChannel = ({
     safeSessionStorage.setItem(`micVolume_${channelId}`, volumePercent);
   }, [volumePercent, channelId]);
 
-  // Helper: build and send mic data JSON via serial join — muted is inverted for backend: 1=muted, 0=unmuted
-  const sendMicData = (overrides = {}) => {
-    if (!serialJoinSetter) return;
-    const mutedValue = overrides.muted ?? contextMutedState;
-    const invertedMuted = mutedValue === 0 ? 1 : 0;
-    const data = {
-      id: channelId,
-      value: overrides.value ?? volumePercent,
-      muted: invertedMuted,
-    };
-    const jsonString = JSON.stringify(data);
-    serialJoinSetter(jsonString);
-    console.log(`📤 ${name}: Serial mic data sent:`, jsonString);
-  };
-
-  // ✅ Mute toggle handler - Updates context AND sends serial JSON
+  // ✅ Mute toggle handler - Updates context AND sends on/off analog join (1=on, 0=muted)
   const handleMuteToggle = () => {
     const newMuteValue = isMuted ? 1 : 0; // Toggle: 0→1 or 1→0
 
     // Update context state (triggers auto-sync for master mic)
     contextMutedSetter(newMuteValue);
 
-    // Send to backend via serial join
-    sendMicData({ muted: newMuteValue });
+    // Send to backend via analog join
+    onOffSetter?.(newMuteValue);
 
     console.log(`🎤 ${name}: ${newMuteValue === 1 ? 'UNMUTED' : 'MUTED'}`);
   };
@@ -63,25 +49,25 @@ const MicChannel = ({
 
   const handleVolumeChangeComplete = (finalPercent) => {
     setVolumePercent(finalPercent);
-    sendMicData({ value: finalPercent });
+    volumeSetter?.(finalPercent);
   };
 
   // Throttled volume send during drag (every 100ms)
   const handleThrottledChange = (throttledPercent) => {
-    sendMicData({ value: throttledPercent });
+    volumeSetter?.(throttledPercent);
   };
 
   const handleIncrement = () => {
     const newVolume = Math.min(100, volumePercent + step);
     setVolumePercent(newVolume);
-    sendMicData({ value: newVolume });
+    volumeSetter?.(newVolume);
     console.log(`📤 ${name}: Volume Up to ${newVolume}%`);
   };
 
   const handleDecrement = () => {
     const newVolume = Math.max(0, volumePercent - step);
     setVolumePercent(newVolume);
-    sendMicData({ value: newVolume });
+    volumeSetter?.(newVolume);
     console.log(`📤 ${name}: Volume Down to ${newVolume}%`);
   };
 
