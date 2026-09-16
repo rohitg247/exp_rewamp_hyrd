@@ -53,7 +53,15 @@ const AudioControls = () => {
     },
     {
       id: 4,
-      name: 'VC Audio',
+      name: 'VC IN',
+      muted: headworn2Muted,
+      setMuted: setHeadworn2Muted,
+      icon: Volume2,
+      mutedIcon: VolumeX,
+    },
+    {
+      id: 5,
+      name: 'VC OUT',
       muted: headworn2Muted,
       setMuted: setHeadworn2Muted,
       icon: Volume2,

@@ -29,8 +29,8 @@ const sendPulse = (setFn) => {
 const INPUT_SOURCES = [
   { label: "Laptop", icon: Laptop },
   { label: "Air Media", icon: Cast },
-  { label: "Codec 1", icon: Video },
-  { label: "Codec 2", icon: Video },
+  { label: "Codec Primary", icon: Video },
+  { label: "Codec Secondary", icon: Video },
 ];
 
 

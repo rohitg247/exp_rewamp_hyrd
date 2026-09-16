@@ -115,7 +115,6 @@ export const DIGITAL_JOINS = {
   // D122-129: Reserved
 
 
-
   // ── GROUP 13: System Heartbeat (D130-139) ──
   SYSTEM_HEARTBEAT_SEND: 130,     // [PULSE] ProcessorConnectionContext.jsx - Frontend sends pulse every 10s
   SYSTEM_HEARTBEAT_RECEIVE: 131,  // [FEEDBACK] ProcessorConnectionContext.jsx - Backend response pulse
