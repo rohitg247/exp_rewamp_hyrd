@@ -9,8 +9,6 @@ const Sidebar = ({ className = '' }) => {
     "/main-page",
     "/av-matrix",
     "/audio-controls",
-    "/cafe",
-    "/room-controls",
     "/settings",
   ];
   const showSidebar = mainPageRoutes.includes(location.pathname);

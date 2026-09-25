@@ -8,9 +8,6 @@
 
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useAudioContext } from '../../context/AudioContext';
-import { useSerialJoin } from '../../hooks/useJoin';
-import { SERIAL_JOINS } from '../../crestron/joins';
-import { safeSessionStorage } from '../../utils/safeStorage';
 import Button from '../ui/Button';
 
 const AudioControls = () => {
@@ -24,8 +21,6 @@ const AudioControls = () => {
     headworn2Muted,
     setHeadworn2Muted,
   } = useAudioContext();
-
-  const [, sendMicSerial] = useSerialJoin(SERIAL_JOINS.MIC_CHANNEL_DATA);
 
   const micChannels = [
     {
@@ -72,21 +67,7 @@ const AudioControls = () => {
   const handleToggle = (channel) => {
     const newState = channel.muted === 0 ? 1 : 0;
     channel.setMuted(newState);
-
-    const savedVolume = safeSessionStorage.getItem(`micVolume_${channel.id}`);
-    const value = savedVolume ? parseInt(savedVolume, 10) : 50;
-
-    const invertedMuted = newState === 0 ? 1 : 0;
-    const data = JSON.stringify({
-      id: channel.id,
-      value,
-      muted: invertedMuted,
-    });
-
-    sendMicSerial(data);
-    console.log(
-      `🎧 ${channel.name} ${newState === 0 ? 'MUTED' : 'UNMUTED'} → ${data}`
-    );
+    console.log(`🎧 ${channel.name} ${newState === 0 ? 'MUTED' : 'UNMUTED'}`);
   };
 
   const renderChannel = (channel) => {

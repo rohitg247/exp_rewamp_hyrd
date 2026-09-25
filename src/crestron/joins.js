@@ -46,11 +46,7 @@ export const DIGITAL_JOINS = {
 
 
 
-  // ── GROUP 3: Room Layout (D20-29) ──
-  ROOM_LAYOUT_TOWNHALL: 20,       // [PULSE] RoomLayoutDisplay.jsx - Townhall layout
-  ROOM_LAYOUT_TRAINING: 21,       // [PULSE] RoomLayoutDisplay.jsx - Training layout
-  ROOM_LAYOUT_COMBINED: 22,       // [PULSE] RoomLayoutDisplay.jsx - Combined layout
-  // D23-29: Reserved
+  // D20-29: Reserved (Group 3, Room Layout — card removed from Room Controls)
 
 
 
@@ -103,8 +99,8 @@ export const DIGITAL_JOINS = {
 
 
   // ── GROUP 11: Source Mode Selection (D110-119) ──
-  SOURCE_MODE_PRESENTATION: 110,  // [PULSE] SourceSelection.jsx - Presentation mode selected
-  SOURCE_MODE_BYOD: 111,          // [PULSE] SourceSelection.jsx - BYOD mode selected
+  SOURCE_MODE_PRESENTATION: 110,  // [PULSE] SourceSelection.jsx - Presentation mode (laptop on all displays)
+  SOURCE_MODE_VC: 111,            // [PULSE] SourceSelection.jsx - VC Call mode (codec primary/secondary)
   // D112-119: Reserved
 
 
@@ -165,7 +161,49 @@ export const DIGITAL_JOINS = {
 
 
 
-  // D180-199: Reserved (Group 17, Main Source Selection Deselect/Blank — unused)
+  // ── GROUP 17: Display HDMI Input Select, 2 per display (D180-191) ──
+  // Mutually exclusive in the UI only — the processor sends no feedback.
+  SIDE_DISPLAY_1_HDMI1: 180,      // [PULSE] DisplayPowerGrid.jsx - Side Display 1 → HDMI 1
+  SIDE_DISPLAY_1_HDMI2: 181,      // [PULSE] DisplayPowerGrid.jsx - Side Display 1 → HDMI 2
+  SIDE_DISPLAY_2_HDMI1: 182,      // [PULSE] DisplayPowerGrid.jsx - Side Display 2 → HDMI 1
+  SIDE_DISPLAY_2_HDMI2: 183,      // [PULSE] DisplayPowerGrid.jsx - Side Display 2 → HDMI 2
+  SIDE_DISPLAY_3_HDMI1: 184,      // [PULSE] DisplayPowerGrid.jsx - Side Display 3 → HDMI 1
+  SIDE_DISPLAY_3_HDMI2: 185,      // [PULSE] DisplayPowerGrid.jsx - Side Display 3 → HDMI 2
+  SIDE_DISPLAY_4_HDMI1: 186,      // [PULSE] DisplayPowerGrid.jsx - Side Display 4 → HDMI 1
+  SIDE_DISPLAY_4_HDMI2: 187,      // [PULSE] DisplayPowerGrid.jsx - Side Display 4 → HDMI 2
+  BACK_DISPLAY_HDMI1: 188,        // [PULSE] DisplayPowerGrid.jsx - 75" Back Display → HDMI 1
+  BACK_DISPLAY_HDMI2: 189,        // [PULSE] DisplayPowerGrid.jsx - 75" Back Display → HDMI 2
+  VIDEOWALL_HDMI1: 190,           // [PULSE] DisplayPowerGrid.jsx - Video Wall → HDMI 1
+  VIDEOWALL_HDMI2: 191,           // [PULSE] DisplayPowerGrid.jsx - Video Wall → HDMI 2
+  // ── GROUP 18: AV Matrix — 75" Back Display Layouts (D192-195) ──
+  // Same presets as the video wall, addressed on their own joins so the two
+  // surfaces never collide.
+  BACK_LAYOUT_FULL: 192,          // [PULSE] AVMatrixPage.jsx - 75" Full Window layout select
+  BACK_LAYOUT_DUAL: 193,          // [PULSE] AVMatrixPage.jsx - 75" Dual Window layout select
+  BACK_LAYOUT_QUAD: 194,          // [PULSE] AVMatrixPage.jsx - 75" Quad Window layout select
+  BACK_LAYOUT_3_RIGHT: 195,       // [PULSE] AVMatrixPage.jsx - 75" 3 Window layout select
+  // D196-199: Reserved
+
+
+  // ── GROUP 20: Camera Presets (D200-209) ──
+  CAM_PRESET_1: 200,              // [PULSE] CameraControl.jsx - Room_View
+  CAM_PRESET_2: 201,              // [PULSE] CameraControl.jsx - Front_cameras
+  CAM_PRESET_3: 202,              // [PULSE] CameraControl.jsx - Sightline
+  CAM_PRESET_4: 203,              // [PULSE] CameraControl.jsx - Sightline_AI
+  CAM_PRESET_5: 204,              // [PULSE] CameraControl.jsx - SightlineAI_PIP
+  CAM_PRESET_6: 205,              // [PULSE] CameraControl.jsx - SightlineAI_Conv
+  CAM_PRESET_7: 206,              // [PULSE] CameraControl.jsx - Training_room
+  CAM_PRESET_8: 207,              // [PULSE] CameraControl.jsx - Training Room_Conv
+  CAM_PRESET_9: 208,              // [PULSE] CameraControl.jsx - Preset 9
+  // D209: Reserved
+
+
+  // ── GROUP 21: Camera Wake/Sleep + Global Display Power (D210-219) ──
+  CAM_WAKE: 210,                  // [PULSE] CameraControl.jsx - Camera wake (exclusive with sleep, UI-side)
+  CAM_SLEEP: 211,                 // [PULSE] CameraControl.jsx - Camera sleep
+  GLOBAL_DISPLAY_ON: 212,         // [PULSE] GlobalDisplayControl.jsx - All displays on (backend fans out)
+  GLOBAL_DISPLAY_OFF: 213,        // [PULSE] GlobalDisplayControl.jsx - All displays off
+  // D214-219: Reserved
 };
 
 
@@ -182,16 +220,17 @@ export const ANALOG_JOINS = {
 
 
 
-  // ── GROUP 2: Mic Channels — Audio Controls Page (A210-219) ──
-  MIC1_VOLUME: 210,               // [ANALOG 0-100%] MicChannel.jsx - Ceiling Mic 1 volume
-  MIC1_ON_OFF_ANALOG: 211,        // [ANALOG 0/1] MicChannel.jsx - Ceiling Mic 1 (1=on, 0=muted)
-  MIC2_VOLUME: 212,               // [ANALOG 0-100%] MicChannel.jsx - Ceiling Mic 2 volume
-  MIC2_ON_OFF_ANALOG: 213,        // [ANALOG 0/1] MicChannel.jsx - Ceiling Mic 2 (1=on, 0=muted)
+  // ── GROUP 2: Audio Channels — Audio Controls Page, 5 channels (A210-219) ──
+  CEILING_BR_VOLUME: 210,         // [ANALOG 0-100%] MicChannel.jsx - Ceiling BR volume
+  CEILING_BR_ON_OFF_ANALOG: 211,  // [ANALOG 0/1] MicChannel.jsx - Ceiling BR (1=on, 0=muted)
+  CEILING_TR_VOLUME: 212,         // [ANALOG 0-100%] MicChannel.jsx - Ceiling TR volume
+  CEILING_TR_ON_OFF_ANALOG: 213,  // [ANALOG 0/1] MicChannel.jsx - Ceiling TR (1=on, 0=muted)
   PROGRAM_AUDIO_VOLUME: 214,      // [ANALOG 0-100%] MicChannel.jsx - Program Audio volume
   PROGRAM_AUDIO_ON_OFF_ANALOG: 215, // [ANALOG 0/1] MicChannel.jsx - Program Audio (1=on, 0=muted)
-  VC_AUDIO_VOLUME: 216,           // [ANALOG 0-100%] MicChannel.jsx - VC Audio volume
-  VC_AUDIO_ON_OFF_ANALOG: 217,    // [ANALOG 0/1] MicChannel.jsx - VC Audio (1=on, 0=muted)
-  // A218-219: Reserved
+  VC_IN_VOLUME: 216,              // [ANALOG 0-100%] MicChannel.jsx - VC In volume
+  VC_IN_ON_OFF_ANALOG: 217,       // [ANALOG 0/1] MicChannel.jsx - VC In (1=on, 0=muted)
+  VC_OUT_VOLUME: 218,             // [ANALOG 0-100%] MicChannel.jsx - VC Out volume
+  VC_OUT_ON_OFF_ANALOG: 219,      // [ANALOG 0/1] MicChannel.jsx - VC Out (1=on, 0=muted)
 
 
 
@@ -236,8 +275,9 @@ export const PRESET_BRIGHTNESS = {
 export const SERIAL_JOINS = {
   // ── GROUP 1: AV Matrix (S300-309) ──
   AVMATRIX_ROUTING: 300,          // [SERIAL] AVMatrixPage.jsx, SourceSelection.jsx - Direct display routing. Format: "input:output" e.g. "1:2", clear: "0:2"
-  AVMATRIX_LAYOUT_ROUTING: 301,   // [SERIAL] AVMatrixPage.jsx - Combine-layout zone routing. Format: "input:layout:zone" e.g. "1:2:3", clear: "0:2:3"
-  // S302-309: Reserved
+  AVMATRIX_LAYOUT_ROUTING: 301,   // [SERIAL] AVMatrixPage.jsx - Video Wall zone routing. Format: "input:layout:zone" e.g. "1:2:3", clear: "0:2:3"
+  AVMATRIX_BACK_LAYOUT_ROUTING: 302, // [SERIAL] AVMatrixPage.jsx - 75" Back Display zone routing. Same format as S301
+  // S303-309: Reserved
 
 
 
@@ -255,7 +295,5 @@ export const SERIAL_JOINS = {
 
 
 
-  // ── GROUP 4: Mic Channel Data (S330-339) ──
-  MIC_CHANNEL_DATA: 330,          // [SERIAL JSON] MicrophoneControl.jsx, AudioControls.jsx - Format: {"id":1,"value":45,"muted":0}
-  // S331-399: Reserved (Group 5, AC Status Feedback — single-room UI, unused)
+  // S330-399: Reserved (mic channels now use analog joins A210-219)
 };

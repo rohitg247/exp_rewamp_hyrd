@@ -21,6 +21,7 @@ const SpeakerControl = () => {
     setLapelMuted,
     setProgramAudioMuted,
     setVcAudioMuted,
+    setVcOutMuted,
     masterSpeakerOn,
     setMasterSpeakerOn,
   } = useAudioContext();
@@ -106,6 +107,7 @@ const SpeakerControl = () => {
     const speakerChannelState = newState ? 1 : 0;
     setProgramAudioMuted(speakerChannelState);
     setVcAudioMuted(speakerChannelState);
+    setVcOutMuted(speakerChannelState);
     console.log(`🔊 Speaker channels UI updated to: ${newState ? 'UNMUTED (1)' : 'MUTED (0)'}`);
 
     safeSessionStorage.removeItem('masterSpeakerManualClick');

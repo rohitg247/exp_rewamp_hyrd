@@ -12,6 +12,7 @@ const MicChannel = ({
   volumeSetter,
   onOffSetter,
   step = 1,
+  defaultVolume = 50,
   icon: ActiveIcon = Mic,
   mutedIcon: MutedIcon = MicOff,
 }) => {
@@ -69,6 +70,13 @@ const MicChannel = ({
     setVolumePercent(newVolume);
     volumeSetter?.(newVolume);
     console.log(`📤 ${name}: Volume Down to ${newVolume}%`);
+  };
+
+  // Reset to default level on the channel's existing volume join
+  const handleDefault = () => {
+    setVolumePercent(defaultVolume);
+    volumeSetter?.(defaultVolume);
+    console.log(`📤 ${name}: Volume reset to default ${defaultVolume}%`);
   };
 
   return (
@@ -132,6 +140,19 @@ const MicChannel = ({
                    h-auto font-semibold flex-shrink-0"
       >
         {isMuted ? <MutedIcon size={20} /> : <ActiveIcon size={20} />}
+      </Button>
+
+      {/* Default Level Button */}
+      <Button
+        variant="secondary"
+        size="md"
+        onClick={handleDefault}
+        className="w-20 touchPanel:w-24 flex items-center justify-center
+                   px-1 touchPanel:py-4 text-xs touchPanel:text-sm
+                   h-auto font-semibold flex-shrink-0"
+        aria-label={`Reset ${name} to default volume`}
+      >
+        Default
       </Button>
     </div>
   );

@@ -11,6 +11,7 @@ import Navbar from "./components/layout/Navbar";
 import Sidebar from "./components/layout/Sidebar";
 import ShutdownScreen from "./components/ShutdownScreen";
 import ShutdownModal from "./components/modals/ShutdownModal";
+import PinModal from "./components/modals/PinModal";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ToastContainer from "./components/ui/ToastContainer";
 import { AudioProvider, useAudioContext } from "./context/AudioContext";
@@ -49,8 +50,6 @@ const ContentWrapper = ({ children, onShutdown }) => {
     "/main-page",
     "/av-matrix",
     "/audio-controls",
-    "/cafe",
-    "/room-controls",
     "/settings",
   ];
   const showSidebar = SIDEBAR_ENABLED && mainPageRoutes.includes(location.pathname);
@@ -77,6 +76,11 @@ const AppContent = () => {
   const navigate = useNavigate();
   const [showShutdown, setShowShutdown] = useState(false);
   const [showShutdownModal, setShowShutdownModal] = useState(false);
+  const location = useLocation();
+
+  // Session PIN — asked once per session, reset on shutdown (handleShutdownComplete).
+  // Shutdown already clears sessionStorage, so the stored flag goes with it.
+  const [pinOk, setPinOk] = useState(() => safeSessionStorage.getItem('sessionPinOk') === 'true');
 
   // Backend-triggered shutdown hooks
   const { setCeiling1Muted, setCeiling2Muted, setHeadworn1Muted,
@@ -138,6 +142,7 @@ const AppContent = () => {
 
   const handleShutdownComplete = () => {
     setShowShutdown(false);
+    setPinOk(false);
     navigate("/", { replace: true });
     console.log("🔄 Navigated to landing page after shutdown");
   };
@@ -219,7 +224,7 @@ const AppContent = () => {
             path="/cafe"
             element={
               <ContentWrapper onShutdown={handleShutdownClick}>
-                <CafePage sidebarEnabled={SIDEBAR_ENABLED} />
+                <CafePage sidebarEnabled={false} />
               </ContentWrapper>
             }
           />
@@ -228,7 +233,7 @@ const AppContent = () => {
             path="/room-controls"
             element={
               <ContentWrapper onShutdown={handleShutdownClick}>
-                <RoomControlsPage sidebarEnabled={SIDEBAR_ENABLED} />
+                <RoomControlsPage sidebarEnabled={false} />
               </ContentWrapper>
             }
           />
@@ -257,6 +262,16 @@ const AppContent = () => {
           isOpen={showShutdownModal}
           onConfirm={handleShutdownConfirm}
           onCancel={handleShutdownCancel}
+        />
+
+        <PinModal
+          isOpen={!pinOk && location.pathname !== "/"}
+          showCloseButton={false}
+          onClose={() => {}}
+          onSuccess={() => {
+            safeSessionStorage.setItem('sessionPinOk', 'true');
+            setPinOk(true);
+          }}
         />
 
         <ShutdownScreen

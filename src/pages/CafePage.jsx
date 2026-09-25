@@ -6,7 +6,7 @@ import {
 import { useSerialJoin } from '../hooks/useJoin';
 import { SERIAL_JOINS } from '../crestron/joins';
 import { safeLocalStorage } from '../utils/safeStorage';
-import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import EditMenuModal from '../components/modals/EditMenuModal';
 import orderPlacedSound from '../assets/sounds/order-placed.mp3';
@@ -20,6 +20,10 @@ const DEFAULT_MENU_ITEMS = [
 const MAX_STORED_ORDERS = 100;
 const SUBMIT_LOCK_MS = 1200;
 const UNDO_WINDOW_SECONDS = 8;
+
+// Card header styling — same tokens as MainPage / RoomControlsPage, left-aligned here
+const ICON_CLS = 'w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7';
+const LABEL_CLS = 'text-base md:text-lg touchPanel:text-xl';
 
 
 // --- Item icon mapping (first match wins) ---
@@ -242,12 +246,6 @@ const CafePage = ({ sidebarEnabled = false }) => {
   // The bottom quantity strip shares the same well aesthetic.
   const stripStyle = { ...wellStyle };
 
-  // Header divider: stronger than the default --color-border so it
-  // anchors the header visually against the tinted card.
-  const headerBorderStyle = {
-    borderColor: 'color-mix(in srgb, var(--color-primary-200) 45%, var(--color-bg-secondary))',
-  };
-
   // ── Tile states ───────────────────────────────────────────────
   //
   // unselected tile: sits on the well, needs to read as interactive
@@ -298,16 +296,12 @@ const CafePage = ({ sidebarEnabled = false }) => {
           variant="gradient"
           tone="brand"
           className="flex-[1.3] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0 }}
         >
-          <CardHeader
-            className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"
-            style={{ ...headerBorderStyle, marginBottom: 0 }}
-          >
+          <CardHeader className="pb-3 flex-shrink-0">
             <div className="flex items-center justify-between gap-3 w-full">
-              <CardTitle className="flex items-center gap-2 text-base touchPanel:text-2xl font-bold">
-                <Coffee className="w-5 h-5 touchPanel:w-7 touchPanel:h-7 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
-                <span>Select Item</span>
+              <CardTitle className="flex items-center space-x-2">
+                <CardIcon tone="brand"><Coffee className={ICON_CLS} /></CardIcon>
+                <span className={LABEL_CLS}>Select Item</span>
               </CardTitle>
 
               <Button
@@ -322,7 +316,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4 px-4 py-4 touchPanel:px-6 touchPanel:py-5">
+          <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4">
             {/* Menu grid. `no-scrollbar` (global.css @layer utilities) hides the
                 bar without disabling scrolling — a visible scrollbar has no
                 place on a touch panel. */}
@@ -396,20 +390,26 @@ const CafePage = ({ sidebarEnabled = false }) => {
                 out and merely hidden with `invisible`, which still reserves its
                 exact box, so the height cannot change. */}
             <div
-              className="flex-shrink-0 rounded-xl px-3 py-2.5 touchPanel:px-4 touchPanel:py-3.5 flex items-center justify-between gap-3"
+              className="flex-shrink-0 rounded-xl px-3 py-3.5 touchPanel:px-4 touchPanel:py-5 flex items-center justify-between gap-3"
               style={stripStyle}
             >
-              <div className="min-w-0 flex-1">
+              <div className="relative min-w-0 flex-1">
                 <p className="text-[10px] touchPanel:text-xs uppercase tracking-wide" style={{ color: 'var(--color-text-light)' }}>
                   {/* nbsp keeps the two-line block at a constant height */}
                   {selectedQty > 0 ? 'Adjust quantity' : ' '}
                 </p>
-                <p
-                  className="text-sm touchPanel:text-lg font-semibold truncate text-heading"
-                  style={selectedQty > 0 ? undefined : { color: 'var(--color-text-light)' }}
-                >
-                  {selectedQty > 0 ? selectedItem : 'Tap an item to add it — tap again for more'}
+                <p className="text-sm touchPanel:text-lg font-semibold truncate text-heading">
+                  {selectedQty > 0 ? selectedItem : ' '}
                 </p>
+                {/* Empty-state hint overlays both spacer lines, vertically centred */}
+                {selectedQty === 0 && (
+                  <p
+                    className="absolute inset-0 flex items-center text-sm touchPanel:text-lg font-semibold truncate"
+                    style={{ color: 'var(--color-text-light)' }}
+                  >
+                    Tap an item to add it — tap again for more
+                  </p>
+                )}
               </div>
 
               <div
@@ -422,28 +422,28 @@ const CafePage = ({ sidebarEnabled = false }) => {
                   variant="secondary"
                   size="sm"
                   onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty - 1)}
-                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                  className="px-4 py-3 touchPanel:px-7 touchPanel:py-4"
                 >
-                  <Minus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                  <Minus className="w-5 h-5 touchPanel:w-8 touchPanel:h-8" />
                 </Button>
-                <span className="text-lg touchPanel:text-2xl font-bold text-heading w-8 touchPanel:w-12 text-center">
+                <span className="text-xl touchPanel:text-3xl font-bold text-heading w-10 touchPanel:w-14 text-center">
                   {selectedQty}
                 </span>
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => handleQtyChangeInSummary(selectedItem, selectedQty + 1)}
-                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                  className="px-4 py-3 touchPanel:px-7 touchPanel:py-4"
                 >
-                  <Plus className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                  <Plus className="w-5 h-5 touchPanel:w-8 touchPanel:h-8" />
                 </Button>
                 <Button
                   variant="danger"
                   size="sm"
                   onClick={() => handleDeleteFromOrder(selectedItem)}
-                  className="px-3 py-2 touchPanel:px-5 touchPanel:py-3"
+                  className="px-4 py-3 touchPanel:px-7 touchPanel:py-4"
                 >
-                  <Trash2 className="w-4 h-4 touchPanel:w-6 touchPanel:h-6" />
+                  <Trash2 className="w-5 h-5 touchPanel:w-8 touchPanel:h-8" />
                 </Button>
               </div>
             </div>
@@ -455,16 +455,12 @@ const CafePage = ({ sidebarEnabled = false }) => {
           variant="gradient"
           tone="climate"
           className="flex-[1] min-w-0 flex flex-col overflow-hidden"
-          style={{ padding: 0 }}
         >
-          <CardHeader
-            className="px-4 py-3 touchPanel:px-6 touchPanel:py-4 border-b flex-shrink-0"
-            style={{ ...headerBorderStyle, marginBottom: 0 }}
-          >
+          <CardHeader className="pb-3 flex-shrink-0">
             <div className="flex items-center justify-between gap-3 w-full">
-              <CardTitle className="flex items-center gap-2 text-base touchPanel:text-2xl font-bold">
-                <ClipboardList className="w-5 h-5 touchPanel:w-7 touchPanel:h-7 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
-                <span>Order Summary</span>
+              <CardTitle className="flex items-center space-x-2">
+                <CardIcon tone="climate"><ClipboardList className={ICON_CLS} /></CardIcon>
+                <span className={LABEL_CLS}>Order Summary</span>
               </CardTitle>
 
               <span
@@ -476,7 +472,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
             </div>
           </CardHeader>
 
-          <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4 px-4 py-4 touchPanel:px-6 touchPanel:py-5">
+          <CardContent className="flex-1 min-h-0 flex flex-col gap-3 touchPanel:gap-4">
             <div
               className="flex-1 min-h-0 overflow-y-auto rounded-xl p-3 touchPanel:p-4"
               style={wellStyle}

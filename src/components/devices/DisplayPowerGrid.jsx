@@ -11,13 +11,13 @@ const sendPulse = (setFn) => {
 };
 
 // 6 real displays for this room
-const DISPLAY_CONFIGS = [
-  { key: 'side-1', label: 'Side Display 1', storageKey: 'sideDisplay1Power', onJoinKey: 'SIDE_DISPLAY_1_ON', offJoinKey: 'SIDE_DISPLAY_1_OFF' },
-  { key: 'side-2', label: 'Side Display 2', storageKey: 'sideDisplay2Power', onJoinKey: 'SIDE_DISPLAY_2_ON', offJoinKey: 'SIDE_DISPLAY_2_OFF' },
-  { key: 'side-3', label: 'Side Display 3', storageKey: 'sideDisplay3Power', onJoinKey: 'SIDE_DISPLAY_3_ON', offJoinKey: 'SIDE_DISPLAY_3_OFF' },
-  { key: 'side-4', label: 'Side Display 4', storageKey: 'sideDisplay4Power', onJoinKey: 'SIDE_DISPLAY_4_ON', offJoinKey: 'SIDE_DISPLAY_4_OFF' },
-  { key: 'back', label: 'Back Display', storageKey: 'backDisplayPower', onJoinKey: 'BACK_DISPLAY_ON', offJoinKey: 'BACK_DISPLAY_OFF' },
-  { key: 'videowall', label: 'Video Wall', storageKey: 'videoWallPower', onJoinKey: 'VIDEOWALL_ON', offJoinKey: 'VIDEOWALL_OFF' },
+export const DISPLAY_CONFIGS = [
+  { key: 'side-1', label: 'Side Display 1', storageKey: 'sideDisplay1Power', onJoinKey: 'SIDE_DISPLAY_1_ON', offJoinKey: 'SIDE_DISPLAY_1_OFF', hdmi1JoinKey: 'SIDE_DISPLAY_1_HDMI1', hdmi2JoinKey: 'SIDE_DISPLAY_1_HDMI2' },
+  { key: 'side-2', label: 'Side Display 2', storageKey: 'sideDisplay2Power', onJoinKey: 'SIDE_DISPLAY_2_ON', offJoinKey: 'SIDE_DISPLAY_2_OFF', hdmi1JoinKey: 'SIDE_DISPLAY_2_HDMI1', hdmi2JoinKey: 'SIDE_DISPLAY_2_HDMI2' },
+  { key: 'side-3', label: 'Side Display 3', storageKey: 'sideDisplay3Power', onJoinKey: 'SIDE_DISPLAY_3_ON', offJoinKey: 'SIDE_DISPLAY_3_OFF', hdmi1JoinKey: 'SIDE_DISPLAY_3_HDMI1', hdmi2JoinKey: 'SIDE_DISPLAY_3_HDMI2' },
+  { key: 'side-4', label: 'Side Display 4', storageKey: 'sideDisplay4Power', onJoinKey: 'SIDE_DISPLAY_4_ON', offJoinKey: 'SIDE_DISPLAY_4_OFF', hdmi1JoinKey: 'SIDE_DISPLAY_4_HDMI1', hdmi2JoinKey: 'SIDE_DISPLAY_4_HDMI2' },
+  { key: 'back', label: 'Back Display', storageKey: 'backDisplayPower', onJoinKey: 'BACK_DISPLAY_ON', offJoinKey: 'BACK_DISPLAY_OFF', hdmi1JoinKey: 'BACK_DISPLAY_HDMI1', hdmi2JoinKey: 'BACK_DISPLAY_HDMI2' },
+  { key: 'videowall', label: 'Video Wall', storageKey: 'videoWallPower', onJoinKey: 'VIDEOWALL_ON', offJoinKey: 'VIDEOWALL_OFF', hdmi1JoinKey: 'VIDEOWALL_HDMI1', hdmi2JoinKey: 'VIDEOWALL_HDMI2' },
 ];
 
 const STATE_UI = {
@@ -41,13 +41,25 @@ const STATE_UI = {
   },
 };
 
-function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
+function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey, hdmi1JoinKey, hdmi2JoinKey }) {
   const [powerState, setPowerState] = useState(
     () => safeSessionStorage.getItem(storageKey) || 'off'
   );
 
   const [, , sendOn] = useDigitalJoin(DIGITAL_JOINS[onJoinKey]);
   const [, , sendOff] = useDigitalJoin(DIGITAL_JOINS[offJoinKey]);
+
+  // HDMI input — mutually exclusive, UI-side only (no processor feedback)
+  const [input, setInput] = useState(() => safeSessionStorage.getItem(`${storageKey}Input`));
+  const [, , sendHdmi1] = useDigitalJoin(DIGITAL_JOINS[hdmi1JoinKey]);
+  const [, , sendHdmi2] = useDigitalJoin(DIGITAL_JOINS[hdmi2JoinKey]);
+
+  const handleInput = (next, sendFn) => {
+    if (input === next) return;
+    setInput(next);
+    safeSessionStorage.setItem(`${storageKey}Input`, next);
+    sendPulse(sendFn);
+  };
 
   const isOn = powerState === 'on';
   const HeroIcon = isOn ? Monitor : MonitorX;
@@ -118,8 +130,8 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
         />
       </div>
 
-      {/* Vertically stacked buttons using your Button component */}
-      <div className="flex flex-col gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
+      {/* ON / OFF side by side — keeps the tile short enough for the 3x2 grid */}
+      <div className="grid grid-cols-2 gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
         <Button
           variant={isOn ? 'success' : 'secondary'}
           size="sm"
@@ -142,6 +154,25 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey }) {
           <span className="text-xs touchPanel:text-sm">OFF</span>
         </Button>
       </div>
+
+      {/* HDMI input select — mutually exclusive */}
+      <div className="grid grid-cols-2 gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
+        {[
+          { key: 'hdmi1', text: 'HDMI 1', sendFn: sendHdmi1 },
+          { key: 'hdmi2', text: 'HDMI 2', sendFn: sendHdmi2 },
+        ].map((option) => (
+          <Button
+            key={option.key}
+            variant={input === option.key ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => handleInput(option.key, option.sendFn)}
+            aria-label={`${label} ${option.text}`}
+            className="w-full flex items-center justify-center py-1.5 px-1 touchPanel:py-2"
+          >
+            <span className="text-xs touchPanel:text-sm whitespace-nowrap">{option.text}</span>
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -156,6 +187,8 @@ const DisplayPowerGrid = () => {
             storageKey={display.storageKey}
             onJoinKey={display.onJoinKey}
             offJoinKey={display.offJoinKey}
+            hdmi1JoinKey={display.hdmi1JoinKey}
+            hdmi2JoinKey={display.hdmi2JoinKey}
           />
         </div>
       ))}

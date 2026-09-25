@@ -63,6 +63,11 @@ export function AudioProvider({ children }) {
     return saved !== null ? parseInt(saved, 10) : 1;
   });
 
+  const [vcOutMuted, setVcOutMuted] = useState(() => {
+    const saved = safeSessionStorage.getItem('speaker_vc_out_muted');
+    return saved !== null ? parseInt(saved, 10) : 1;
+  });
+
   // Persist master mic state
   useEffect(() => {
     safeSessionStorage.setItem('masterMicOnGlobal', masterMicOn);
@@ -106,13 +111,17 @@ export function AudioProvider({ children }) {
     safeSessionStorage.setItem('speaker_vc_muted', vcAudioMuted);
   }, [vcAudioMuted]);
 
-  // ✅ Auto-sync master speaker based on the 2 speaker channels (mirrors master mic below)
+  useEffect(() => {
+    safeSessionStorage.setItem('speaker_vc_out_muted', vcOutMuted);
+  }, [vcOutMuted]);
+
+  // ✅ Auto-sync master speaker based on the 3 speaker channels (mirrors master mic below)
   useEffect(() => {
     const isManualClick = safeSessionStorage.getItem('masterSpeakerManualClick') === 'true';
     if (isManualClick) return;
 
-    const allMuted = programAudioMuted === 0 && vcAudioMuted === 0;
-    const anyUnmuted = programAudioMuted === 1 || vcAudioMuted === 1;
+    const allMuted = programAudioMuted === 0 && vcAudioMuted === 0 && vcOutMuted === 0;
+    const anyUnmuted = programAudioMuted === 1 || vcAudioMuted === 1 || vcOutMuted === 1;
 
     if (allMuted && masterSpeakerOn) {
       setMasterSpeakerOn(false);
@@ -121,7 +130,7 @@ export function AudioProvider({ children }) {
       setMasterSpeakerOn(true);
       console.log('🔊 Master Speaker AUTO-UNMUTED (speaker activity detected)');
     }
-  }, [programAudioMuted, vcAudioMuted, masterSpeakerOn]);
+  }, [programAudioMuted, vcAudioMuted, vcOutMuted, masterSpeakerOn]);
 
   // ✅ Auto-sync master mic based on individual mics (ONLY if not manual click)
   useEffect(() => {
@@ -180,6 +189,8 @@ export function AudioProvider({ children }) {
     setProgramAudioMuted,
     vcAudioMuted,
     setVcAudioMuted,
+    vcOutMuted,
+    setVcOutMuted,
   };
 
   return (

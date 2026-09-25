@@ -1,8 +1,9 @@
 // src/pages/MainPage.jsx
-import { Mic, Volume2, Laptop, Lightbulb, Thermometer } from 'lucide-react';
+import { Mic, Laptop, Lightbulb, Thermometer, Monitor } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 import MicrophoneControl from '../components/devices/MicrophoneControl';
 import SourceSelection from '../components/devices/SourceSelection';
+import GlobalDisplayControl from '../components/devices/GlobalDisplayControl';
 import LightingPresetsCompact from '../components/devices/LightingPresetsCompact';
 import AirconControl from '../components/devices/AirconControl';
 
@@ -18,10 +19,10 @@ const MainPage = ({ sidebarEnabled = false }) => {
         <div className="grid grid-cols-3 auto-rows-fr gap-6 touchPanel:gap-8 flex-1 h-full min-h-0">
 
           {/* ══════════════════════════════════════════════════════
-              COLUMN 1: Mics (Top) + Speakers (Bottom)
+              COLUMN 1: Mics (Top) + Global Display (Bottom)
               ══════════════════════════════════════════════════════ */}
           <div className="flex flex-col gap-6 touchPanel:gap-8 h-full min-h-0">
-            {/* Row 1: Mics (50% height) */}
+            {/* Mics */}
             <Card variant="gradient" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
@@ -34,16 +35,16 @@ const MainPage = ({ sidebarEnabled = false }) => {
               </CardContent>
             </Card>
 
-            {/* Row 2: Speakers (50% height) */}
-            <Card variant="gradient" tone="audio" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
+            {/* Global Display power — all displays on / off */}
+            <Card variant="gradient" tone="video" className="flex-[1] flex flex-col min-h-0 overflow-hidden">
               <CardHeader className="pb-3 flex-shrink-0">
                 <CardTitle className="flex items-center justify-center space-x-2">
-                  <CardIcon tone="audio"><Volume2 className={ICON_CLS} /></CardIcon>
-                  <span className={LABEL_CLS}>Speakers</span>
+                  <CardIcon tone="video"><Monitor className={ICON_CLS} /></CardIcon>
+                  <span className={LABEL_CLS}>Global Display</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto min-h-0">
-                <MicrophoneControl variant="speakers" />
+              <CardContent className="flex-1 flex items-stretch px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-hidden min-h-0">
+                <GlobalDisplayControl />
               </CardContent>
             </Card>
           </div>
@@ -61,7 +62,7 @@ const MainPage = ({ sidebarEnabled = false }) => {
                   <span className={LABEL_CLS}>Mode Selection</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex-1 flex items-center justify-center px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto touchPanel:overflow-hidden min-h-0">
+              <CardContent className="flex-1 flex items-stretch px-4 py-4 touchPanel:px-6 touchPanel:py-6 overflow-y-auto touchPanel:overflow-hidden min-h-0">
                 <SourceSelection />
               </CardContent>
             </Card>

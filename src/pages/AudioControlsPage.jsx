@@ -16,37 +16,41 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
     setProgramAudioMuted,
     vcAudioMuted,
     setVcAudioMuted,
+    vcOutMuted,
+    setVcOutMuted,
   } = useAudioContext();
 
 
   // ✅ Two analog joins per channel: volume (0-100%) + on/off (1=on, 0=muted)
-  const [, setMic1Volume] = useAnalogJoin(ANALOG_JOINS.MIC1_VOLUME);
-  const [, setMic1OnOff] = useAnalogJoin(ANALOG_JOINS.MIC1_ON_OFF_ANALOG);
-  const [, setMic2Volume] = useAnalogJoin(ANALOG_JOINS.MIC2_VOLUME);
-  const [, setMic2OnOff] = useAnalogJoin(ANALOG_JOINS.MIC2_ON_OFF_ANALOG);
+  const [, setCeilingBrVolume] = useAnalogJoin(ANALOG_JOINS.CEILING_BR_VOLUME);
+  const [, setCeilingBrOnOff] = useAnalogJoin(ANALOG_JOINS.CEILING_BR_ON_OFF_ANALOG);
+  const [, setCeilingTrVolume] = useAnalogJoin(ANALOG_JOINS.CEILING_TR_VOLUME);
+  const [, setCeilingTrOnOff] = useAnalogJoin(ANALOG_JOINS.CEILING_TR_ON_OFF_ANALOG);
   const [, setProgramAudioVolume] = useAnalogJoin(ANALOG_JOINS.PROGRAM_AUDIO_VOLUME);
   const [, setProgramAudioOnOff] = useAnalogJoin(ANALOG_JOINS.PROGRAM_AUDIO_ON_OFF_ANALOG);
-  const [, setVcAudioVolume] = useAnalogJoin(ANALOG_JOINS.VC_AUDIO_VOLUME);
-  const [, setVcAudioOnOff] = useAnalogJoin(ANALOG_JOINS.VC_AUDIO_ON_OFF_ANALOG);
+  const [, setVcInVolume] = useAnalogJoin(ANALOG_JOINS.VC_IN_VOLUME);
+  const [, setVcInOnOff] = useAnalogJoin(ANALOG_JOINS.VC_IN_ON_OFF_ANALOG);
+  const [, setVcOutVolume] = useAnalogJoin(ANALOG_JOINS.VC_OUT_VOLUME);
+  const [, setVcOutOnOff] = useAnalogJoin(ANALOG_JOINS.VC_OUT_ON_OFF_ANALOG);
 
 
-  // 4 channels: 2 mics + 2 speaker zones
+  // 5 channels: 2 mics + 3 speaker zones
   const micChannels = [
     {
       id: 1,
-      name: 'Ceiling Mic 1',
+      name: 'Ceiling BR',
       contextMutedState: ceiling1Muted,
       contextMutedSetter: setCeiling1Muted,
-      volumeSetter: setMic1Volume,
-      onOffSetter: setMic1OnOff,
+      volumeSetter: setCeilingBrVolume,
+      onOffSetter: setCeilingBrOnOff,
     },
     {
       id: 2,
-      name: 'Ceiling Mic 2',
+      name: 'Ceiling TR',
       contextMutedState: ceiling2Muted,
       contextMutedSetter: setCeiling2Muted,
-      volumeSetter: setMic2Volume,
-      onOffSetter: setMic2OnOff,
+      volumeSetter: setCeilingTrVolume,
+      onOffSetter: setCeilingTrOnOff,
     },
 
     // speaker controls
@@ -62,11 +66,21 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
     },
     {
       id: 4,
-      name: 'VC Audio',
+      name: 'VC In',
       contextMutedState: vcAudioMuted,
       contextMutedSetter: setVcAudioMuted,
-      volumeSetter: setVcAudioVolume,
-      onOffSetter: setVcAudioOnOff,
+      volumeSetter: setVcInVolume,
+      onOffSetter: setVcInOnOff,
+      icon: Volume2,
+      mutedIcon: VolumeX,
+    },
+    {
+      id: 5,
+      name: 'VC Out',
+      contextMutedState: vcOutMuted,
+      contextMutedSetter: setVcOutMuted,
+      volumeSetter: setVcOutVolume,
+      onOffSetter: setVcOutOnOff,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
@@ -78,7 +92,7 @@ const AudioControlsPage = ({ sidebarEnabled = false }) => {
       <div className={`flex-1 p-6 touchPanel:p-8 flex h-full items-stretch gap-6 touchPanel:gap-8 ${
         sidebarEnabled ? 'mr-36 touchPanel:mr-44' : 'mr-0'
       }`}>
-        <div className="flex-1 grid grid-cols-4 gap-6 touchPanel:gap-8">
+        <div className="flex-1 grid grid-cols-5 gap-6 touchPanel:gap-8">
           {micChannels.map((channel) => (
             <Card
               key={channel.id}

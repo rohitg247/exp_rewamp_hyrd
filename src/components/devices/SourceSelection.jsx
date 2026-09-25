@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Laptop, Cast } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Laptop, Video } from "lucide-react";
 import { useSerialJoin, useDigitalJoin } from "../../hooks/useJoin";
 import { SERIAL_JOINS, DIGITAL_JOINS } from "../../crestron/joins";
 import { safeSessionStorage } from "../../utils/safeStorage";
@@ -12,171 +11,122 @@ const sendPulse = (setFn) => {
   setTimeout(() => setFn(false), 100);
 };
 
-// Two simplified modes for the main page.
-// Keep outputs 1/2/3 for both for now — easy to update later.
+// Matrix numbering follows AVMatrixPage (all 1-based on the wire):
+//   inputs  : 1 Laptop, 2 Air Media, 3 Codec Primary, 4 Codec Secondary
+//   displays: 1-4 = Side Display 1-4 (1,2 = left row, 3,4 = right row)
+//   layouts : 1 Full, 2 Dual — zones 1 = left/full, 2 = right
+const LAPTOP = 1;
+const CODEC_PRI = 3;
+const CODEC_SEC = 4;
+
 const MODES = [
   {
     key: "presentation",
     name: "Presentation",
     icon: Laptop,
-    index: 0,
-    backendId: 1,
-    navigateToAVMatrix: false,
-    digitalJoin: DIGITAL_JOINS.SOURCE_MODE_PRESENTATION,
+    // Laptop on every side display, full-window laptop on video wall + 75"
+    displays: [LAPTOP, LAPTOP, LAPTOP, LAPTOP],
+    layoutKey: "full",
+    layoutNum: 1,
+    zones: { "full-main": LAPTOP },
   },
   {
-    key: "byod",
-    name: "BYOD",
-    icon: Cast,
-    index: 1,
-    backendId: 2,
-    navigateToAVMatrix: true,
-    digitalJoin: DIGITAL_JOINS.SOURCE_MODE_BYOD,
+    key: "vc",
+    name: "VC Call",
+    icon: Video,
+    // Displays 1 & 3 primary, 2 & 4 secondary; dual window left = primary, right = secondary
+    displays: [CODEC_PRI, CODEC_SEC, CODEC_PRI, CODEC_SEC],
+    layoutKey: "dual",
+    layoutNum: 2,
+    zones: { "dual-left": CODEC_PRI, "dual-right": CODEC_SEC },
   },
 ];
 
-const BYOD_MODE = MODES[1];
+const PRESENTATION_MODE = MODES[0];
+
+// Mirror a mode into the AV Matrix sessionStorage (0-based input indexes there)
+// so the Live Layout page shows what the mode routed.
+const writeAVMatrixStorage = (mode) => {
+  const routingMap = {};
+  mode.displays.forEach((input, idx) => { routingMap[idx] = input - 1; });
+  const zoneMap = {};
+  Object.entries(mode.zones).forEach(([zone, input]) => { zoneMap[zone] = input - 1; });
+
+  safeSessionStorage.setItem("avmatrix_routing_map", JSON.stringify(routingMap));
+  safeSessionStorage.setItem("avmatrix_layout", mode.layoutKey);
+  safeSessionStorage.setItem("avmatrix_layout_routing", JSON.stringify(zoneMap));
+  safeSessionStorage.setItem("avmatrix_back_layout", mode.layoutKey);
+  safeSessionStorage.setItem("avmatrix_back_layout_routing", JSON.stringify(zoneMap));
+};
+
+// Which mode (if any) the current AV Matrix routing matches
+const detectMode = () => {
+  try {
+    const saved = safeSessionStorage.getItem("avmatrix_routing_map");
+    if (saved === null) return null;
+    const routingMap = JSON.parse(saved);
+    const match = MODES.find((mode) =>
+      mode.displays.every((input, idx) => routingMap[idx] === input - 1)
+    );
+    return match ? match.key : "custom";
+  } catch (error) {
+    console.error("❌ Failed to sync with AV Matrix routing:", error);
+    return "custom";
+  }
+};
 
 const SourceSelection = () => {
-  const navigate = useNavigate();
-
-  // True when this mount should default to BYOD without auto-navigating.
-  // Fresh startup or Combined switch keeps the old Air Media intent,
-  // but the UI now exposes it as BYOD.
-  const didInitBYODDefault = useRef(false);
-
-  const [activeKey, setActiveKey] = useState(() => {
-    const saved = safeSessionStorage.getItem("avmatrix_routing_map");
-    const forceBYOD =
-      safeSessionStorage.getItem("combinedForceAirMediaSource") === "true";
-
-    if (forceBYOD || saved === null) {
-      didInitBYODDefault.current = true;
-      return "byod";
-    }
-
-    return null;
-  });
+  const [activeKey, setActiveKey] = useState(() => detectMode());
 
   const [, sendRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_ROUTING);
+  const [, sendLayoutRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_LAYOUT_ROUTING);
+  const [, sendBackLayoutRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_BACK_LAYOUT_ROUTING);
 
-  // One digital pulse join per selectable mode
   const [, , sendPresentationPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_PRESENTATION);
-  const [, , sendByodPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_BYOD);
-  const modeJoinSenders = {
-    presentation: sendPresentationPulse,
-    byod: sendByodPulse,
+  const [, , sendVcPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_VC);
+  const [, , sendWallFull] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_FULL);
+  const [, , sendWallDual] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_DUAL);
+  const [, , sendBackFull] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_FULL);
+  const [, , sendBackDual] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_DUAL);
+
+  const modePulses = {
+    presentation: [sendPresentationPulse, sendWallFull, sendBackFull],
+    vc: [sendVcPulse, sendWallDual, sendBackDual],
   };
 
-  // Sync active state with AV Matrix sessionStorage on mount.
-  // Skipped when startup default-BYOD flow takes over this mount.
+  // Startup: no routing yet → show Presentation (UI only; backend sets the room up)
   useEffect(() => {
-    if (didInitBYODDefault.current) return;
-
-    try {
-      const saved = safeSessionStorage.getItem("avmatrix_routing_map");
-      if (!saved) return;
-
-      const routingMap = JSON.parse(saved);
-      const routedInputs = Object.values(routingMap).slice(0, 3);
-      const firstInput = routedInputs[0];
-
-      if (routedInputs.length === 0) return;
-
-      if (routedInputs.every((input) => input === firstInput)) {
-        if (firstInput === 0) {
-          setActiveKey("presentation");
-        } else if (firstInput === 1) {
-          setActiveKey("byod");
-        } else {
-          setActiveKey("custom");
-        }
-      } else {
-        setActiveKey("custom");
-      }
-    } catch (error) {
-      console.error("❌ Failed to sync with AV Matrix routing:", error);
-    }
-  }, []);
-
-  const buildRoutingString = (input, output) => `${input}:${output}`;
-
-  const sendSingleRouting = (input, output) => {
-    const routingCommand = buildRoutingString(input, output);
-    console.log(
-      `📤 Sending to serial join ${SERIAL_JOINS.AVMATRIX_ROUTING}: ${routingCommand}`
-    );
-    sendRoutingCommand(routingCommand);
-  };
-
-  const sendMultipleRoutings = (routings) => {
-    routings.forEach((routing, index) => {
-      setTimeout(() => {
-        sendSingleRouting(routing.input, routing.output);
-      }, index * 150);
-    });
-  };
-
-  const updateAVMatrixStorage = (inputIdx, outputIndices) => {
-    try {
-      const routingMap = {};
-      outputIndices.forEach((outputIdx) => {
-        routingMap[outputIdx] = inputIdx;
-      });
-
-      safeSessionStorage.setItem(
-        "avmatrix_routing_map",
-        JSON.stringify(routingMap)
-      );
-      console.log("💾 Source Selection: Updated AV Matrix routing map", routingMap);
-    } catch (error) {
-      console.error("❌ Failed to update AV Matrix storage:", error);
-    }
-  };
-
-  const routeMode = (mode, { navigateAfterRoute = true } = {}) => {
-    setActiveKey(mode.key);
-
-    // Pulse the digital join marking which mode was selected
-    sendPulse(modeJoinSenders[mode.key]);
-
-    // Keep outputs 1/2/3 for now
-    sendMultipleRoutings([
-      { input: mode.backendId, output: 1 },
-      { input: mode.backendId, output: 2 },
-      { input: mode.backendId, output: 3 },
-    ]);
-
-    updateAVMatrixStorage(mode.index, [0, 1, 2]);
-
-    console.log(
-      `✅ ${mode.name} selected - Routed to Boardroom, Training, Repeater`
-    );
-
-    if (navigateAfterRoute && mode.navigateToAVMatrix) {
-      setTimeout(() => navigate("/av-matrix"), 500);
-    }
-  };
-
-  const handleModeTap = (mode) => {
-    routeMode(mode, { navigateAfterRoute: true });
-  };
-
-  // On startup / Combined switch:
-  // default to BYOD, route it, but DO NOT navigate away automatically.
-  useEffect(() => {
-    if (!didInitBYODDefault.current) return;
-
-    safeSessionStorage.removeItem("combinedForceAirMediaSource");
-    routeMode(BYOD_MODE, { navigateAfterRoute: false });
-    console.log("🟢 Combined: BYOD default — routed to Boardroom, Training, Repeater");
-
+    if (activeKey !== null) return;
+    writeAVMatrixStorage(PRESENTATION_MODE);
+    setActiveKey(PRESENTATION_MODE.key);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const routeMode = (mode) => {
+    setActiveKey(mode.key);
+    modePulses[mode.key].forEach(sendPulse);
+
+    // Serial routes, staggered 150ms apart
+    const commands = [
+      ...mode.displays.map((input, idx) => [sendRoutingCommand, `${input}:${idx + 1}`]),
+      ...Object.values(mode.zones).flatMap((input, zoneIdx) => [
+        [sendLayoutRoutingCommand, `${input}:${mode.layoutNum}:${zoneIdx + 1}`],
+        [sendBackLayoutRoutingCommand, `${input}:${mode.layoutNum}:${zoneIdx + 1}`],
+      ]),
+    ];
+    commands.forEach(([send, command], index) => {
+      setTimeout(() => {
+        console.log(`📤 ${mode.name} route: ${command}`);
+        send(command);
+      }, index * 150);
+    });
+
+    writeAVMatrixStorage(mode);
+  };
+
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-2 gap-3 md:gap-4 touchPanel:gap-5">
+    <div className="w-full h-full">
+      <div className="grid grid-rows-2 gap-3 md:gap-4 touchPanel:gap-5 h-full">
         {MODES.map((mode) => {
           const IconComponent = mode.icon;
           const isActive = activeKey === mode.key;
@@ -186,8 +136,8 @@ const SourceSelection = () => {
               key={mode.key}
               variant={isActive ? "primary" : "secondary"}
               size="md"
-              onClick={() => handleModeTap(mode)}
-              className="flex flex-col items-center justify-center gap-2 touchPanel:gap-3 h-auto min-h-[108px] touchPanel:min-h-[136px] py-4 md:py-5 touchPanel:py-6"
+              onClick={() => routeMode(mode)}
+              className="flex items-center justify-center gap-3 touchPanel:gap-4 h-full min-h-[64px] touchPanel:min-h-[80px]"
             >
               <IconComponent className="w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7" />
               <span className="text-sm md:text-base touchPanel:text-lg font-semibold">

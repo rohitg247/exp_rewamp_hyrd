@@ -1,8 +1,7 @@
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { useAudioContext } from '../../context/AudioContext';
-import { useSerialJoin } from '../../hooks/useJoin';
-import { SERIAL_JOINS } from '../../crestron/joins';
-import { safeSessionStorage } from '../../utils/safeStorage';
+import { useAnalogJoin } from '../../hooks/useJoin';
+import { ANALOG_JOINS } from '../../crestron/joins';
 import Button from '../ui/Button';
 
 const MicrophoneControl = ({ variant = 'mics' }) => {
@@ -17,8 +16,11 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
     setVcAudioMuted,
   } = useAudioContext();
 
-  // ✅ Single serial join for all mic channel data
-  const [, sendMicSerial] = useSerialJoin(SERIAL_JOINS.MIC_CHANNEL_DATA);
+  // Analog on/off join per channel (1 = on, 0 = muted)
+  const [, setCeiling1OnOff] = useAnalogJoin(ANALOG_JOINS.CEILING_BR_ON_OFF_ANALOG);
+  const [, setCeiling2OnOff] = useAnalogJoin(ANALOG_JOINS.CEILING_TR_ON_OFF_ANALOG);
+  const [, setProgramOnOff] = useAnalogJoin(ANALOG_JOINS.PROGRAM_AUDIO_ON_OFF_ANALOG);
+  const [, setVcInOnOff] = useAnalogJoin(ANALOG_JOINS.VC_IN_ON_OFF_ANALOG);
 
   const micRow = [
     {
@@ -26,12 +28,14 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
       name: 'Ceiling BR',
       muted: ceiling1Muted,
       setMuted: setCeiling1Muted,
+      sendOnOff: setCeiling1OnOff,
     },
     {
       id: 2,
       name: 'Ceiling TR',
       muted: ceiling2Muted,
       setMuted: setCeiling2Muted,
+      sendOnOff: setCeiling2OnOff,
     },
   ];
 
@@ -42,6 +46,7 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
       name: 'Program Audio',
       muted: programAudioMuted,
       setMuted: setProgramAudioMuted,
+      sendOnOff: setProgramOnOff,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
@@ -50,6 +55,7 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
       name: 'VC Audio',
       muted: vcAudioMuted,
       setMuted: setVcAudioMuted,
+      sendOnOff: setVcInOnOff,
       icon: Volume2,
       mutedIcon: VolumeX,
     },
@@ -58,16 +64,8 @@ const MicrophoneControl = ({ variant = 'mics' }) => {
   const handleToggle = (mic) => {
     const newState = mic.muted === 0 ? 1 : 0; // Toggle: 0→1 or 1→0
     mic.setMuted(newState);
-
-    // Read persisted volume from MicChannel's sessionStorage (consistent format)
-    const savedVolume = safeSessionStorage.getItem(`micVolume_${mic.id}`);
-    const value = savedVolume ? parseInt(savedVolume, 10) : 50;
-
-    // Send via serial join with standard {id, value, muted} format — inverted: 1=muted, 0=unmuted
-    const invertedMuted = newState === 0 ? 1 : 0;
-    const data = JSON.stringify({ id: mic.id, value, muted: invertedMuted });
-    sendMicSerial(data);
-    console.log(`🎤 ${mic.name} ${newState === 0 ? 'MUTED' : 'UNMUTED'} → ${data}`);
+    mic.sendOnOff(newState);
+    console.log(`🎤 ${mic.name} ${newState === 0 ? 'MUTED' : 'UNMUTED'} → analog ${newState}`);
   };
 
   const renderChannel = (mic) => {

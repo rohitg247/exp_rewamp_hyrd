@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   DndContext,
   useDroppable,
@@ -11,11 +11,11 @@ import {
   pointerWithin,
 } from "@dnd-kit/core";
 import { restrictToWindowEdges, snapCenterToCursor } from "@dnd-kit/modifiers";
-import { LayoutGrid, Cast, Laptop, Video, ArrowRight, X, Check } from 'lucide-react';
+import { LayoutGrid, Cast, Laptop, Video, X, Check, MonitorOff } from 'lucide-react';
 import { useDigitalJoin, useSerialJoin } from '../hooks/useJoin';
 import { DIGITAL_JOINS, SERIAL_JOINS } from '../crestron/joins';
 import { safeSessionStorage } from '../utils/safeStorage';
-import Card, { CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 
 
 const sendPulse = (setFn) => {
@@ -41,6 +41,31 @@ const DISPLAY_TARGETS = [
   '55" Side Display 4',
   '75" Back Display',
 ];
+
+
+// The 75" back display gets its own tab, so it is routed on its own.
+const BACK_DISPLAY_IDX = 4;
+
+
+// Output tabs: 4 side displays, the video-wall layout, and the 75" back display
+const OUTPUT_TABS = [
+  { key: 'displays', label: 'Display', title: 'Displays' },
+  { key: 'layout', label: 'Video Wall', title: 'Video Wall' },
+  { key: 'back', label: '75" Display', title: '75" Back Display' },
+];
+
+
+// Card header styling — same tokens as MainPage / RoomControlsPage, left-aligned here
+const ICON_CLS = 'w-5 h-5 md:w-6 md:h-6 touchPanel:w-7 touchPanel:h-7';
+const LABEL_CLS = 'text-base md:text-lg touchPanel:text-xl';
+
+
+// Stage frame shared by the Video Wall and 75" Display views
+const STAGE_STYLE = {
+  background: 'linear-gradient(180deg, var(--color-bg), color-mix(in srgb, var(--color-bg-secondary) 60%, white))',
+  border: '2px solid color-mix(in srgb, var(--color-primary) 32%, var(--color-border))',
+  boxShadow: '0 10px 30px color-mix(in srgb, var(--color-shadow) 12%, transparent)',
+};
 
 
 /* ⚠️ ADD THIS JOIN TO src/crestron/joins.js:
@@ -235,6 +260,43 @@ function DraggableInputCard({ id, label, icon: Icon, isPinned, isDragging, onPin
 }
 
 
+// --- Screen graphic: fills the free height of a display card / layout zone ---
+// Routed → primary-filled screen with the source icon + name; empty → dimmed outline.
+function ScreenPreview({ routedInput, narrow = false, label, onClear }) {
+  const Icon = routedInput?.icon ?? MonitorOff;
+  return (
+    <div
+      className="relative flex-1 min-h-0 flex flex-col items-center justify-center gap-1.5 touchPanel:gap-2 rounded-xl overflow-hidden transition-all duration-200"
+      style={
+        routedInput
+          ? { background: 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))', color: '#ffffff' }
+          : { backgroundColor: 'var(--color-bg)', border: '1.5px dashed var(--color-border)', color: 'var(--color-text-light)' }
+      }
+    >
+      <Icon
+        className={`${narrow ? 'w-6 h-6 touchPanel:w-8 touchPanel:h-8' : 'w-10 h-10 touchPanel:w-14 touchPanel:h-14'} ${routedInput ? '' : 'opacity-50'}`}
+      />
+      {!narrow && (
+        <span className={`px-2 max-w-full truncate text-center ${routedInput ? 'text-sm touchPanel:text-lg font-semibold' : 'text-xs touchPanel:text-sm'}`}>
+          {routedInput ? routedInput.label : 'No source assigned'}
+        </span>
+      )}
+      {routedInput && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onClear(); }}
+          className="absolute top-1.5 right-1.5 touchPanel:top-2 touchPanel:right-2 rounded-full p-1 touchPanel:p-1.5"
+          style={{ backgroundColor: 'rgba(255,255,255,0.18)' }}
+          aria-label={`Clear source for ${label}`}
+        >
+          <X className="w-4 h-4 touchPanel:w-5 touchPanel:h-5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+
 // --- Droppable Display Assignment Card (direct crosspoint routing) ---
 function DisplayAssignmentCard({ id, label, routedInputIdx, isPinActive, onClickRoute, onClearRoute }) {
   const { setNodeRef, isOver } = useDroppable({ id });
@@ -273,32 +335,7 @@ function DisplayAssignmentCard({ id, label, routedInputIdx, isPinActive, onClick
         </span>
       </div>
 
-      {routedInput ? (
-        <div
-          className="flex items-center gap-2 px-3 py-2.5 touchPanel:py-3 rounded-xl"
-          style={{ background: 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))', color: '#ffffff' }}
-        >
-          <ArrowRight className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0 opacity-90" />
-          <span className="text-xs touchPanel:text-base font-semibold flex-1 truncate">{routedInput.label}</span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onClearRoute(); }}
-            className="flex-shrink-0 rounded-full p-0.5 touchPanel:p-1 transition-colors"
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.22)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            aria-label={`Clear route for ${label}`}
-          >
-            <X className="w-4 h-4 touchPanel:w-5 touchPanel:h-5" />
-          </button>
-        </div>
-      ) : (
-        <div
-          className="text-xs touchPanel:text-sm px-3 py-2 touchPanel:py-2.5 rounded-xl"
-          style={{ color: 'var(--color-text-light)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
-        >
-          No source assigned
-        </div>
-      )}
+      <ScreenPreview routedInput={routedInput} label={label} onClear={onClearRoute} />
     </div>
   );
 }
@@ -315,7 +352,7 @@ function DroppableLayoutZone({ id, zoneKey, label, narrow = false, routedInputId
     <div
       ref={setNodeRef}
       onClick={() => onZoneClickRoute(zoneKey)}
-      className={`rounded-2xl border-2 p-3 flex flex-col justify-between transition-all duration-200 select-none h-full ${
+      className={`rounded-2xl border-2 p-3 flex flex-col gap-2 transition-all duration-200 select-none h-full ${
         isPinActive ? 'cursor-pointer' : 'cursor-default'
       }`}
       style={{
@@ -360,34 +397,7 @@ function DroppableLayoutZone({ id, zoneKey, label, narrow = false, routedInputId
       ) : null}
       ─────────────────────────────────────────────────────────────────── */}
 
-      {routedInput ? (
-        <div
-          className={`flex items-center gap-1.5 touchPanel:gap-2 rounded-xl mt-2 ${
-            narrow ? 'px-2 py-2 touchPanel:py-2.5' : 'px-3 py-2.5 touchPanel:py-3'
-          }`}
-          style={{ background: 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))', color: '#ffffff' }}
-        >
-          {!narrow && <ArrowRight className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0 opacity-90" />}
-          <span className="text-sm touchPanel:text-lg font-semibold flex-1 truncate">{routedInput.label}</span>
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onClearZone(zoneKey); }}
-            className="flex-shrink-0 rounded-full p-0.5 touchPanel:p-1 transition-colors"
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.22)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            aria-label={`Clear source for ${label}`}
-          >
-            <X className="w-4 h-4 touchPanel:w-5 touchPanel:h-5" />
-          </button>
-        </div>
-      ) : (
-        <div
-          className="text-xs touchPanel:text-sm px-3 py-2 touchPanel:py-2.5 rounded-xl mt-2"
-          style={{ color: 'var(--color-text-light)', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}
-        >
-          No source assigned
-        </div>
-      )}
+      <ScreenPreview routedInput={routedInput} narrow={narrow} label={label} onClear={() => onClearZone(zoneKey)} />
     </div>
   );
 }
@@ -474,14 +484,40 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
     }
   });
 
+  // 75" back display — same presets as the video wall, but its own selection,
+  // its own zone routing and its own joins.
+  const [activeBackLayoutKey, setActiveBackLayoutKey] = useState(() => {
+    const saved = safeSessionStorage.getItem('avmatrix_back_layout');
+    if (saved && LAYOUT_KEYS.includes(saved)) return saved;
+    if (saved) safeSessionStorage.removeItem('avmatrix_back_layout');
+    return DEFAULT_LAYOUT_KEY;
+  });
+
+  const [backLayoutRoutingMap, setBackLayoutRoutingMap] = useState(() => {
+    try {
+      const saved = safeSessionStorage.getItem('avmatrix_back_layout_routing');
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error('❌ Failed to restore back-display layout routing from session storage:', error);
+      safeSessionStorage.removeItem('avmatrix_back_layout_routing');
+      return {};
+    }
+  });
+
   const activeLayout = useMemo(
     () => LAYOUTS.find((layout) => layout.key === activeLayoutKey) || LAYOUTS[0],
     [activeLayoutKey]
   );
 
-  // Serial joins: direct display routing, and combine-layout zone routing
+  const activeBackLayout = useMemo(
+    () => LAYOUTS.find((layout) => layout.key === activeBackLayoutKey) || LAYOUTS[0],
+    [activeBackLayoutKey]
+  );
+
+  // Serial joins: direct display routing, video-wall zone routing, 75" zone routing
   const [, sendRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_ROUTING);
   const [, sendLayoutRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_LAYOUT_ROUTING);
+  const [, sendBackLayoutRoutingCommand] = useSerialJoin(SERIAL_JOINS.AVMATRIX_BACK_LAYOUT_ROUTING);
 
   // Digital pulses: one per combine layout preset
   const [, , sendFullJoin] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_FULL);
@@ -489,12 +525,51 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
   const [, , sendQuadJoin] = useDigitalJoin(QUAD_JOIN);
   const [, , send3RightJoin] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_3_RIGHT);
 
+  // …and the same four for the 75" back display
+  const [, , sendBackFullJoin] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_FULL);
+  const [, , sendBackDualJoin] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_DUAL);
+  const [, , sendBackQuadJoin] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_QUAD);
+  const [, , sendBack3RightJoin] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_3_RIGHT);
+
   const layoutJoinSenders = useMemo(() => ({
     full: sendFullJoin,
     dual: sendDualJoin,
     quad: sendQuadJoin,
     'three-right': send3RightJoin,
   }), [sendFullJoin, sendDualJoin, sendQuadJoin, send3RightJoin]);
+
+  const backLayoutJoinSenders = useMemo(() => ({
+    full: sendBackFullJoin,
+    dual: sendBackDualJoin,
+    quad: sendBackQuadJoin,
+    'three-right': sendBack3RightJoin,
+  }), [sendBackFullJoin, sendBackDualJoin, sendBackQuadJoin, sendBack3RightJoin]);
+
+  // The Layouts column and every zone handler act on whichever surface the
+  // active tab is showing — the video wall, or the 75" back display. Both are
+  // driven through this one object, so there is a single set of handlers.
+  const isBackTab = activeRightTab === 'back';
+  const layoutsDisabled = activeRightTab === 'displays';
+
+  const stage = isBackTab
+    ? {
+        layout: activeBackLayout,
+        layoutKey: activeBackLayoutKey,
+        setLayoutKey: setActiveBackLayoutKey,
+        routingMap: backLayoutRoutingMap,
+        setRoutingMap: setBackLayoutRoutingMap,
+        sendSerial: sendBackLayoutRoutingCommand,
+        joinSenders: backLayoutJoinSenders,
+      }
+    : {
+        layout: activeLayout,
+        layoutKey: activeLayoutKey,
+        setLayoutKey: setActiveLayoutKey,
+        routingMap: layoutRoutingMap,
+        setRoutingMap: setLayoutRoutingMap,
+        sendSerial: sendLayoutRoutingCommand,
+        joinSenders: layoutJoinSenders,
+      };
 
   // --- Persist state ---
   useEffect(() => {
@@ -520,6 +595,14 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
   useEffect(() => {
     safeSessionStorage.setItem('avmatrix_layout_routing', JSON.stringify(layoutRoutingMap));
   }, [layoutRoutingMap]);
+
+  useEffect(() => {
+    safeSessionStorage.setItem('avmatrix_back_layout', activeBackLayoutKey);
+  }, [activeBackLayoutKey]);
+
+  useEffect(() => {
+    safeSessionStorage.setItem('avmatrix_back_layout_routing', JSON.stringify(backLayoutRoutingMap));
+  }, [backLayoutRoutingMap]);
 
   // --- Direct display routing (Displays tab) — serial: "input:display" ---
   const sendRouting = (inputIdx, outputIdx) => {
@@ -549,32 +632,34 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
     sendClearRouting(outputIdx);
   };
 
-  // --- Combine layout zone routing (Layout tab) — serial: "input:layout:zone" ---
-  const handleLayoutSelect = useCallback((layoutKey) => {
-    setActiveLayoutKey(layoutKey);
-    setLayoutRoutingMap({});
-    sendPulse(layoutJoinSenders[layoutKey]);
-  }, [layoutJoinSenders]);
+  // --- Layout zone routing (Video Wall + 75" tabs) — serial: "input:layout:zone" ---
+  // `stage` decides which surface these act on, so the wall and the 75" display
+  // share one implementation on two sets of joins.
+  const handleLayoutSelect = (layoutKey) => {
+    stage.setLayoutKey(layoutKey);
+    stage.setRoutingMap({});
+    sendPulse(stage.joinSenders[layoutKey]);
+  };
 
-  const sendZoneRoute = useCallback((inputIdx, zoneId) => {
-    const zoneIndex = activeLayout.zones.findIndex((zone) => zone.id === zoneId);
+  const sendZoneRoute = (inputIdx, zoneId) => {
+    const zoneIndex = stage.layout.zones.findIndex((zone) => zone.id === zoneId);
     if (zoneIndex === -1) return;
-    sendLayoutRoutingCommand(`${inputIdx + 1}:${activeLayout.num}:${zoneIndex + 1}`);
-  }, [activeLayout, sendLayoutRoutingCommand]);
+    stage.sendSerial(`${inputIdx + 1}:${stage.layout.num}:${zoneIndex + 1}`);
+  };
 
-  const clearZoneRoute = useCallback((zoneId) => {
-    setLayoutRoutingMap((prev) => { const next = { ...prev }; delete next[zoneId]; return next; });
-    const zoneIndex = activeLayout.zones.findIndex((zone) => zone.id === zoneId);
-    if (zoneIndex !== -1) sendLayoutRoutingCommand(`0:${activeLayout.num}:${zoneIndex + 1}`);
-  }, [activeLayout, sendLayoutRoutingCommand]);
+  const clearZoneRoute = (zoneId) => {
+    stage.setRoutingMap((prev) => { const next = { ...prev }; delete next[zoneId]; return next; });
+    const zoneIndex = stage.layout.zones.findIndex((zone) => zone.id === zoneId);
+    if (zoneIndex !== -1) stage.sendSerial(`0:${stage.layout.num}:${zoneIndex + 1}`);
+  };
 
   const handleZoneClickRoute = (zoneId) => {
     if (selectedInputIdx === null) return;
-    const alreadyAssigned = layoutRoutingMap[zoneId] === selectedInputIdx;
+    const alreadyAssigned = stage.routingMap[zoneId] === selectedInputIdx;
     if (alreadyAssigned) {
       clearZoneRoute(zoneId);
     } else {
-      setLayoutRoutingMap((prev) => ({ ...prev, [zoneId]: selectedInputIdx }));
+      stage.setRoutingMap((prev) => ({ ...prev, [zoneId]: selectedInputIdx }));
       sendZoneRoute(selectedInputIdx, zoneId);
     }
   };
@@ -607,7 +692,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
 
     if (overId.startsWith('zone-')) {
       const zoneId = overId.replace('zone-', '');
-      setLayoutRoutingMap((prev) => ({ ...prev, [zoneId]: inputIdx }));
+      stage.setRoutingMap((prev) => ({ ...prev, [zoneId]: inputIdx }));
       sendZoneRoute(inputIdx, zoneId);
     }
   };
@@ -694,36 +779,34 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
           </div> */}
 
         {/* ── Column 1: Layouts ─────────────────────────────────── */}
+        {/* Layouts drive whichever surface the active tab shows; inert on the
+            Display tab, which routes displays one by one instead. */}
         <div
           className="flex-shrink-0 flex flex-col min-h-0 overflow-visible"
-          style={{ width: '16%', minWidth: '190px' }}
+          style={{
+            width: '16%',
+            minWidth: '190px',
+            opacity: layoutsDisabled ? 0.45 : 1,
+            pointerEvents: layoutsDisabled ? 'none' : 'auto',
+            transition: 'opacity 200ms ease',
+          }}
         >
           <Card
             variant="gradient"
             tone="video"
             className="flex-1 flex flex-col min-h-0 overflow-visible"
-            style={{ padding: 0 }}
           >
-            <CardHeader
-              className="px-4 py-3 touchPanel:px-5 touchPanel:py-4 border-b flex-shrink-0"
-              style={{ borderColor: 'var(--color-border)', marginBottom: 0 }}
-            >
-              <CardTitle
-                className="flex items-center gap-2 text-base font-semibold"
-                style={{ color: 'var(--color-heading)' }}
-              >
-                <LayoutGrid
-                  className="w-5 h-5 flex-shrink-0"
-                  style={{ color: 'var(--color-primary)' }}
-                />
-                <span>Layouts</span>
+            <CardHeader className="pb-3 flex-shrink-0">
+              <CardTitle className="flex items-center space-x-2">
+                <CardIcon tone="video"><LayoutGrid className={ICON_CLS} /></CardIcon>
+                <span className={`${LABEL_CLS} whitespace-nowrap`}>{isBackTab ? '75" Layouts' : 'Layouts'}</span>
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="flex-1 min-h-0 px-3 py-3 touchPanel:px-4 touchPanel:py-4 overflow-visible">
+            <CardContent className="flex-1 min-h-0 overflow-visible">
               <div className="h-full flex flex-col gap-3 touchPanel:gap-4 overflow-visible">
                 {LAYOUTS.map((layout) => {
-                  const active = activeLayoutKey === layout.key;
+                  const active = stage.layoutKey === layout.key;
 
                   return (
                     <div
@@ -781,16 +864,16 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
           </Card>
         </div>          
 
-          {/* ── Column 2: Inputs (20%) stacked over Outputs (80%) ──── */}
+          {/* ── Column 2: Inputs (15%) stacked over Outputs (85%) ──── */}
           <div className="flex-1 min-w-0 flex flex-col gap-6 touchPanel:gap-8 h-full">
 
-            {/* Row 1 — Input Sources (20% height) */}
+            {/* Row 1 — Input Sources (15% height) */}
             {/* padding set inline (0.75rem ≈ p-3) so it beats Card's baked-in p-6 */}
             <Card
               variant="gradient"
               tone="video"
               className="flex flex-col overflow-hidden relative will-change-transform"
-              style={{ flex: '0 0 20%', minHeight: 0, padding: '0.75rem' }}
+              style={{ flex: '0 0 15%', minHeight: 0, padding: '0.75rem' }}
             >
               {/* <CardHeader className="py-2 px-4 touchPanel:px-6 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border)' }}>
                 <div className="flex items-center justify-between gap-3 w-full">
@@ -832,22 +915,23 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
               </CardContent>
             </Card>
 
-            {/* Row 2 — Displays / Live Layout (80% height) */}
+            {/* Row 2 — Displays / Live Layout (85% height) */}
+            {/* padding set inline (1rem) so it beats Card's baked-in p-6 — more room for the stage */}
             <Card
               variant="gradient"
               tone="video"
               className="flex flex-col overflow-hidden relative will-change-transform"
-              style={{ flex: '1 1 80%', minHeight: 0 }}
+              style={{ flex: '1 1 85%', minHeight: 0, padding: '1rem' }}
             >
-              <CardHeader className="pb-2.5 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border)' }}>
+              <CardHeader className="pb-2 flex-shrink-0">
                 <div className="flex items-center justify-between gap-3 w-full">
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--color-heading)' }}>
-                    <LayoutGrid className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
-                    <span>{activeRightTab === 'displays' ? 'Displays' : 'Live Layout'}</span>
+                  <CardTitle className="flex items-center space-x-2">
+                    <CardIcon tone="video"><LayoutGrid className={ICON_CLS} /></CardIcon>
+                    <span className={LABEL_CLS}>{(OUTPUT_TABS.find((tab) => tab.key === activeRightTab) ?? OUTPUT_TABS[0]).title}</span>
                   </CardTitle>
 
                   <div className="flex gap-2">
-                    {[{ key: 'displays', label: 'Displays' }, { key: 'layout', label: 'Layout' }].map((tab) => {
+                    {OUTPUT_TABS.map((tab) => {
                       const active = activeRightTab === tab.key;
                       return (
                         <button
@@ -871,51 +955,44 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 min-h-0 overflow-hidden px-4 py-4 touchPanel:px-6 touchPanel:py-6">
+              <CardContent className="flex-1 min-h-0 overflow-hidden">
                 {activeRightTab === 'displays' ? (
                   <div className="h-full overflow-auto pr-1">
                     <div className="grid grid-cols-2 gap-3 md:gap-4 touchPanel:gap-5 auto-rows-fr h-full">
-                      {DISPLAY_TARGETS.map((display, idx) => {
-                        const isLastOdd =
-                          idx === DISPLAY_TARGETS.length - 1 && DISPLAY_TARGETS.length % 2 === 1;
-                        return (
-                          <div key={`display-${idx}`} className={isLastOdd ? 'col-span-2' : ''}>
-                            <DisplayAssignmentCard
-                              id={`display-${idx}`}
-                              label={display}
-                              routedInputIdx={routingMap[idx]}
-                              isPinActive={selectedInputIdx !== null}
-                              onClickRoute={() => handleDisplayClickRoute(idx)}
-                              onClearRoute={() => clearRoute(idx)}
-                            />
-                          </div>
-                        );
-                      })}
+                      {DISPLAY_TARGETS.slice(0, BACK_DISPLAY_IDX).map((display, idx) => (
+                        <DisplayAssignmentCard
+                          key={`display-${idx}`}
+                          id={`display-${idx}`}
+                          label={display}
+                          routedInputIdx={routingMap[idx]}
+                          isPinActive={selectedInputIdx !== null}
+                          onClickRoute={() => handleDisplayClickRoute(idx)}
+                          onClearRoute={() => clearRoute(idx)}
+                        />
+                      ))}
                     </div>
                   </div>
                 ) : (
-                  /* Live Layout stage — mirrors the Frame styling of the col-1 swatches.
+                  /* Zone stage — used by BOTH the Video Wall and the 75" Display
+                     tabs; `stage` selects which surface's layout and routing it
+                     shows. Mirrors the Frame styling of the col-1 swatches.
                      The inner `relative` wrapper is REQUIRED: absolutely positioned zones
                      resolve against the PADDING box, so padding applied to the same element
                      that holds them would simply be painted over. */
                   <div className="w-full h-full flex items-center justify-center">
                     <div
                       className="h-full max-h-full w-auto max-w-full aspect-video rounded-2xl p-2.5 touchPanel:p-4"
-                      style={{
-                        background: 'linear-gradient(180deg, var(--color-bg), color-mix(in srgb, var(--color-bg-secondary) 60%, white))',
-                        border: '2px solid color-mix(in srgb, var(--color-primary) 32%, var(--color-border))',
-                        boxShadow: '0 10px 30px color-mix(in srgb, var(--color-shadow) 12%, transparent)',
-                      }}
+                      style={STAGE_STYLE}
                     >
                       <div className="relative w-full h-full">
-                        {activeLayout.zones.map((zone) => (
+                        {stage.layout.zones.map((zone) => (
                           <div key={zone.id} className={zone.className}>
                             <DroppableLayoutZone
                               id={`zone-${zone.id}`}
                               zoneKey={zone.id}
                               label={zone.label}
                               narrow={zone.narrow ?? false}
-                              routedInputIdx={layoutRoutingMap[zone.id]}
+                              routedInputIdx={stage.routingMap[zone.id]}
                               onZoneClickRoute={handleZoneClickRoute}
                               onClearZone={clearZoneRoute}
                               isPinActive={selectedInputIdx !== null}

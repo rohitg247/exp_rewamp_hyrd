@@ -19,6 +19,7 @@ import Button from "../components/ui/Button";
 import { useDigitalJoin } from "../hooks/useJoin";
 import { DIGITAL_JOINS, PRESET_BRIGHTNESS } from "../crestron/joins";
 import { safeSessionStorage } from "../utils/safeStorage";
+import { DISPLAY_CONFIGS } from "../components/devices/DisplayPowerGrid";
 
 const INIT_STEPS = [
   { key: "lights", label: "Turning on lights...", short: "Lights", icon: Lightbulb },
@@ -66,15 +67,15 @@ const LandingPage = () => {
   const progressRef = useRef(null);
   const timerRef = useRef(null);
 
-  // Reset all mics to muted on LandingPage mount (startup/shutdown cycle)
+  // Reset all mics to unmuted on LandingPage mount (startup/shutdown cycle) — UI only
   useEffect(() => {
-    setCeiling1Muted(0);
-    setCeiling2Muted(0);
-    setHeadworn1Muted(0);
-    setHeadworn2Muted(0);
-    setHandheldMuted(0);
-    setLapelMuted(0);
-    console.log('🎤 All mics reset to MUTED on LandingPage mount');
+    setCeiling1Muted(1);
+    setCeiling2Muted(1);
+    setHeadworn1Muted(1);
+    setHeadworn2Muted(1);
+    setHandheldMuted(1);
+    setLapelMuted(1);
+    console.log('🎤 All mics reset to UNMUTED on LandingPage mount');
   }, []);
 
   // Startup join hook
@@ -159,8 +160,13 @@ const LandingPage = () => {
     safeSessionStorage.setItem('acForceOnBoardroom', 'true');
     console.log('❄️ AC primed ON for startup (acForceOnBoardroom set)');
 
-    // Main Page defaults its source to Air Media (SourceSelection consumes this flag on mount).
-    safeSessionStorage.setItem('combinedForceAirMediaSource', 'true');
+    // Displays: all ON with HDMI 1 selected, camera awake — UI only, backend switches them on startup.
+    // (Main Page mode defaults to Presentation: SourceSelection seeds it when no routing is stored.)
+    DISPLAY_CONFIGS.forEach(({ storageKey }) => {
+      safeSessionStorage.setItem(storageKey, 'on');
+      safeSessionStorage.setItem(`${storageKey}Input`, 'hdmi1');
+    });
+    safeSessionStorage.setItem('cameraPowerMode', 'wake');
 
     // Lights: show "Welcome" preset selected on startup — UI only, no backend pulse.
     // The lighting components seed their active preset from this sessionStorage key.

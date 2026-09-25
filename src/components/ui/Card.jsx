@@ -106,18 +106,30 @@ const Card = ({
       {tone && (
         // Category rail. Readable from across the room — the cue that makes a
         // wall panel look like an instrument rather than a web page.
+        // Outer span is a clip layer with the card's own radius: a 4px rail
+        // can't hold a 12px+ corner radius itself, so without this its corners
+        // poke past the card's curve on overflow-visible cards.
         <span
           aria-hidden="true"
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: "var(--rail-height)",
-            borderRadius: "0.75rem 0.75rem 0 0",
-            backgroundImage: `linear-gradient(90deg, ${railFrom} 0%, ${railTo} 100%)`,
+            inset: 0,
+            borderRadius: "inherit",
+            overflow: "hidden",
+            pointerEvents: "none",
           }}
-        />
+        >
+          <span
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "var(--rail-height)",
+              backgroundImage: `linear-gradient(90deg, ${railFrom} 0%, ${railTo} 100%)`,
+            }}
+          />
+        </span>
       )}
       {children}
     </div>
