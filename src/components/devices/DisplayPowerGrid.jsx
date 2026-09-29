@@ -92,7 +92,7 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey, hdmi1JoinK
       <CardContent className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 touchPanel:gap-4">
         {/* Hero icon with preserved floating motion */}
         <div
-          className="p-3.5 touchPanel:p-4 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0"
+          className="p-3.5 touchPanel:p-4 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0 -mt-3"
           style={{
             backgroundColor: ui.glowBg,
             boxShadow: ui.glowShadow,
@@ -123,32 +123,32 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey, hdmi1JoinK
         </div>
 
         {/* ON / OFF side by side — keeps the tile short enough for the 3x2 grid */}
-        <div className="grid grid-cols-2 gap-3 touchPanel:gap-4 w-full flex-shrink-0">
+        <div className="grid grid-cols-2 gap-3 pt-1 touchPanel:gap-4 -mx-3 w-auto self-stretch flex-shrink-0">
           <Button
             variant={isOn ? 'success' : 'secondary'}
-            size="sm"
+            size="md"
             onClick={handlePowerOn}
             aria-label={`Turn on ${label}`}
-            className="w-full flex items-center justify-center gap-2 py-2 px-2 touchPanel:py-3"
+            className="w-full flex items-center justify-center gap-2 py-4 px-3 touchPanel:py-4"
           >
             <Play className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
-            <span className="text-sm touchPanel:text-base">ON</span>
+            <span className="text-md touchPanel:text-base">ON</span>
           </Button>
 
           <Button
             variant={!isOn ? 'danger' : 'secondary'}
-            size="sm"
+            size="md"
             onClick={handlePowerOff}
             aria-label={`Turn off ${label}`}
-            className="w-full flex items-center justify-center gap-2 py-2 px-2 touchPanel:py-3"
+            className="w-full flex items-center justify-center gap-2 py-4 px-3 touchPanel:py-4"
           >
             <Power className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
-            <span className="text-sm touchPanel:text-base">OFF</span>
+            <span className="text-md touchPanel:text-base">OFF</span>
           </Button>
         </div>
 
         {/* HDMI input select — mutually exclusive */}
-        <div className="grid grid-cols-2 gap-3 touchPanel:gap-4 w-full flex-shrink-0">
+        <div className="grid grid-cols-2 gap-3 touchPanel:gap-4 pt-1 -mx-3 w-auto self-stretch flex-shrink-0">
           {[
             { key: 'hdmi1', text: 'HDMI 1', sendFn: sendHdmi1 },
             { key: 'hdmi2', text: 'HDMI 2', sendFn: sendHdmi2 },
@@ -156,12 +156,12 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey, hdmi1JoinK
             <Button
               key={option.key}
               variant={input === option.key ? 'primary' : 'secondary'}
-              size="sm"
+              size="md"
               onClick={() => handleInput(option.key, option.sendFn)}
               aria-label={`${label} ${option.text}`}
-              className="w-full flex items-center justify-center py-2 px-1 touchPanel:py-3"
+              className="w-full flex items-center justify-center py-4 px-3 touchPanel:py-4"
             >
-              <span className="text-sm touchPanel:text-base whitespace-nowrap">{option.text}</span>
+              <span className="text-md touchPanel:text-base whitespace-nowrap">{option.text}</span>
             </Button>
           ))}
         </div>

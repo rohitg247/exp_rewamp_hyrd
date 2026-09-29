@@ -1951,7 +1951,9 @@ button,
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 0;
+  /* Under the app, not over it: a mix-blend layer on top of backdrop-filter
+     cards/buttons composites per GPU tile and shows as bright flickering squares. */
+  z-index: -1;
   pointer-events: none;
   background-image: var(--grain);
   opacity: var(--grain-opacity);

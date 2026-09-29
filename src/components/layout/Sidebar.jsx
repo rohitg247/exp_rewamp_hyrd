@@ -29,7 +29,7 @@ const Sidebar = ({ className = '' }) => {
       className={`
         fixed top-[72px] touchPanel:top-[110px] right-0
         h-[calc(100vh-72px)] touchPanel:h-[calc(100vh-110px)]
-        w-40 touchPanel:w-52 p-6 touchPanel:p-8 pt-7 pb-5
+        w-40 touchPanel:w-52 p-6 touchPanel:p-8
         z-40
         ${className}
       `}

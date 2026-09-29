@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Fragment } from 'react';
 import { Sun, Moon, Camera } from 'lucide-react';
 import { useDigitalJoin, useAnalogJoinSendOnly } from '../../hooks/useJoin';
 import { DIGITAL_JOINS, ANALOG_JOINS } from '../../crestron/joins';
@@ -35,7 +35,11 @@ function PresetButton({ name, disabled, onRecall }) {
       onClick={onRecall}
       className="w-full h-full flex items-center justify-center px-2 py-2 select-none"
     >
-      <span className="text-xs touchPanel:text-sm font-semibold text-center leading-tight break-words">{name}</span>
+      <span className="text-sm touchPanel:text-base font-semibold text-center leading-tight break-words">
+        {name.split('_').map((part, i) => (
+          <Fragment key={i}>{i > 0 && <br />}{part}</Fragment>
+        ))}
+      </span>
     </Button>
   );
 }
@@ -66,7 +70,7 @@ const CameraControl = () => {
 
   return (
     <div className="h-full w-full flex flex-col gap-3 touchPanel:gap-4">
-      <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-2 touchPanel:gap-3">
+      <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-3 touchPanel:gap-3">
         {PRESET_NAMES.map((name, index) =>
           busy === index ? (
             <LayoutApplyBar

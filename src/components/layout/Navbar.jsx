@@ -123,7 +123,7 @@ const Navbar = ({ onShutdown }) => {
         >
           <Network className="w-4 h-4 md:w-5 md:h-5 touchPanel:w-6 touchPanel:h-6 flex-shrink-0" />
           <span className="touchPanel:text-xl">AV Matrix</span>
-        </Button>
+          </Button>
 
         <Button
           variant={isAudioControlsPage ? "primary" : "secondary"}
@@ -173,7 +173,7 @@ const Navbar = ({ onShutdown }) => {
       <nav
         className="ui-navbar relative z-20 px-6 touchPanel:px-8 py-3 touchPanel:py-4
                       grid grid-cols-[auto_1fr_auto] items-center gap-4 touchPanel:gap-6
-                      min-h-[72px] touchPanel:min-h-[110px] [&_*]:!transition-none
+                      h-[72px] touchPanel:h-[110px] [&_*]:!transition-none
                       [&_button]:!shadow-nav-button"
         style={{
           // 2026-08-03 revamp: overlay glass. This is one of the few surfaces
@@ -210,7 +210,7 @@ const Navbar = ({ onShutdown }) => {
         </div>
 
         {/* CENTER: Main Page nav */}
-        <div className="flex justify-center items-center overflow-hidden min-w-0">
+        <div className="flex justify-center items-center min-w-0">
           <div className="relative w-full">
             <div
               ref={scrollContainerRef}
