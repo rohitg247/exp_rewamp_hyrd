@@ -2056,6 +2056,9 @@ button,
 [data-liquid="true"] .ui-nav-cluster,
 [data-liquid="true"] .ui-nav-actions {
   padding: 0.375rem;
+  /* Cancel the padding's layout height so the bar stays its non-liquid height
+     and page content doesn't shift down; the capsule sits in the bar's py-3/py-4. */
+  margin-block: -0.375rem;
   border-radius: 9999px;
   background-color: var(--liquid-fill);
   box-shadow: var(--liquid-rim), var(--liquid-edge), var(--elev-raised);

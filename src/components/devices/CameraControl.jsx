@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
-import { useDigitalJoin } from '../../hooks/useJoin';
-import { DIGITAL_JOINS } from '../../crestron/joins';
+import { useState, useCallback } from 'react';
+import { Sun, Moon, Camera } from 'lucide-react';
+import { useDigitalJoin, useAnalogJoinSendOnly } from '../../hooks/useJoin';
+import { DIGITAL_JOINS, ANALOG_JOINS } from '../../crestron/joins';
 import { safeSessionStorage } from '../../utils/safeStorage';
 import Button from '../ui/Button';
+import LayoutApplyBar from '../ui/LayoutApplyBar';
 
 const sendPulse = (setFn) => {
   setFn(true);
   setTimeout(() => setFn(false), 100);
 };
+
+// Tap = recall. Presets lock while the camera moves.
+const RECALL_LOCK_MS = 5000;
 
 const PRESET_NAMES = [
   'Room_View',
@@ -22,14 +26,14 @@ const PRESET_NAMES = [
   'Preset 9',
 ];
 
-function PresetButton({ index, name }) {
-  const [, , send] = useDigitalJoin(DIGITAL_JOINS[`CAM_PRESET_${index + 1}`]);
+function PresetButton({ name, disabled, onRecall }) {
   return (
     <Button
       variant="secondary"
       size="sm"
-      onClick={() => sendPulse(send)}
-      className="w-full h-full flex items-center justify-center px-2 py-2"
+      disabled={disabled}
+      onClick={onRecall}
+      className="w-full h-full flex items-center justify-center px-2 py-2 select-none"
     >
       <span className="text-xs touchPanel:text-sm font-semibold text-center leading-tight break-words">{name}</span>
     </Button>
@@ -37,6 +41,17 @@ function PresetButton({ index, name }) {
 }
 
 const CameraControl = () => {
+  const sendPreset = useAnalogJoinSendOnly(ANALOG_JOINS.CAM_PRESET);
+  const [busy, setBusy] = useState(null); // index of the preset being recalled
+  const clearBusy = useCallback(() => setBusy(null), []);
+
+  const recallPreset = (index) => {
+    sendPreset(index + 1);
+    // Back to 0 so the same preset re-triggers next time (analog only fires on change)
+    setTimeout(() => sendPreset(0), 200);
+    setBusy(index);
+  };
+
   // Wake / Sleep — mutually exclusive, UI-side only (no processor feedback)
   const [powerMode, setPowerMode] = useState(() => safeSessionStorage.getItem('cameraPowerMode') || 'wake');
   const [, , sendWake] = useDigitalJoin(DIGITAL_JOINS.CAM_WAKE);
@@ -52,9 +67,25 @@ const CameraControl = () => {
   return (
     <div className="h-full w-full flex flex-col gap-3 touchPanel:gap-4">
       <div className="flex-1 min-h-0 grid grid-cols-3 grid-rows-3 gap-2 touchPanel:gap-3">
-        {PRESET_NAMES.map((name, index) => (
-          <PresetButton key={name} index={index} name={name} />
-        ))}
+        {PRESET_NAMES.map((name, index) =>
+          busy === index ? (
+            <LayoutApplyBar
+              key={name}
+              icon={Camera}
+              label={name}
+              status="Recalling…"
+              duration={RECALL_LOCK_MS}
+              onComplete={clearBusy}
+            />
+          ) : (
+            <PresetButton
+              key={name}
+              name={name}
+              disabled={busy !== null}
+              onRecall={() => recallPreset(index)}
+            />
+          )
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-2 touchPanel:gap-3 flex-shrink-0">

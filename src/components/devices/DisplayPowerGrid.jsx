@@ -4,6 +4,7 @@ import { useDigitalJoin } from '../../hooks/useJoin';
 import { DIGITAL_JOINS } from '../../crestron/joins';
 import { safeSessionStorage } from '../../utils/safeStorage';
 import Button from '../ui/Button';
+import Card, { CardHeader, CardTitle, CardContent } from '../ui/Card';
 
 const sendPulse = (setFn) => {
   setFn(true);
@@ -79,118 +80,109 @@ function DisplayPowerTile({ label, storageKey, onJoinKey, offJoinKey, hdmi1JoinK
     sendPulse(sendOff);
   };
 
-  const tileStyle = {
-    backgroundColor: 'var(--color-bg-secondary)',
-    backgroundImage: 'var(--gloss-specular), var(--surface-glass)',
-    boxShadow: 'var(--surface-hairline), var(--surface-edge), var(--elev-rest)',
-    borderRadius: '0.875rem',
-  };
-
+  // One card per display — same structure as the Audio Controls channel cards
   return (
-    <div
-      className="flex flex-col items-center justify-center gap-2 touchPanel:gap-2.5 w-full h-full px-2 py-3 touchPanel:px-3 touchPanel:py-4"
-      style={tileStyle}
-    >
-      {/* Hero icon with preserved floating motion */}
-      <div
-        className="p-3.5 touchPanel:p-4 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0"
-        style={{
-          backgroundColor: ui.glowBg,
-          boxShadow: ui.glowShadow,
-        }}
-      >
-        <HeroIcon
-          className="w-8 h-8 touchPanel:w-9 touchPanel:h-9 transition-all duration-500"
-          style={{ color: ui.iconColor }}
-        />
-      </div>
-
-      {/* Label */}
-      <div className="w-full min-h-[2.25rem] touchPanel:min-h-[2.5rem] flex items-center justify-center px-1">
-        <span className="text-xs touchPanel:text-sm font-semibold text-heading text-center leading-tight">
+    <Card variant="gradient" tone="video" className="flex flex-col min-h-0 min-w-0">
+      <CardHeader className="pb-3 flex-shrink-0">
+        <CardTitle className="flex items-center justify-center gap-2 text-md text-heading text-center">
           {label}
-        </span>
-      </div>
+        </CardTitle>
+      </CardHeader>
 
-      {/* Full-colour status pill: only size changes */}
-      <div className="w-full h-2 touchPanel:h-2.5 flex items-center justify-center flex-shrink-0">
+      <CardContent className="flex-1 min-h-0 flex flex-col items-center justify-center gap-3 touchPanel:gap-4">
+        {/* Hero icon with preserved floating motion */}
         <div
-          className="rounded-full content-status-fill"
+          className="p-3.5 touchPanel:p-4 rounded-full transition-all duration-500 content-hero-breath flex-shrink-0"
           style={{
-            width: ui.pillWidth,
-            height: '100%',
-            backgroundColor: ui.pillBg,
-            boxShadow: ui.pillShadow,
-            transform: ui.pillScale,
-            transformOrigin: 'center center',
-            opacity: 1,
-            transition:
-              'width 420ms ease, transform 420ms ease, background-color 320ms ease, box-shadow 320ms ease',
+            backgroundColor: ui.glowBg,
+            boxShadow: ui.glowShadow,
           }}
-        />
-      </div>
-
-      {/* ON / OFF side by side — keeps the tile short enough for the 3x2 grid */}
-      <div className="grid grid-cols-2 gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
-        <Button
-          variant={isOn ? 'success' : 'secondary'}
-          size="sm"
-          onClick={handlePowerOn}
-          aria-label={`Turn on ${label}`}
-          className="w-full flex items-center justify-center gap-2 py-1.5 px-2 touchPanel:py-2"
         >
-          <Play className="w-3.5 h-3.5 touchPanel:w-4 touchPanel:h-4 flex-shrink-0" />
-          <span className="text-xs touchPanel:text-sm">ON</span>
-        </Button>
+          <HeroIcon
+            className="w-8 h-8 touchPanel:w-9 touchPanel:h-9 transition-all duration-500"
+            style={{ color: ui.iconColor }}
+          />
+        </div>
 
-        <Button
-          variant={!isOn ? 'danger' : 'secondary'}
-          size="sm"
-          onClick={handlePowerOff}
-          aria-label={`Turn off ${label}`}
-          className="w-full flex items-center justify-center gap-2 py-1.5 px-2 touchPanel:py-2"
-        >
-          <Power className="w-3.5 h-3.5 touchPanel:w-4 touchPanel:h-4 flex-shrink-0" />
-          <span className="text-xs touchPanel:text-sm">OFF</span>
-        </Button>
-      </div>
+        {/* Full-colour status pill: only size changes */}
+        <div className="w-full h-2 touchPanel:h-2.5 flex items-center justify-center flex-shrink-0">
+          <div
+            className="rounded-full content-status-fill"
+            style={{
+              width: ui.pillWidth,
+              height: '100%',
+              backgroundColor: ui.pillBg,
+              boxShadow: ui.pillShadow,
+              transform: ui.pillScale,
+              transformOrigin: 'center center',
+              opacity: 1,
+              transition:
+                'width 420ms ease, transform 420ms ease, background-color 320ms ease, box-shadow 320ms ease',
+            }}
+          />
+        </div>
 
-      {/* HDMI input select — mutually exclusive */}
-      <div className="grid grid-cols-2 gap-1.5 touchPanel:gap-2 w-full flex-shrink-0">
-        {[
-          { key: 'hdmi1', text: 'HDMI 1', sendFn: sendHdmi1 },
-          { key: 'hdmi2', text: 'HDMI 2', sendFn: sendHdmi2 },
-        ].map((option) => (
+        {/* ON / OFF side by side — keeps the tile short enough for the 3x2 grid */}
+        <div className="grid grid-cols-2 gap-3 touchPanel:gap-4 w-full flex-shrink-0">
           <Button
-            key={option.key}
-            variant={input === option.key ? 'primary' : 'secondary'}
+            variant={isOn ? 'success' : 'secondary'}
             size="sm"
-            onClick={() => handleInput(option.key, option.sendFn)}
-            aria-label={`${label} ${option.text}`}
-            className="w-full flex items-center justify-center py-1.5 px-1 touchPanel:py-2"
+            onClick={handlePowerOn}
+            aria-label={`Turn on ${label}`}
+            className="w-full flex items-center justify-center gap-2 py-2 px-2 touchPanel:py-3"
           >
-            <span className="text-xs touchPanel:text-sm whitespace-nowrap">{option.text}</span>
+            <Play className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
+            <span className="text-sm touchPanel:text-base">ON</span>
           </Button>
-        ))}
-      </div>
-    </div>
+
+          <Button
+            variant={!isOn ? 'danger' : 'secondary'}
+            size="sm"
+            onClick={handlePowerOff}
+            aria-label={`Turn off ${label}`}
+            className="w-full flex items-center justify-center gap-2 py-2 px-2 touchPanel:py-3"
+          >
+            <Power className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
+            <span className="text-sm touchPanel:text-base">OFF</span>
+          </Button>
+        </div>
+
+        {/* HDMI input select — mutually exclusive */}
+        <div className="grid grid-cols-2 gap-3 touchPanel:gap-4 w-full flex-shrink-0">
+          {[
+            { key: 'hdmi1', text: 'HDMI 1', sendFn: sendHdmi1 },
+            { key: 'hdmi2', text: 'HDMI 2', sendFn: sendHdmi2 },
+          ].map((option) => (
+            <Button
+              key={option.key}
+              variant={input === option.key ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => handleInput(option.key, option.sendFn)}
+              aria-label={`${label} ${option.text}`}
+              className="w-full flex items-center justify-center py-2 px-1 touchPanel:py-3"
+            >
+              <span className="text-sm touchPanel:text-base whitespace-nowrap">{option.text}</span>
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 const DisplayPowerGrid = () => {
   return (
-    <div className="h-full w-full grid grid-cols-3 grid-rows-2 gap-3 touchPanel:gap-4">
+    <div className="h-full w-full grid grid-cols-3 grid-rows-2 gap-6 touchPanel:gap-8">
       {DISPLAY_CONFIGS.map((display) => (
-        <div key={display.key} className="min-h-0 min-w-0">
-          <DisplayPowerTile
-            label={display.label}
-            storageKey={display.storageKey}
-            onJoinKey={display.onJoinKey}
-            offJoinKey={display.offJoinKey}
-            hdmi1JoinKey={display.hdmi1JoinKey}
-            hdmi2JoinKey={display.hdmi2JoinKey}
-          />
-        </div>
+        <DisplayPowerTile
+          key={display.key}
+          label={display.label}
+          storageKey={display.storageKey}
+          onJoinKey={display.onJoinKey}
+          offJoinKey={display.offJoinKey}
+          hdmi1JoinKey={display.hdmi1JoinKey}
+          hdmi2JoinKey={display.hdmi2JoinKey}
+        />
       ))}
     </div>
   );

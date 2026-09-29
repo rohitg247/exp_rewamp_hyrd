@@ -148,14 +148,14 @@ const SourceSelection = () => {
         })}
       </div>
 
-      {activeKey === "custom" && (
+      {/* {activeKey === "custom" && (
         <p
           className="mt-2 text-center text-xs md:text-sm touchPanel:text-base font-semibold"
           style={{ color: "var(--color-text-light)" }}
         >
           Custom routing active (set on AV Matrix)
         </p>
-      )}
+      )} */}
     </div>
   );
 };

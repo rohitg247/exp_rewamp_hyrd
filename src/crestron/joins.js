@@ -185,17 +185,7 @@ export const DIGITAL_JOINS = {
   // D196-199: Reserved
 
 
-  // ── GROUP 20: Camera Presets (D200-209) ──
-  CAM_PRESET_1: 200,              // [PULSE] CameraControl.jsx - Room_View
-  CAM_PRESET_2: 201,              // [PULSE] CameraControl.jsx - Front_cameras
-  CAM_PRESET_3: 202,              // [PULSE] CameraControl.jsx - Sightline
-  CAM_PRESET_4: 203,              // [PULSE] CameraControl.jsx - Sightline_AI
-  CAM_PRESET_5: 204,              // [PULSE] CameraControl.jsx - SightlineAI_PIP
-  CAM_PRESET_6: 205,              // [PULSE] CameraControl.jsx - SightlineAI_Conv
-  CAM_PRESET_7: 206,              // [PULSE] CameraControl.jsx - Training_room
-  CAM_PRESET_8: 207,              // [PULSE] CameraControl.jsx - Training Room_Conv
-  CAM_PRESET_9: 208,              // [PULSE] CameraControl.jsx - Preset 9
-  // D209: Reserved
+  // D200-209: Reserved (camera presets moved to analog A250 CAM_PRESET)
 
 
   // ── GROUP 21: Camera Wake/Sleep + Global Display Power (D210-219) ──
@@ -250,7 +240,12 @@ export const ANALOG_JOINS = {
 
   // ── GROUP 5: Voice Lift (A240-249) ──
   VOICE_LIFT: 240,                // [ANALOG 0/1] Navbar.jsx - Voice Lift (1=on, 0=off)
-  // A241-299: Reserved
+  // A241-249: Reserved
+
+
+  // ── GROUP 6: Camera Presets (A250-259) ──
+  CAM_PRESET: 250,                // [ANALOG] CameraControl.jsx - 1-9 = recall preset n, 101-109 = save preset n, then 0 (reset so repeats re-trigger)
+  // A251-299: Reserved
 };
 
 

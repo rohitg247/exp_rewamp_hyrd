@@ -274,7 +274,7 @@ const Navbar = ({ onShutdown }) => {
             </>
           )}
 
-          {/* Info */}
+          {/* Info — hidden for now
           <Button
             variant="secondary"
             size="touchPanel"
@@ -285,6 +285,7 @@ const Navbar = ({ onShutdown }) => {
           >
             <Info className="w-4 h-4 md:w-5 md:h-5 touchPanel:w-6 touchPanel:h-6" />
           </Button>
+          */}
 
           {/* Shutdown */}
           <Button

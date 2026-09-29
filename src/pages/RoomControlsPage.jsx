@@ -1,4 +1,4 @@
-import { Monitor, Camera } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import Card, { CardHeader, CardTitle, CardContent, CardIcon } from '../components/ui/Card';
 import DisplayPowerGrid from '../components/devices/DisplayPowerGrid';
 import CameraControl from '../components/devices/CameraControl';
@@ -28,20 +28,11 @@ const RoomControlsPage = ({ sidebarEnabled = false }) => {
         </Card>
 
         {/* ========================================
-            DISPLAY POWER — 6 displays, 3 x 2
-            (4x Side Display, Back Display, Video Wall)
+            DISPLAYS — one card per display, 3 x 2 (no outer wrapper card)
             ======================================== */}
-        <Card variant="gradient" tone="video" className="flex-[2] flex flex-col h-full overflow-hidden">
-          <CardHeader className="pb-3 flex-shrink-0">
-            <CardTitle className="flex items-center justify-center space-x-2">
-              <CardIcon tone="video"><Monitor className={ICON_CLS} /></CardIcon>
-              <span className={LABEL_CLS}>Display Power</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex items-stretch px-4 py-4 touchPanel:px-6 touchPanel:py-4 overflow-hidden min-h-0">
-            <DisplayPowerGrid />
-          </CardContent>
-        </Card>
+        <div className="flex-[2] min-w-0 h-full">
+          <DisplayPowerGrid />
+        </div>
       </div>
     </div>
   );

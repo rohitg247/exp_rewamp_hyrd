@@ -35,9 +35,10 @@ const INIT_STEPS = [
 // const STEP_TRANSITION = 180;
 // const DONE_HOLD = 450;
 
-const STEP_DURATION = 100;
-const STEP_TRANSITION = 10;
-const DONE_HOLD = 45;
+// Matches ShutdownScreen: 7 × 1357 ≈ 9.5s fill + 0.5s hold = 10s total
+const STEP_DURATION = 1357;
+const STEP_TRANSITION = 180;
+const DONE_HOLD = 500;
 
 // Copy-3 frosted-glass card style (confirmed working on the TSW-1070) — reused
 // for the landing card and the boot panel so they share one elegant aesthetic.
