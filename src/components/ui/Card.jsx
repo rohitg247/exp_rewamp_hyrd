@@ -64,7 +64,7 @@ const SURFACES = {
   gradientGlass: {
     // Must stay translucent — behind an opaque background, backdrop-filter
     // has nothing to blur and silently does nothing.
-    backgroundColor: "color-mix(in srgb, var(--color-bg-secondary) 62%, transparent)",
+    backgroundColor: "rgba(var(--rgb-bg-secondary), 0.62)",
     backgroundImage: [
       "var(--grain)", // 1 · noise, topmost
       "var(--gloss-specular)", // 2 · raked highlight

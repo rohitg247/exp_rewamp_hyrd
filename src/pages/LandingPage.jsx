@@ -40,17 +40,10 @@ const STEP_DURATION = 1357;
 const STEP_TRANSITION = 180;
 const DONE_HOLD = 500;
 
-// Copy-3 frosted-glass card style (confirmed working on the TSW-1070) — reused
-// for the landing card and the boot panel so they share one elegant aesthetic.
-const glassStyle = {
-  WebkitBackdropFilter: "blur(12px)",
-  backdropFilter: "blur(12px)",
-  backgroundColor: "rgba(255,255,255,0.06)",
-  borderColor: "rgba(255,255,255,0.20)",
-  boxShadow:
-    "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(255,255,255,0.1)",
-};
-
+// The frosted card, ambient orbs, step dots and progress bar now come from the
+// .landing-*-subtle / .startup-*-subtle classes in global.css. They were written
+// for this screen and never wired up; after the color-mix migration they are
+// panel-safe AND theme-reactive, which the inline rgba literals here were not.
 const MAIN_PAGE_TITLE = "Main Page";
 const MAIN_PAGE_ROUTE = "/main-page";
 
@@ -168,6 +161,8 @@ const LandingPage = () => {
       safeSessionStorage.setItem(`${storageKey}Input`, 'hdmi1');
     });
     safeSessionStorage.setItem('cameraPowerMode', 'wake');
+    // Camera comes up on Sightline AI - string must match PRESET_NAMES[3] in CameraControl.jsx
+    safeSessionStorage.setItem("cameraActivePreset", "Sightline_AI");
 
     // Lights: show "Welcome" preset selected on startup — UI only, no backend pulse.
     // The lighting components seed their active preset from this sessionStorage key.
@@ -203,10 +198,13 @@ const LandingPage = () => {
     </div>
   );
 
+  // Themed drifting orbs. The radial-gradient bakes the soft edge in, so there is
+  // no filter:blur or mix-blend-mode for the panel to composite per frame.
   const orbLayer = (
-    <div className="absolute inset-0 opacity-10" aria-hidden="true">
-      <div className="absolute top-20 left-20 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
+    <div className="landing-orb-layer" aria-hidden="true">
+      <div className="landing-orb landing-orb-1" />
+      <div className="landing-orb landing-orb-2" />
+      <div className="landing-orb landing-orb-3" />
     </div>
   );
 
@@ -226,7 +224,7 @@ const LandingPage = () => {
   );
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500">
+    <div className="h-full relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500">
       {/* Animated Grid Background */}
       {gridLayer}
 
@@ -238,33 +236,22 @@ const LandingPage = () => {
 
       {/* Landing Content (copy-3 basic screen) */}
       <div
-        className={`relative z-10 flex items-center justify-center min-h-screen px-6 touchPanel:px-12 transition-all duration-500 ${
+        className={`relative z-10 flex items-center justify-center min-h-full px-6 touchPanel:px-12 transition-all duration-500 ${
           isEntering ? "opacity-0 scale-95" : "opacity-100 scale-100"
         }`}
       >
-        <div
-          className="rounded-[3rem] touchPanel:rounded-[4rem] p-12 touchPanel:p-24 border max-w-3xl touchPanel:max-w-5xl w-full animate-fadeIn"
-          style={glassStyle}
-        >
+        <div className="landing-shell-subtle rounded-[3rem] touchPanel:rounded-[4rem] p-12 touchPanel:p-24 max-w-3xl touchPanel:max-w-5xl w-full animate-fadeIn">
           {/* Logo with glow effect */}
-          <div className="relative mb-8 touchPanel:mb-16">
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{ backgroundColor: "rgba(255,255,255,0.3)", filter: "blur(48px)" }}
-            />
-            <div
-              className="relative w-32 h-32 touchPanel:w-48 touchPanel:h-48 rounded-3xl touchPanel:rounded-[2.5rem] flex items-center justify-center mx-auto shadow-xl"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.20)",
-                border: "1px solid rgba(255,255,255,0.30)",
-              }}
-            >
+          {/* The glow is .landing-icon-wrap-subtle::before — a radial-gradient,
+              not a filter:blur, so the panel composites it for free. */}
+          <div className="landing-icon-wrap-subtle mb-8 touchPanel:mb-16">
+            <div className="landing-icon-ring-subtle mx-auto">
               <Building2 className="w-16 h-16 touchPanel:w-24 touchPanel:h-24 text-white drop-shadow-lg" />
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-6xl touchPanel:text-8xl font-semibold text-white mb-6 touchPanel:mb-12 text-center animate-slideUp transition-all duration-500">
+          <h1 className="landing-room-title-subtle mb-6 touchPanel:mb-12 text-center animate-slideUp transition-all duration-500">
             {MAIN_PAGE_TITLE}
           </h1>
 
@@ -275,7 +262,7 @@ const LandingPage = () => {
               size="lg"
               onClick={handleEnterSystem}
               disabled={isEntering}
-              className="text-white text-xl touchPanel:text-3xl px-12 touchPanel:px-24 py-6 touchPanel:py-12 rounded-2xl touchPanel:rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105"
+              className="landing-enter-btn-subtle text-white text-xl touchPanel:text-3xl px-12 touchPanel:px-24 py-6 touchPanel:py-12 rounded-2xl touchPanel:rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105"
               style={{
                 WebkitBackdropFilter: "blur(4px)",
                 backdropFilter: "blur(4px)",
@@ -300,12 +287,11 @@ const LandingPage = () => {
 
           {/* Status Indicator */}
           <div className="mt-10 touchPanel:mt-16 flex items-center justify-center gap-3 touchPanel:gap-6 text-white animate-slideUp">
-            {/* Glow set inline: `shadow-success/50` is slash-opacity and does not
-                apply on the panel, so the status dot lost its halo on hardware. */}
-            <div
-              className="w-3 h-3 touchPanel:w-6 touchPanel:h-6 bg-success rounded-full animate-pulse"
-              style={{ boxShadow: "0 0 12px 2px rgba(16,185,129,0.5)" }}
-            ></div>
+            {/* .startup-status-dot-subtle carries both fill and halo. bg-success
+                resolved through the --color-success alias; the class uses the
+                numbered step, and its glow replaces the slash-opacity shadow that
+                never applied on the panel. */}
+            <div className="startup-status-dot-subtle animate-pulse" />
             <span className="text-lg touchPanel:text-2xl">System ready for control</span>
           </div>
         </div>
@@ -313,7 +299,7 @@ const LandingPage = () => {
 
       {/* ===== Boot / startup sequence overlay — built on the copy-3 aesthetic ===== */}
       {isEntering && (
-        <div className="fixed inset-0 z-20 overflow-hidden bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500 flex items-center justify-center px-6">
+        <div className="startup-scrim fixed inset-0 z-20 overflow-hidden flex items-center justify-center px-6">
           {/* Same ambient backdrop as the landing */}
           {gridLayer}
           {orbLayer}
@@ -321,39 +307,26 @@ const LandingPage = () => {
 
           {/* Glass panel (same frosted card as the landing) */}
           <div
-            className="relative z-10 rounded-[3rem] touchPanel:rounded-[4rem] p-10 md:p-14 touchPanel:p-24 border max-w-xl touchPanel:max-w-4xl w-full animate-fadeIn"
-            style={{ ...glassStyle, color: "#ffffff" }}
+            className="startup-panel-subtle relative z-10 rounded-[3rem] touchPanel:rounded-[4rem] p-10 md:p-14 touchPanel:p-24 max-w-xl touchPanel:max-w-4xl w-full animate-fadeIn"
+            style={{ color: "#ffffff" }}
           >
             <div className="flex flex-col items-center text-center">
               {/* Header chip */}
-              <div className="flex items-center gap-3 mb-8 touchPanel:mb-12">
-                <div
-                  className="w-2.5 h-2.5 touchPanel:w-4 touchPanel:h-4 bg-success rounded-full animate-pulse"
-                  style={{ boxShadow: "0 0 10px 2px rgba(16,185,129,0.5)" }}
-                />
-                <span
-                  className="text-sm touchPanel:text-xl font-semibold uppercase tracking-[0.2em]"
-                  style={{ color: "rgba(255,255,255,0.72)" }}
-                >
-                  System startup
-                </span>
+              <div className="startup-header-subtle mb-8 touchPanel:mb-12">
+                <div className="startup-status-dot-subtle animate-pulse" />
+                <span className="startup-header-text-subtle">System startup</span>
               </div>
 
               {/* Current step icon — same glowing white-glass ring as the landing logo */}
-              <div className="relative mb-8 touchPanel:mb-12">
+              <div className="startup-icon-wrap-subtle mb-8 touchPanel:mb-12">
                 <div
-                  className="absolute inset-0 rounded-full"
-                  style={{ backgroundColor: "rgba(255,255,255,0.3)", filter: "blur(48px)" }}
-                />
-                <div
-                  className="relative w-24 h-24 touchPanel:w-40 touchPanel:h-40 rounded-3xl touchPanel:rounded-[2.5rem] flex items-center justify-center mx-auto shadow-xl transition-colors duration-300"
-                  style={{
-                    backgroundColor: isDone ? "rgba(16,185,129,0.18)" : "rgba(255,255,255,0.20)",
-                    border: isDone ? "1px solid rgba(16,185,129,0.45)" : "1px solid rgba(255,255,255,0.30)",
-                  }}
+                  className={`${isDone ? "startup-done-subtle" : "startup-current-icon-subtle"} transition-colors duration-300`}
                 >
                   {isDone ? (
-                    <Check className="w-12 h-12 touchPanel:w-20 touchPanel:h-20 text-success drop-shadow-lg" />
+                    <Check
+                      className="w-12 h-12 touchPanel:w-20 touchPanel:h-20 drop-shadow-lg"
+                      style={{ color: "var(--color-success-500)" }}
+                    />
                   ) : (
                     <CurrentStepIcon className="w-12 h-12 touchPanel:w-20 touchPanel:h-20 text-white drop-shadow-lg" />
                   )}
@@ -377,23 +350,14 @@ const LandingPage = () => {
               </p>
 
               {/* Mini step dots */}
-              <div className="flex items-center justify-center gap-2 touchPanel:gap-3 flex-wrap mb-8 touchPanel:mb-12">
+              <div className="startup-mini-steps mb-8 touchPanel:mb-12">
                 {INIT_STEPS.map((step, idx) => {
                   const done = completedSteps.includes(idx) || isDone;
                   const active = idx === stepIndex && !isDone;
                   return (
                     <span
                       key={step.key}
-                      className={`rounded-full transition-all duration-200 w-2.5 h-2.5 touchPanel:w-4 touchPanel:h-4 ${
-                        active ? "scale-110" : ""
-                      }`}
-                      style={{
-                        backgroundColor: active
-                          ? "#ffffff"
-                          : done
-                          ? "var(--color-success)"
-                          : "rgba(255,255,255,0.25)",
-                      }}
+                      className={`startup-mini-step ${active ? "is-active" : done ? "is-done" : ""}`}
                     />
                   );
                 })}
@@ -401,29 +365,20 @@ const LandingPage = () => {
 
               {/* Progress bar */}
               <div className="w-full max-w-md touchPanel:max-w-2xl">
-                <div
-                  className="flex justify-between text-xs md:text-sm touchPanel:text-lg mb-3 uppercase tracking-[0.16em]"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
-                >
+                <div className="startup-progress-meta flex justify-between text-xs md:text-sm touchPanel:text-lg mb-3 uppercase tracking-[0.16em]">
                   <span>Boot sequence</span>
                   <span className="tabular-nums">{Math.round(progress)}%</span>
                 </div>
-                <div
-                  className="w-full rounded-full h-2.5 touchPanel:h-4 overflow-hidden"
-                  style={{ backgroundColor: "rgba(255,255,255,0.22)" }}
-                >
+                <div className="startup-progress-track-subtle w-full rounded-full h-2.5 touchPanel:h-4 overflow-hidden">
                   <div
-                    className="h-2.5 touchPanel:h-4 rounded-full transition-all duration-100 ease-linear"
-                    style={{ width: `${progress}%`, backgroundColor: "#ffffff" }}
+                    className="startup-progress-fill-subtle h-2.5 touchPanel:h-4 rounded-full transition-all duration-100 ease-linear"
+                    style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
 
               {/* Counter */}
-              <p
-                className="mt-5 touchPanel:mt-8 text-xs touchPanel:text-lg tracking-[0.06em]"
-                style={{ color: "rgba(255,255,255,0.5)" }}
-              >
+              <p className="startup-counter-subtle mt-5 touchPanel:mt-8 text-xs touchPanel:text-lg tracking-[0.06em]">
                 {isDone
                   ? `${INIT_STEPS.length} / ${INIT_STEPS.length}`
                   : `${stepIndex + 1} / ${INIT_STEPS.length}`}

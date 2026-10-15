@@ -197,7 +197,7 @@ const EngineeringPage = () => {
   const btnClass = "flex-1 flex flex-col items-center justify-center space-y-2 touchPanel:space-y-3 w-full min-h-0";
 
   return (
-    <div className="h-screen w-screen bg-theme-bg flex flex-col overflow-hidden">
+    <div className="h-full w-full bg-theme-bg flex flex-col overflow-hidden">
 
       {/* ── Top Bar ── */}
       <div

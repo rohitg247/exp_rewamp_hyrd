@@ -10,8 +10,11 @@ const PinPad = ({ pin, length, onDigit, onBackspace, onClear }) => (
         <div
           key={i}
           className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-colors ${
-            pin.length > i ? 'bg-primary border-primary' : 'bg-black/20 border-theme-border'
+            pin.length > i ? 'bg-primary border-primary' : 'border-theme-border'
           }`}
+          // Panel rule (TSW-1070): bg-black/20 is slash-opacity and does not apply,
+          // so the empty dot's fill is inline rgba().
+          style={pin.length > i ? undefined : { backgroundColor: 'rgba(0, 0, 0, 0.20)' }}
         >
           {pin.length > i && <div className="w-3 h-3 bg-white rounded-full" />}
         </div>

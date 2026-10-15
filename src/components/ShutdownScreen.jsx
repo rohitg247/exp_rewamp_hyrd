@@ -91,7 +91,13 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
       <div className="text-center space-y-8 touchPanel:space-y-16 animate-fadeIn pointer-events-auto">
         {/* Logo/Icon */}
         <div className="relative">
-          <div className="w-24 h-24 touchPanel:w-40 touchPanel:h-40 bg-danger rounded-full flex items-center justify-center mx-auto mb-8 touchPanel:mb-16 shadow-2xl">
+          {/* Inline #f21212, not bg-danger: that class resolves through
+              --color-accent -> --color-danger-500 and paints nothing on the
+              panel (same reason as the progress bar below). Matches the ring. */}
+          <div
+            className="w-24 h-24 touchPanel:w-40 touchPanel:h-40 rounded-full flex items-center justify-center mx-auto mb-8 touchPanel:mb-16 shadow-2xl"
+            style={{ backgroundColor: "#f21212" }}
+          >
             <Power className="w-12 h-12 touchPanel:w-24 touchPanel:h-24 text-white" />
           </div>
 
@@ -150,8 +156,14 @@ const ShutdownScreen = ({ isVisible, onComplete }) => {
             key={stepIndex}
             className="flex items-center justify-center gap-3 touchPanel:gap-4 animate-fadeIn"
           >
-            <StepIcon className="w-5 h-5 touchPanel:w-8 touchPanel:h-8 text-gray-300 flex-shrink-0" />
-            <p className="text-xl touchPanel:text-3xl text-gray-200">
+            {/* Inline white, not text-gray-*: those are theme variables that
+                invert under dark mode, so on this always-dark backdrop the step
+                label went darker instead of lighter. */}
+            <StepIcon
+              className="w-5 h-5 touchPanel:w-8 touchPanel:h-8 flex-shrink-0"
+              style={{ color: "rgba(255,255,255,0.65)" }}
+            />
+            <p className="text-xl touchPanel:text-3xl" style={{ color: "rgba(255,255,255,0.82)" }}>
               {SHUTDOWN_STEPS[stepIndex].label}
             </p>
           </div>

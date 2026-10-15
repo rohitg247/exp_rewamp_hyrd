@@ -233,12 +233,12 @@ const CafePage = ({ sidebarEnabled = false }) => {
 
   // Shared soft blue-tinted border — lands on ~#ccdfe9 in the default light
   // theme (the original hardcoded #d1e3ed) and darkens correctly in dark mode.
-  const softBorder = 'color-mix(in srgb, var(--color-primary-200) 40%, var(--color-bg-secondary))';
+  const softBorder = 'rgba(var(--rgb-primary-200), 0.4)';
 
   // Inset well: a shade different from the Card's own surface, reading as
   // recessed. ~#e3f0f6 in the default light theme (the original #e6f2f8).
   const wellStyle = {
-    backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+    backgroundColor: 'rgba(var(--rgb-primary-200), 0.22)',
     border: `1px solid ${softBorder}`,
     boxShadow: 'inset 0 2px 4px var(--color-shadow)',
   };
@@ -258,7 +258,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
   // in-order tile: subtle primary-tinted wash so the user knows "this item
   // is already on the list"
   const tileInOrderStyle = {
-    backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 8%, var(--color-bg-secondary))',
+    backgroundColor: 'rgba(var(--rgb-primary-200), 0.08)',
     borderColor: 'var(--color-primary-200)',
     boxShadow: '0 1px 4px var(--color-shadow)',
   };
@@ -279,7 +279,7 @@ const CafePage = ({ sidebarEnabled = false }) => {
   // --color-gray-50 is safe here: the gray scale IS inverted for dark mode.
   const badgeStyle = (active) => ({
     backgroundColor: active
-      ? 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))'
+      ? 'rgba(var(--rgb-primary-200), 0.22)'
       : 'var(--color-gray-50)',
     color: active ? 'var(--color-primary)' : 'var(--color-text-light)',
     border: `1px solid ${active ? 'var(--color-primary-200)' : softBorder}`,

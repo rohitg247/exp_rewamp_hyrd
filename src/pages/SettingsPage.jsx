@@ -19,6 +19,35 @@ import Toggle from '../components/ui/Toggle';
 const getAckLogs = () => window.__ackLogs || [];
 const clearAckLogs = () => { window.__ackLogs = []; };
 
+// Debug-log row tints. Inline rgba() because slash-opacity backgrounds
+// (bg-red-900/30 and friends) do not apply on the TSW-1070 - see
+// Docs/crestron-panel-safe-css.md.
+
+// Copied verbatim from tailwind.config.js -> theme.extend.screens.touchPanel.raw,
+// so the Viewport tab reports whether touchPanel: utilities are really live.
+const TOUCHPANEL_QUERY = '(min-width: 1910px) and (ipadmin-height: 1190px)';
+// What the Viewport tab probes. color-mix is the one that matters most: it needs
+// Chromium 111, and if it reports false then every translucency in this project
+// has to stay an --rgb-* triplet composed with rgba(). See
+// Docs/crestron-panel-safe-css.md.
+const CSS_PROBES = [
+  ['color-mix()', 'color', 'color-mix(in srgb, red, blue)'],
+  ['aspect-ratio', 'aspect-ratio', '16 / 9'],
+  ['backdrop-filter', 'backdrop-filter', 'blur(1px)'],
+  ['inset (shorthand)', 'inset', '0px'],
+  ['clamp()', 'width', 'clamp(1rem, 2vw, 3rem)'],
+  [':is()', 'selector', ':is(*)'],
+  [':has()', 'selector', ':has(*)'],
+];
+
+const LOG_ROW_BG = {
+  error:   'rgba(127, 29, 29, 0.30)',
+  success: 'rgba(20, 83, 45, 0.30)',
+  warning: 'rgba(113, 63, 18, 0.30)',
+  connect: 'rgba(30, 58, 138, 0.30)',
+  default: 'rgba(31, 41, 55, 0.50)',
+};
+
 const SettingsPage = ({ sidebarEnabled = false }) => {
   const [, , sendRefreshPulse] = useDigitalJoin(DIGITAL_JOINS.DEVICE_STATUS_REFRESH);
   const [devices, setDevices] = useState([]);
@@ -34,7 +63,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   const [debugLogs, setDebugLogs] = useState([]);
   const [showDebug, setShowDebug] = useState(false);
   const [debugTab, setDebugTab] = useState('device');
-  const debugEndRef = useRef(null);
+  const logScrollRef = useRef(null);
 
   // ── ACK tab — poll the global buffer every second when debug panel is open ──
   const [ackLogs, setAckLogs] = useState([]);
@@ -54,7 +83,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   }, [debugTab]);
 
   // ── Viewport Debug Info ──
-  const [, setViewportInfo] = useState({});
+  const [viewportInfo, setViewportInfo] = useState({});
   useEffect(() => {
     const update = () => setViewportInfo({
       innerWidth: window.innerWidth,
@@ -64,6 +93,19 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
       dpr: window.devicePixelRatio,
       bp1910: window.matchMedia('(min-width: 1910px) and (min-height: 1190px)').matches,
       bp1920: window.matchMedia('(min-width: 1920px) and (min-height: 1200px)').matches,
+      // The literal query tailwind.config.js uses for the touchPanel: variant.
+      // It contains "ipadmin-height", which is not a media feature, so an unknown
+      // feature invalidates the whole query and it can never match - i.e. every
+      // touchPanel: utility in the app is inert. See TOUCHPANEL-BREAKPOINT.md.
+      tpActive: window.matchMedia(TOUCHPANEL_QUERY).matches,
+      // Engine probe. The panel's CSS support is the thing every styling
+      // decision in this project hangs off, and the published Crestron figures
+      // only bracket it (Chromium 87-100). Read it off the device instead.
+      ua: navigator.userAgent,
+      features: CSS_PROBES.map(([label, kind, value]) => [
+        label,
+        kind === 'selector' ? CSS.supports(`selector(${value})`) : CSS.supports(kind, value),
+      ]),
     });
     update();
     window.addEventListener('resize', update);
@@ -89,11 +131,13 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
     setDebugLogs(prev => [...prev.slice(-50), { time: timestamp, message, type }]);
   };
 
+  // Keep the log list pinned to the newest entry. scrollTop on the list itself,
+  // NOT scrollIntoView: that walks every scrollable ancestor, and with the debug
+  // panel open the page root can scroll, so it shifted the whole page up.
   useEffect(() => {
-    if (showDebug && debugEndRef.current) {
-      debugEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [debugLogs, heartbeatLogs, ackLogs, showDebug]);
+    const el = logScrollRef.current;
+    if (showDebug && el) el.scrollTop = el.scrollHeight;
+  }, [debugLogs, heartbeatLogs, ackLogs, showDebug, debugTab]);
 
   useSerialJoinCallback(SERIAL_JOINS.DEVICE_STATUS_LIST, (chunk) => {
     const trimmed = chunk.trim();
@@ -228,7 +272,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
   const handleClearLogs = () => {
     if (debugTab === 'device')         setDebugLogs([]);
     else if (debugTab === 'heartbeat') clearHeartbeatLogs();
-    else { clearAckLogs(); setAckLogs([]); }
+    else if (debugTab === 'ack') { clearAckLogs(); setAckLogs([]); }
   };
 
   return (
@@ -413,7 +457,7 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
             🐛 Debug Panel (Toggleable Overlay)
         ════════════════════════════════════════════ */}
         {showDebug && (
-          <div className="absolute right-6 top-24 w-96 h-[calc(100vh-150px)] bg-gray-900 rounded-xl border border-gray-700 shadow-2xl flex flex-col overflow-hidden z-50">
+          <div className="absolute right-6 top-24 bottom-6 w-96 bg-gray-900 rounded-xl border border-gray-700 shadow-2xl flex flex-col overflow-hidden z-50">
 
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-700">
@@ -462,29 +506,100 @@ const SettingsPage = ({ sidebarEnabled = false }) => {
               >
                 TCP / ACK
               </button>
+              <button
+                onClick={() => setDebugTab('viewport')}
+                className={`flex-1 py-2 text-xs font-semibold transition-colors ${
+                  debugTab === 'viewport'
+                    ? 'bg-gray-800 text-purple-400 border-b-2 border-purple-400'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Viewport
+              </button>
             </div>
 
             {/* ── Log Output ── */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 font-mono text-xs">
-              {activeLogList.length === 0 ? (
+            <div ref={logScrollRef} className="flex-1 overflow-y-auto p-4 space-y-2 font-mono text-xs">
+              {debugTab === 'viewport' ? (
+                <div className="space-y-1">
+                  {[
+                    ['window.innerWidth', viewportInfo.innerWidth],
+                    ['window.innerHeight', viewportInfo.innerHeight],
+                    ['screen.width', viewportInfo.screenWidth],
+                    ['screen.height', viewportInfo.screenHeight],
+                    ['devicePixelRatio', viewportInfo.dpr],
+                    ['>= 1910 x 1190', String(viewportInfo.bp1910)],
+                    ['>= 1920 x 1200', String(viewportInfo.bp1920)],
+                  ].map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between gap-3 p-2 rounded text-gray-300"
+                      style={{ backgroundColor: LOG_ROW_BG.default }}
+                    >
+                      <span className="text-gray-500">{label}</span>
+                      <span className="font-semibold">{String(value)}</span>
+                    </div>
+                  ))}
+                  {(viewportInfo.features || []).map(([label, ok]) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between gap-3 p-2 rounded"
+                      style={{
+                        backgroundColor: ok ? LOG_ROW_BG.success : LOG_ROW_BG.warning,
+                        color: ok ? 'rgb(134, 239, 172)' : 'rgb(253, 224, 71)',
+                      }}
+                    >
+                      <span>{label}</span>
+                      <span className="font-semibold">{ok ? 'YES' : 'NO'}</span>
+                    </div>
+                  ))}
+
+                  <div className="p-2 rounded text-gray-300" style={{ backgroundColor: LOG_ROW_BG.default }}>
+                    <div className="text-gray-500">navigator.userAgent</div>
+                    <div className="mt-1 break-all">{viewportInfo.ua}</div>
+                  </div>
+
+                  <div
+                    className="p-2 rounded"
+                    style={{
+                      backgroundColor: viewportInfo.tpActive ? LOG_ROW_BG.success : LOG_ROW_BG.warning,
+                      color: viewportInfo.tpActive ? 'rgb(134, 239, 172)' : 'rgb(253, 224, 71)',
+                    }}
+                  >
+                    <div className="font-semibold">
+                      touchPanel: utilities {viewportInfo.tpActive ? 'ACTIVE' : 'INERT'}
+                    </div>
+                    <div className="mt-1 break-all" style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
+                      {TOUCHPANEL_QUERY}
+                    </div>
+                    {!viewportInfo.tpActive && (
+                      <div className="mt-1" style={{ color: 'rgba(255, 255, 255, 0.65)' }}>
+                        Query never matches - see TOUCHPANEL-BREAKPOINT.md before changing it.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : activeLogList.length === 0 ? (
                 <div className="text-gray-500 text-center py-8">No logs yet...</div>
               ) : (
                 activeLogList.map((log, idx) => (
                   <div
                     key={idx}
+                    // Panel rule (TSW-1070): slash-opacity backgrounds do not apply, so the
+                    // row tint is inline rgba(). The text-*-300 classes are solid and fine.
                     className={`p-2 rounded ${
-                      log.type === 'error'   ? 'bg-red-900/30 text-red-300' :
-                      log.type === 'success' ? 'bg-green-900/30 text-green-300' :
-                      log.type === 'warning' ? 'bg-yellow-900/30 text-yellow-300' :
-                      log.type === 'connect' ? 'bg-blue-900/30 text-blue-300' :
-                                               'bg-gray-800/50 text-gray-300'
+                      log.type === 'error'   ? 'text-red-300' :
+                      log.type === 'success' ? 'text-green-300' :
+                      log.type === 'warning' ? 'text-yellow-300' :
+                      log.type === 'connect' ? 'text-blue-300' :
+                                               'text-gray-300'
                     }`}
+                    style={{ backgroundColor: LOG_ROW_BG[log.type] || LOG_ROW_BG.default }}
                   >
                     <span className="text-gray-500">[{log.time}]</span> {log.message}
                   </div>
                 ))
               )}
-              <div ref={debugEndRef} />
             </div>
 
             {/* ── Footer Status ── */}

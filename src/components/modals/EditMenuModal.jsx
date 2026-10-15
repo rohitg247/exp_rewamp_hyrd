@@ -13,10 +13,10 @@ const MAX_ITEM_NAME_LENGTH = 30;
 // --color-bg, which is the saturated PAGE backdrop (#80c2d8 in the default
 // light theme), so the wells read as strong teal slabs next to the Cafe card's
 // soft tint. See CafePage.jsx for the matching definitions.
-const softBorder = 'color-mix(in srgb, var(--color-primary-200) 40%, var(--color-bg-secondary))';
+const softBorder = 'rgba(var(--rgb-primary-200), 0.4)';
 
 const wellStyle = {
-  backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+  backgroundColor: 'rgba(var(--rgb-primary-200), 0.22)',
   border: `1px solid ${softBorder}`,
   boxShadow: 'inset 0 2px 4px var(--color-shadow)',
 };
@@ -161,7 +161,7 @@ const EditMenuModal = ({ isOpen, onClose, menuItems, onSaveMenu }) => {
       <span
         className="text-sm touchPanel:text-lg px-3 py-1 rounded-full font-medium"
         style={{
-          backgroundColor: 'color-mix(in srgb, var(--color-primary-200) 22%, var(--color-bg-secondary))',
+          backgroundColor: 'rgba(var(--rgb-primary-200), 0.22)',
           color: 'var(--color-primary)',
         }}
       >

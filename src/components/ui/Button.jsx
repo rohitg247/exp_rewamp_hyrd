@@ -29,7 +29,9 @@ const Button = forwardRef(({
     const variants = {
         primary: 'bg-primary text-buttonText-primary border-2 border-transparent gloss-sweep',
         danger: 'bg-danger hover:bg-danger-700 text-buttonText-primary border-2 border-transparent gloss-sweep',
-        success: 'bg-green-500 hover:bg-green-600 text-buttonText-primary border-2 border-transparent',
+        // Fill comes from global.css (--color-success-500); the stock Tailwind
+        // green-500 used here before was not this project's success colour.
+        success: 'text-buttonText-primary border-2 border-transparent',
         // Updated: Same brightness on hover and active (press)
         secondary: 'hover:brightness-95 active:brightness-95 text-buttonText-secondary border-2 border-primary-200',
         outline: 'bg-transparent border-2 border-primary text-buttonText-secondary hover:bg-primary hover:text-buttonText-primary',

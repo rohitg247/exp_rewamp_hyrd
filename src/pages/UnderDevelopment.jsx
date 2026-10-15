@@ -22,7 +22,7 @@ const UnderDevelopment = ({ sidebarEnabled = false }) => {
             <div className="flex justify-center">
               <div
                 className="p-8 touchPanel:p-10 rounded-full"
-                style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 12%, transparent)' }}
+                style={{ backgroundColor: 'rgba(var(--rgb-primary), 0.12)' }}
               >
                 <Wrench size={64} className="w-16 h-16 touchPanel:w-20 touchPanel:h-20 text-primary" />
               </div>

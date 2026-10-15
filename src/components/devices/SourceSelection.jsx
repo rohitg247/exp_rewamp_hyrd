@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Laptop, Video } from "lucide-react";
+import { Laptop, Cast, Video } from "lucide-react";
 import { useSerialJoin, useDigitalJoin } from "../../hooks/useJoin";
 import { SERIAL_JOINS, DIGITAL_JOINS } from "../../crestron/joins";
 import { safeSessionStorage } from "../../utils/safeStorage";
@@ -16,6 +16,7 @@ const sendPulse = (setFn) => {
 //   displays: 1-4 = Side Display 1-4 (1,2 = left row, 3,4 = right row)
 //   layouts : 1 Full, 2 Dual — zones 1 = left/full, 2 = right
 const LAPTOP = 1;
+const AIR_MEDIA = 2;
 const CODEC_PRI = 3;
 const CODEC_SEC = 4;
 
@@ -29,6 +30,16 @@ const MODES = [
     layoutKey: "full",
     layoutNum: 1,
     zones: { "full-main": LAPTOP },
+  },
+  {
+    key: "airmedia",
+    name: "Air Media",
+    icon: Cast,
+    // Air Media on every side display, full-window Air Media on video wall + 75"
+    displays: [AIR_MEDIA, AIR_MEDIA, AIR_MEDIA, AIR_MEDIA],
+    layoutKey: "full",
+    layoutNum: 1,
+    zones: { "full-main": AIR_MEDIA },
   },
   {
     key: "vc",
@@ -84,6 +95,7 @@ const SourceSelection = () => {
 
   const [, , sendPresentationPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_PRESENTATION);
   const [, , sendVcPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_VC);
+  const [, , sendAirMediaPulse] = useDigitalJoin(DIGITAL_JOINS.SOURCE_MODE_AIRMEDIA);
   const [, , sendWallFull] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_FULL);
   const [, , sendWallDual] = useDigitalJoin(DIGITAL_JOINS.PRES_LAYOUT_DUAL);
   const [, , sendBackFull] = useDigitalJoin(DIGITAL_JOINS.BACK_LAYOUT_FULL);
@@ -91,6 +103,7 @@ const SourceSelection = () => {
 
   const modePulses = {
     presentation: [sendPresentationPulse, sendWallFull, sendBackFull],
+    airmedia: [sendAirMediaPulse, sendWallFull, sendBackFull],
     vc: [sendVcPulse, sendWallDual, sendBackDual],
   };
 
@@ -126,7 +139,7 @@ const SourceSelection = () => {
 
   return (
     <div className="w-full h-full">
-      <div className="grid grid-rows-2 gap-3 md:gap-4 touchPanel:gap-5 h-full">
+      <div className="grid grid-rows-3 gap-3 md:gap-4 touchPanel:gap-5 h-full">
         {MODES.map((mode) => {
           const IconComponent = mode.icon;
           const isActive = activeKey === mode.key;

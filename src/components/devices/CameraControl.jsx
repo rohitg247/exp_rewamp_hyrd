@@ -26,10 +26,10 @@ const PRESET_NAMES = [
   'Preset 9',
 ];
 
-function PresetButton({ name, disabled, onRecall }) {
+function PresetButton({ name, active, disabled, onRecall }) {
   return (
     <Button
-      variant="secondary"
+      variant={active ? "primary" : "secondary"}
       size="sm"
       disabled={disabled}
       onClick={onRecall}
@@ -47,6 +47,11 @@ function PresetButton({ name, disabled, onRecall }) {
 const CameraControl = () => {
   const sendPreset = useAnalogJoinSendOnly(ANALOG_JOINS.CAM_PRESET);
   const [busy, setBusy] = useState(null); // index of the preset being recalled
+  // Last recalled preset stays lit, so the operator can see which view the camera is on.
+  // Name-keyed (not index) so reordering PRESET_NAMES can never mis-highlight.
+  const [activePreset, setActivePreset] = useState(
+    () => safeSessionStorage.getItem("cameraActivePreset")
+  );
   const clearBusy = useCallback(() => setBusy(null), []);
 
   const recallPreset = (index) => {
@@ -54,6 +59,8 @@ const CameraControl = () => {
     // Back to 0 so the same preset re-triggers next time (analog only fires on change)
     setTimeout(() => sendPreset(0), 200);
     setBusy(index);
+    setActivePreset(PRESET_NAMES[index]);
+    safeSessionStorage.setItem("cameraActivePreset", PRESET_NAMES[index]);
   };
 
   // Wake / Sleep — mutually exclusive, UI-side only (no processor feedback)
@@ -85,6 +92,7 @@ const CameraControl = () => {
             <PresetButton
               key={name}
               name={name}
+              active={activePreset === name}
               disabled={busy !== null}
               onRecall={() => recallPreset(index)}
             />

@@ -168,6 +168,12 @@ export default {
         // 2026-08-06: route change. Keyed off location.pathname in App.jsx so
         // React remounts and the animation replays — no transition library.
         "page-enter": "pageFadeIn 0.2s ease-out both",
+        // OrientationGate overlay (src/components/OrientationGate.jsx).
+        "gate-fade-in": "gate-fade-in 0.35s ease-out both",
+        "gate-reveal": "gate-reveal 0.52s ease-out 0.16s both",
+        "gate-shimmer": "gate-shimmer 4.2s cubic-bezier(0.32,0,0.68,1) 0.8s infinite",
+        "gate-rotate": "gate-rotate 5.5s ease-in-out infinite",
+        "gate-dot-pulse": "gate-dot-pulse 2.4s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -185,6 +191,27 @@ export default {
         pageFadeIn: {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        // OrientationGate overlay (src/components/OrientationGate.jsx).
+        "gate-fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "gate-reveal": {
+          from: { opacity: "0", transform: "translateY(20px)", filter: "blur(4px)" },
+          to: { opacity: "1", transform: "translateY(0)", filter: "blur(0px)" },
+        },
+        "gate-shimmer": {
+          "0%": { opacity: "0", transform: "translateX(-100%)" },
+          "15%": { opacity: "0.75", transform: "translateX(-100%)" },
+          "85%": { opacity: "0.75", transform: "translateX(100%)" },
+          "100%": { opacity: "0", transform: "translateX(100%)" },
+        },
+        "gate-rotate": {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "30%": { transform: "rotate(90deg)" },
+          "70%": { transform: "rotate(90deg)" },
+        },
+        "gate-dot-pulse": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.3", transform: "scale(0.72)" },
         },
       },
     },

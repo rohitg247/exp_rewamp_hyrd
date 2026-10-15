@@ -13,6 +13,7 @@ import ShutdownScreen from "./components/ShutdownScreen";
 import ShutdownModal from "./components/modals/ShutdownModal";
 import PinModal from "./components/modals/PinModal";
 import ErrorBoundary from "./components/ErrorBoundary";
+import OrientationGate from "./components/OrientationGate";
 import ToastContainer from "./components/ui/ToastContainer";
 import { AudioProvider, useAudioContext } from "./context/AudioContext";
 import { ProcessorConnectionProvider } from "./context/ProcessorConnectionContext";
@@ -190,7 +191,7 @@ const AppContent = () => {
       {/* 🔔 TOAST NOTIFICATIONS */}
       <ToastContainer position="top-right" />
 
-      <div className="h-screen w-screen overflow-hidden bg-theme-bg flex flex-col">
+      <div className="h-full w-full overflow-hidden bg-theme-bg flex flex-col">
         <Routes>
           {/* Landing Page */}
           <Route path="/" element={<LandingPage />} />
@@ -288,11 +289,16 @@ function App() {
     <ErrorBoundary>
       <ProcessorConnectionProvider>
         <ThemeProvider>
-          <AudioProvider>
-            <MemoryRouter initialEntries={["/"]}>
-              <AppContent />
-            </MemoryRouter>
-          </AudioProvider>
+          {/* Inside ThemeProvider so the portrait overlay can use theme colours;
+              everything that must survive a tilt stays in its children, and
+              ProcessorConnectionProvider sits above it entirely. */}
+          <OrientationGate>
+            <AudioProvider>
+              <MemoryRouter initialEntries={["/"]}>
+                <AppContent />
+              </MemoryRouter>
+            </AudioProvider>
+          </OrientationGate>
         </ThemeProvider>
       </ProcessorConnectionProvider>
     </ErrorBoundary>

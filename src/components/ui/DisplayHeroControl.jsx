@@ -4,17 +4,17 @@ import Button from './Button';
 const HERO_CONFIG = {
   on: {
     iconColor: 'var(--color-success)',
-    glowBg: 'color-mix(in srgb, var(--color-success) 14%, transparent)',
-    glowShadow: '0 0 32px color-mix(in srgb, var(--color-success) 22%, transparent)',
+    glowBg: 'rgba(var(--rgb-success-500), 0.14)',
+    glowShadow: '0 0 32px rgba(var(--rgb-success-500), 0.22)',
   },
   off: {
     iconColor: 'var(--color-danger-500)',
-    glowBg: 'color-mix(in srgb, var(--color-danger-500) 14%, transparent)',
-    glowShadow: '0 0 32px color-mix(in srgb, var(--color-danger-500) 18%, transparent)',
+    glowBg: 'rgba(var(--rgb-danger-500), 0.14)',
+    glowShadow: '0 0 32px rgba(var(--rgb-danger-500), 0.18)',
   },
   idle: {
     iconColor: 'var(--color-text-light)',
-    glowBg: 'color-mix(in srgb, var(--color-text-light) 10%, transparent)',
+    glowBg: 'rgba(var(--rgb-text-light), 0.1)',
     glowShadow: 'none',
   },
 };

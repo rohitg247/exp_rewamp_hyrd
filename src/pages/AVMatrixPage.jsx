@@ -62,9 +62,12 @@ const LABEL_CLS = 'text-base md:text-lg touchPanel:text-xl';
 
 // Stage frame shared by the Video Wall and 75" Display views
 const STAGE_STYLE = {
-  background: 'linear-gradient(180deg, var(--color-bg), color-mix(in srgb, var(--color-bg-secondary) 60%, white))',
-  border: '2px solid color-mix(in srgb, var(--color-primary) 32%, var(--color-border))',
-  boxShadow: '0 10px 30px color-mix(in srgb, var(--color-shadow) 12%, transparent)',
+  // Panel-safe (Chromium 87, no color-mix): the white veil layer reproduces the
+  // old mix(--color-bg-secondary 60%, white) end stop exactly — white at 0.4 over
+  // bg-secondary — while the bottom layer keeps both theme colours.
+  background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 100%), linear-gradient(180deg, var(--color-bg), var(--color-bg-secondary))',
+  border: '2px solid rgba(var(--rgb-primary), 0.32)',
+  boxShadow: '0 10px 30px rgba(var(--rgb-shadow), 0.12)',
 };
 
 
@@ -149,16 +152,16 @@ const DEFAULT_LAYOUT_KEY = 'full';
 const LayoutMiniPreview = ({ layout, active }) => {
   const tone = active ? 'var(--color-primary)' : 'var(--color-border)';
   const fill = active
-    ? 'color-mix(in srgb, var(--color-primary) 32%, var(--color-bg-secondary))'
+    ? 'rgba(var(--rgb-primary), 0.32)'
     : 'var(--color-bg)';
   const cellStyle = { backgroundColor: fill, border: `1.5px solid ${tone}`, borderRadius: 4 };
 
   const Frame = ({ children }) => (
     <div
-      className="h-full max-h-full w-auto max-w-full aspect-video rounded-xl p-1.5 mx-auto transition-all duration-200"
+      className="h-full max-h-full w-auto max-w-full ratio-16x9 rounded-xl p-1.5 mx-auto transition-all duration-200"
       style={{
         backgroundColor: active
-          ? 'color-mix(in srgb, var(--color-primary) 14%, var(--color-bg-secondary))'
+          ? 'rgba(var(--rgb-primary), 0.14)'
           : 'var(--color-bg-secondary)',
         border: `2px solid ${tone}`,
       }}
@@ -215,13 +218,13 @@ function DraggableInputCard({ id, label, icon: Icon, isPinned, isDragging, onPin
       style={{
         background: isPinned
           ? 'linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500))'
-          : 'linear-gradient(180deg, var(--color-bg-secondary), color-mix(in srgb, var(--color-bg) 55%, white))',
+          : 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%), linear-gradient(180deg, var(--color-bg-secondary), var(--color-bg))',
         borderColor: isPinned ? 'transparent' : 'var(--color-border)',
         color: isPinned ? '#ffffff' : 'var(--color-heading)',
         opacity: isDragging ? 0.3 : 1,
         boxShadow: isPinned
-          ? '0 8px 22px color-mix(in srgb, var(--color-primary) 28%, transparent)'
-          : '0 6px 18px color-mix(in srgb, var(--color-shadow) 10%, transparent)',
+          ? '0 8px 22px rgba(var(--rgb-primary), 0.28)'
+          : '0 6px 18px rgba(var(--rgb-shadow), 0.1)',
         cursor: isActiveDrag ? 'grabbing' : 'grab',
         touchAction: 'none',
       }}
@@ -232,8 +235,8 @@ function DraggableInputCard({ id, label, icon: Icon, isPinned, isDragging, onPin
         style={{
           backgroundColor: isPinned
             ? 'rgba(255,255,255,0.14)'
-            : 'color-mix(in srgb, var(--color-primary) 8%, var(--color-bg))',
-          border: `1px solid ${isPinned ? 'rgba(255,255,255,0.18)' : 'color-mix(in srgb, var(--color-primary) 10%, var(--color-border))'}`,
+            : 'rgba(var(--rgb-primary), 0.08)',
+          border: `1px solid ${isPinned ? 'rgba(255,255,255,0.18)' : 'rgba(var(--rgb-primary), 0.1)'}`,
         }}
       >
         <Icon className="w-4 h-4 touchPanel:w-5 touchPanel:h-5 flex-shrink-0" />
@@ -248,7 +251,7 @@ function DraggableInputCard({ id, label, icon: Icon, isPinned, isDragging, onPin
         style={{
           backgroundColor: isPinned
             ? 'rgba(255,255,255,0.16)'
-            : 'color-mix(in srgb, var(--color-primary) 7%, var(--color-bg))',
+            : 'rgba(var(--rgb-primary), 0.07)',
           color: isPinned ? '#ffffff' : 'var(--color-text-light)',
           border: `1px solid ${isPinned ? 'rgba(255,255,255,0.18)' : 'transparent'}`,
         }}
@@ -309,13 +312,13 @@ function DisplayAssignmentCard({ id, label, routedInputIdx, isPinActive, onClick
       className="rounded-2xl border-2 p-3 touchPanel:p-4 flex flex-col gap-2.5 touchPanel:gap-3 transition-all duration-200 select-none h-full min-h-[104px] touchPanel:min-h-[132px]"
       style={{
         background: isOver
-          ? 'linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary)), var(--color-bg-secondary))'
-          : 'linear-gradient(180deg, var(--color-bg-secondary), color-mix(in srgb, var(--color-bg) 55%, white))',
+          ? 'linear-gradient(180deg, rgba(var(--rgb-primary), 0.1), var(--color-bg-secondary))'
+          : 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%), linear-gradient(180deg, var(--color-bg-secondary), var(--color-bg))',
         borderColor: isOver ? 'var(--color-primary)' : 'var(--color-border)',
         cursor: isPinActive ? 'pointer' : 'default',
         boxShadow: isOver
-          ? '0 0 0 2px color-mix(in srgb, var(--color-primary) 22%, transparent), 0 10px 24px color-mix(in srgb, var(--color-primary) 10%, transparent)'
-          : '0 6px 18px color-mix(in srgb, var(--color-shadow) 8%, transparent)',
+          ? '0 0 0 2px rgba(var(--rgb-primary), 0.22), 0 10px 24px rgba(var(--rgb-primary), 0.1)'
+          : '0 6px 18px rgba(var(--rgb-shadow), 0.08)',
       }}
       title={isPinActive ? 'Click to toggle route for pinned source.' : 'Drag a source here.'}
     >
@@ -326,9 +329,11 @@ function DisplayAssignmentCard({ id, label, routedInputIdx, isPinActive, onClick
         <span
           className="text-[10px] touchPanel:text-xs px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0"
           style={{
-            backgroundColor: isOver ? 'color-mix(in srgb, var(--color-primary) 14%, white)' : 'var(--color-bg)',
+            background: isOver
+              ? 'linear-gradient(rgba(var(--rgb-primary), 0.14), rgba(var(--rgb-primary), 0.14)), #ffffff'
+              : 'var(--color-bg)',
             color: isOver ? 'var(--color-primary)' : 'var(--color-text-light)',
-            border: `1px solid ${isOver ? 'color-mix(in srgb, var(--color-primary) 18%, transparent)' : 'var(--color-border)'}`,
+            border: `1px solid ${isOver ? 'rgba(var(--rgb-primary), 0.18)' : 'var(--color-border)'}`,
           }}
         >
           {isOver ? 'Drop here' : isPinActive ? 'Tap to route' : 'Ready'}
@@ -357,12 +362,12 @@ function DroppableLayoutZone({ id, zoneKey, label, narrow = false, routedInputId
       }`}
       style={{
         background: isOver
-          ? 'linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary)), var(--color-bg-secondary))'
-          : 'linear-gradient(180deg, var(--color-bg-secondary), color-mix(in srgb, var(--color-bg) 55%, white))',
+          ? 'linear-gradient(180deg, rgba(var(--rgb-primary), 0.1), var(--color-bg-secondary))'
+          : 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.45) 100%), linear-gradient(180deg, var(--color-bg-secondary), var(--color-bg))',
         borderColor: isOver ? 'var(--color-primary)' : 'var(--color-border)',
         boxShadow: isOver
-          ? '0 0 0 2px color-mix(in srgb, var(--color-primary) 22%, transparent), 0 10px 24px color-mix(in srgb, var(--color-primary) 10%, transparent)'
-          : '0 6px 18px color-mix(in srgb, var(--color-shadow) 8%, transparent)',
+          ? '0 0 0 2px rgba(var(--rgb-primary), 0.22), 0 10px 24px rgba(var(--rgb-primary), 0.1)'
+          : '0 6px 18px rgba(var(--rgb-shadow), 0.08)',
       }}
     >
       <div className="flex items-center justify-between gap-2">
@@ -370,9 +375,11 @@ function DroppableLayoutZone({ id, zoneKey, label, narrow = false, routedInputId
         <span
           className="text-[10px] touchPanel:text-[11px] px-2 py-1 rounded-full"
           style={{
-            backgroundColor: isOver ? 'color-mix(in srgb, var(--color-primary) 14%, white)' : 'var(--color-bg)',
+            background: isOver
+              ? 'linear-gradient(rgba(var(--rgb-primary), 0.14), rgba(var(--rgb-primary), 0.14)), #ffffff'
+              : 'var(--color-bg)',
             color: isOver ? 'var(--color-primary)' : 'var(--color-text-light)',
-            border: `1px solid ${isOver ? 'color-mix(in srgb, var(--color-primary) 18%, transparent)' : 'var(--color-border)'}`,
+            border: `1px solid ${isOver ? 'rgba(var(--rgb-primary), 0.18)' : 'var(--color-border)'}`,
           }}
         >
           {isOver ? 'Drop here' : isPinActive ? 'Tap to route' : 'Ready'}
@@ -738,12 +745,12 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                       className="flex-1 min-h-0 flex flex-col justify-center rounded-2xl border-2 p-2 text-left transition-all duration-200 relative whitespace-nowrap"
                       style={{
                         background: active
-                          ? 'linear-gradient(160deg, color-mix(in srgb, var(--color-primary) 26%, var(--color-bg-secondary)), color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary)))'
+                          ? 'linear-gradient(160deg, rgba(var(--rgb-primary), 0.26), rgba(var(--rgb-primary), 0.1))'
                           : 'var(--color-bg)',
                         borderColor: active ? 'var(--color-primary)' : 'var(--color-border)',
                         boxShadow: active
-                          ? '0 0 0 2px color-mix(in srgb, var(--color-primary) 34%, transparent), 0 14px 34px color-mix(in srgb, var(--color-primary) 30%, transparent)'
-                          : '0 6px 18px color-mix(in srgb, var(--color-shadow) 8%, transparent)',
+                          ? '0 0 0 2px rgba(var(--rgb-primary), 0.34), 0 14px 34px rgba(var(--rgb-primary), 0.3)'
+                          : '0 6px 18px rgba(var(--rgb-shadow), 0.08)',
                         transform: active ? 'translateY(-3px) scale(1.015)' : 'none',
                       }}
                     >
@@ -821,12 +828,12 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                         style={{
                           zIndex: active ? 3 : 1,
                           background: active
-                            ? 'linear-gradient(160deg, color-mix(in srgb, var(--color-primary) 26%, var(--color-bg-secondary)), color-mix(in srgb, var(--color-primary) 10%, var(--color-bg-secondary)))'
+                            ? 'linear-gradient(160deg, rgba(var(--rgb-primary), 0.26), rgba(var(--rgb-primary), 0.1))'
                             : 'var(--color-bg)',
                           borderColor: active ? 'var(--color-primary)' : 'var(--color-border)',
                           boxShadow: active
-                            ? '0 0 0 2px color-mix(in srgb, var(--color-primary) 34%, transparent), 0 14px 34px color-mix(in srgb, var(--color-primary) 30%, transparent)'
-                            : '0 6px 18px color-mix(in srgb, var(--color-shadow) 8%, transparent)',
+                            ? '0 0 0 2px rgba(var(--rgb-primary), 0.34), 0 14px 34px rgba(var(--rgb-primary), 0.3)'
+                            : '0 6px 18px rgba(var(--rgb-shadow), 0.08)',
                           transform: active ? 'translateY(-2px) scale(1.01)' : 'none',
                         }}
                       >
@@ -885,7 +892,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                   <span
                     className="text-[10px] touchPanel:text-xs px-2.5 py-1 rounded-full whitespace-nowrap"
                     style={{
-                      backgroundColor: 'color-mix(in srgb, var(--color-primary) 8%, var(--color-bg))',
+                      backgroundColor: 'rgba(var(--rgb-primary), 0.08)',
                       color: 'var(--color-heading)',
                       border: '1px solid var(--color-border)',
                     }}
@@ -981,7 +988,7 @@ export default function AVMatrixPage({ sidebarEnabled = false }) {
                      that holds them would simply be painted over. */
                   <div className="w-full h-full flex items-center justify-center">
                     <div
-                      className="h-full max-h-full w-auto max-w-full aspect-video rounded-2xl p-2.5 touchPanel:p-4"
+                      className="h-full max-h-full w-auto max-w-full ratio-16x9 rounded-2xl p-2.5 touchPanel:p-4"
                       style={STAGE_STYLE}
                     >
                       <div className="relative w-full h-full">

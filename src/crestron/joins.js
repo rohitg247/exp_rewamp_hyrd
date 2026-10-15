@@ -101,7 +101,8 @@ export const DIGITAL_JOINS = {
   // ── GROUP 11: Source Mode Selection (D110-119) ──
   SOURCE_MODE_PRESENTATION: 110,  // [PULSE] SourceSelection.jsx - Presentation mode (laptop on all displays)
   SOURCE_MODE_VC: 111,            // [PULSE] SourceSelection.jsx - VC Call mode (codec primary/secondary)
-  // D112-119: Reserved
+  SOURCE_MODE_AIRMEDIA: 112,      // [PULSE] SourceSelection.jsx - Air Media mode (wireless presentation)
+  // D113-119: Reserved
 
 
 

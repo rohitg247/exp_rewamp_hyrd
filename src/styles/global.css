@@ -89,6 +89,30 @@
   --color-bg-glass-light: rgba(255, 255, 255, 0.04);
   --color-bg-glass-hover: rgba(255, 255, 255, 0.08);
   --color-border-glass: rgba(255, 255, 255, 0.07);
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-primary-50: 230, 242, 248;
+  --rgb-primary-100: 179, 218, 232;
+  --rgb-primary-200: 128, 194, 216;
+  --rgb-primary-300: 77, 170, 200;
+  --rgb-primary-400: 38, 146, 184;
+  --rgb-primary-500: 0, 78, 122;
+  --rgb-primary-700: 0, 54, 86;
+  --rgb-primary-900: 0, 30, 50;
+  --rgb-success-500: 16, 185, 129;
+  --rgb-danger-500: 242, 18, 18;
+  --rgb-text-light: 107, 114, 128;
+  --rgb-bg: 128, 194, 216;
+  --rgb-bg-secondary: 255, 255, 255;
+  --rgb-border: 229, 231, 235;
+  --rgb-shadow: 0, 78, 122;
+  --rgb-primary: 0, 78, 122;   /* -> 500 */
 }
 
 /* ============================================
@@ -193,6 +217,30 @@
   --color-text-light: #cbd5e1; /* Medium gray text (slate-300) */
   --color-border: #475569; /* Slate-600 */
   --color-shadow: rgba(0, 0, 0, 0.7);
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-primary-50: 224, 240, 255;
+  --rgb-primary-100: 179, 217, 255;
+  --rgb-primary-200: 128, 193, 255;
+  --rgb-primary-300: 91, 163, 255;
+  --rgb-primary-400: 61, 143, 255;
+  --rgb-primary-500: 26, 117, 255;
+  --rgb-primary-700: 0, 82, 204;
+  --rgb-primary-900: 0, 53, 133;
+  --rgb-success-500: 34, 197, 94;
+  --rgb-danger-500: 239, 68, 68;
+  --rgb-text-light: 203, 213, 225;
+  --rgb-bg: 15, 23, 42;
+  --rgb-bg-secondary: 30, 41, 59;
+  --rgb-border: 71, 85, 105;
+  --rgb-shadow: 0, 0, 0;
+  --rgb-primary: 61, 143, 255;   /* -> 400 */
 }
 
 
@@ -279,6 +327,29 @@
   --color-text-light: #666666;
   --color-border: #e5e5e5;
   --color-shadow: rgba(49, 49, 49, 0.1);
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-primary-50: 248, 246, 251;
+  --rgb-primary-100: 237, 232, 245;
+  --rgb-primary-200: 221, 209, 236;
+  --rgb-primary-300: 204, 185, 226;
+  --rgb-primary-400: 181, 160, 214;
+  --rgb-primary-500: 110, 39, 110;
+  --rgb-primary-700: 72, 25, 74;
+  --rgb-primary-900: 36, 14, 39;
+  --rgb-danger-500: 239, 68, 68;
+  --rgb-text-light: 102, 102, 102;
+  --rgb-bg: 221, 209, 236;
+  --rgb-bg-secondary: 250, 250, 250;
+  --rgb-border: 229, 229, 229;
+  --rgb-shadow: 49, 49, 49;
+  --rgb-primary: 110, 39, 110;   /* -> 500 */
 }
 
 
@@ -365,6 +436,25 @@
   --color-text-light: #6b7280;
   --color-border: #e5e7eb;
   --color-shadow: rgba(0, 0, 0, 0.1);
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-primary-50: 240, 241, 248;
+  --rgb-primary-100: 225, 228, 241;
+  --rgb-primary-200: 195, 200, 227;
+  --rgb-primary-300: 165, 173, 213;
+  --rgb-primary-400: 102, 110, 184;
+  --rgb-primary-500: 25, 30, 79;
+  --rgb-primary-700: 17, 21, 53;
+  --rgb-primary-900: 9, 11, 27;
+  --rgb-bg: 195, 200, 227;
+  --rgb-shadow: 0, 0, 0;
+  --rgb-primary: 25, 30, 79;   /* -> 500 */
 }
 
 
@@ -399,9 +489,31 @@
   --color-gray-700: #f1f5f9;
   --color-gray-800: #f8fafc;
   --color-gray-900: #ffffff;
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-text-light: 203, 213, 225;
+  --rgb-bg: 15, 23, 42;
+  --rgb-bg-secondary: 30, 41, 59;
+  --rgb-border: 71, 85, 105;
+  --rgb-shadow: 0, 0, 0;
+  --rgb-primary: 38, 146, 184;   /* default theme -> 400 */
 }
 
 /* Dark mode + Purple theme */
+/* blue-dark + dark toggle. theme x dark are orthogonal (ThemeContext), so this
+   combination is reachable, and [data-dark-mode="true"] above would otherwise
+   leak the DEFAULT theme's 400 triplet into it. Colour tokens need no override
+   here — only the literal triplet does. */
+[data-theme="blue-dark"][data-dark-mode="true"] {
+  --rgb-primary: 61, 143, 255;   /* blue-dark -> 400 */
+}
+
 [data-theme="purple"][data-dark-mode="true"] {
   --color-primary: var(--color-primary-400);
   --color-bg: #1a0f2e;
@@ -424,6 +536,18 @@
   --color-gray-700: #f1edf5;
   --color-gray-800: #f8f6fb;
   --color-gray-900: #ffffff;
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-bg: 26, 15, 46;
+  --rgb-bg-secondary: 45, 27, 78;
+  --rgb-border: 74, 53, 102;
+  --rgb-primary: 181, 160, 214;   /* purple -> 400, must beat the dark block */
 }
 
 /* Dark mode + Dark Blue theme */
@@ -449,6 +573,18 @@
   --color-gray-700: #ecedf5;
   --color-gray-800: #f5f5fb;
   --color-gray-900: #ffffff;
+
+  /* ── RGB TRIPLETS (panel tints) ───────────────────────────────────────────
+     The TSW-1070 runs Chromium 87-100; color-mix() needs 111, so it NEVER
+     paints there. These hold each colour as bare "r, g, b" channels so any
+     alpha can be composed at the use site as rgba(var(--rgb-x), 0.22) — the
+     pre-color-mix technique, supported since custom properties shipped.
+     Every theme block carries its own, so all four themes x dark mode keep
+     working. See Docs/crestron-panel-safe-css.md. */
+  --rgb-bg: 10, 12, 31;
+  --rgb-bg-secondary: 21, 24, 56;
+  --rgb-border: 42, 46, 88;
+  --rgb-primary: 102, 110, 184;   /* dark-blue -> 400, must beat the dark block */
 }
 
 /* blue-dark theme is already dark — no dark mode modifier needed */
@@ -468,6 +604,9 @@
    ============================================================================ */
 [data-custom-color="true"] {
   --color-primary: var(--color-primary-500);
+  /* Panel tint alias — applyCustomColorToDOM() writes the numbered --rgb-primary-*
+     triplets inline; the alias is derived here so it follows dark mode. */
+  --rgb-primary: var(--rgb-primary-500);
   --color-heading: var(--color-primary-500);
   --color-button-secondary-text: var(--color-primary-500);
   --color-primary-light: var(--color-primary-50);
@@ -478,6 +617,7 @@
   /* 400 not 500: the picked mid-tone is chosen against a light page and goes
      muddy on a dark one. */
   --color-primary: var(--color-primary-400);
+  --rgb-primary: var(--rgb-primary-400);
   --color-heading: var(--color-primary-200);
   --color-button-secondary-text: var(--color-primary-200);
   --color-primary-light: var(--color-primary-900);
@@ -505,6 +645,24 @@
   --elev-rest: 0 1px 2px var(--color-shadow), 0 6px 16px -6px var(--color-shadow);
   --elev-raised: 0 2px 4px var(--color-shadow), 0 14px 32px -10px var(--color-shadow);
   --elev-pressed: inset 0 1px 3px var(--color-shadow);
+
+  /* Button surfaces. A filled control should read as a raised object, not a flat
+     slab — gradient, not fill. Built from the NUMBERED primary steps so all four
+     themes and dark mode re-tint them for free; never var(--color-primary),
+     which is an alias. */
+  --btn-surface-primary: linear-gradient(135deg,
+      var(--color-primary-400) 0%, var(--color-primary-500) 45%, var(--color-primary-700) 100%);
+  /* Theme-agnostic light-to-shade overlay, laid over whatever fill the variant
+     already has, so it works on white, navy or purple without knowing the hue. */
+  --btn-surface-raised: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 55%, rgba(0, 0, 0, 0.05) 100%);
+
+  /* "Lit" — a selected/committed control, not just a recoloured one. Primary-
+     tinted glow so the last-tapped preset/mode reads from across the room.
+     Tinted through --rgb-primary so every theme and dark mode re-tint the glow.
+     See Docs/crestron-panel-safe-css.md. */
+  --elev-lit: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+              0 10px 26px -6px rgba(var(--rgb-primary), 0.34);
 
   /* Static "glass" card surface: highlight at the top-left falling to clear,
      laid over the theme's own --color-bg-secondary. */
@@ -539,8 +697,8 @@
     135deg,
     transparent 0%,
     transparent 20%,
-    color-mix(in srgb, var(--color-primary-50) 85%, transparent) 55%,
-    color-mix(in srgb, var(--color-primary-100) 85%, transparent) 70%,
+    rgba(var(--rgb-primary-50), 0.85) 55%,
+    rgba(var(--rgb-primary-100), 0.85) 70%,
     transparent 100%
   );
 
@@ -552,7 +710,7 @@
      slab after every press. A soft tint over the card surface instead.
      NOTE: deliberately still --color-bg in the dark block below, because dark
      mode already looked right and must not change. */
-  --control-active-bg: color-mix(in srgb, var(--color-primary-200) 18%, var(--color-bg-secondary));
+  --control-active-bg: rgba(var(--rgb-primary-200), 0.18);
 
   /* Overlay surfaces — these DO get real backdrop-filter. */
   --overlay-glass: rgba(255, 255, 255, 0.72);
@@ -637,16 +795,16 @@
     135deg,
     var(--color-bg-secondary) 0%,
     var(--color-bg-secondary) 20%,
-    color-mix(in srgb, var(--color-primary-400) 22%, var(--color-bg-secondary)) 55%,
-    color-mix(in srgb, var(--color-primary-400) 32%, var(--color-bg-secondary)) 70%,
+    rgba(var(--rgb-primary-400), 0.22) 55%,
+    rgba(var(--rgb-primary-400), 0.32) 70%,
     var(--color-bg-secondary) 100%
   );
   --surface-tint-soft: linear-gradient(
     135deg,
     transparent 0%,
     transparent 20%,
-    color-mix(in srgb, var(--color-primary-400) 26%, transparent) 55%,
-    color-mix(in srgb, var(--color-primary-400) 36%, transparent) 70%,
+    rgba(var(--rgb-primary-400), 0.26) 55%,
+    rgba(var(--rgb-primary-400), 0.36) 70%,
     transparent 100%
   );
 
@@ -995,12 +1153,18 @@ button,
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
     overflow: hidden;
+    /* WKWebView: kill rubber-banding and double-tap zoom on the panel. */
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 
   html, body, #root {
     font-size: 16px;
-    height: 100vh;
-    width: 100vw;
+    /* 100% not 100vh/100vw: vh/vw follow the OS orientation signal, which races
+       WKWebView's own reflow on app-switch and left the iPad build sized to the
+       pre-reflow viewport. On a fixed-size panel these resolve identically. */
+    height: 100%;
+    width: 100%;
     overflow: hidden;
   }
 }
@@ -1563,11 +1727,9 @@ button,
   left: 8%;
   width: 30rem;
   height: 30rem;
-  /* fallback for engines without color-mix (e.g. Crestron panel Chromium) */
-  background: radial-gradient(closest-side, rgba(179, 218, 232, 0.42), transparent 70%);
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--color-primary-100) 42%, transparent),
+    rgba(var(--rgb-primary-100), 0.42),
     transparent 70%
   );
   animation-duration: 19s;
@@ -1578,10 +1740,9 @@ button,
   right: 6%;
   width: 34rem;
   height: 34rem;
-  background: radial-gradient(closest-side, rgba(128, 194, 216, 0.38), transparent 70%);
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--color-primary-200) 38%, transparent),
+    rgba(var(--rgb-primary-200), 0.38),
     transparent 70%
   );
   animation-duration: 23s;
@@ -1594,10 +1755,9 @@ button,
   width: 22rem;
   height: 22rem;
   opacity: 0.4;
-  background: radial-gradient(closest-side, rgba(77, 170, 200, 0.32), transparent 70%);
   background: radial-gradient(
     closest-side,
-    color-mix(in srgb, var(--color-primary-300) 32%, transparent),
+    rgba(var(--rgb-primary-300), 0.32),
     transparent 70%
   );
   animation-duration: 15s;
@@ -1619,15 +1779,9 @@ button,
 .startup-scrim {
   background: linear-gradient(
     135deg,
-    rgba(0, 30, 50, 0.82) 0%,
-    rgba(0, 54, 86, 0.80) 55%,
-    rgba(0, 78, 122, 0.78) 100%
-  );
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-primary-900) 82%, transparent) 0%,
-    color-mix(in srgb, var(--color-primary-700) 80%, transparent) 55%,
-    color-mix(in srgb, var(--color-primary-500) 78%, transparent) 100%
+    rgba(var(--rgb-primary-900), 0.82) 0%,
+    rgba(var(--rgb-primary-700), 0.8) 55%,
+    rgba(var(--rgb-primary-500), 0.78) 100%
   );
 }
 
@@ -1638,14 +1792,8 @@ button,
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(128, 194, 216, 0.08) 0%,
-    rgba(128, 194, 216, 0.03) 45%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--color-primary-200) 8%, transparent) 0%,
-    color-mix(in srgb, var(--color-primary-200) 3%, transparent) 45%,
+    rgba(var(--rgb-primary-200), 0.08) 0%,
+    rgba(var(--rgb-primary-200), 0.03) 45%,
     rgba(255, 255, 255, 0) 100%
   );
 }
@@ -1660,10 +1808,9 @@ button,
      Crestron panels have no GPU → backdrop-filter is dropped; the opaque tint +
      white sheen below reads as frosted glass on its own. backdrop-filter stays
      LAST as a laptop-only enhancement. See docs/crestron-panel-safe-css.md. */
-  background: rgba(10, 30, 50, 0.62);                          /* fallback — visible w/o blur */
   background:
     linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)),
-    color-mix(in srgb, var(--color-primary-900) 62%, transparent); /* themed */
+    rgba(var(--rgb-primary-900), 0.62); /* themed */
   border: 1px solid rgba(255, 255, 255, 0.22);
   box-shadow:
     0 3px 8px rgba(0, 0, 0, 0.35),                              /* tight, panel-safe */
@@ -1731,20 +1878,17 @@ button,
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(179, 218, 232, 0.12) 50%,
-    transparent 100%
-  );
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--color-primary-100) 12%, transparent) 50%,
+    rgba(var(--rgb-primary-100), 0.12) 50%,
     transparent 100%
   );
   transition: transform 0.9s ease;
   pointer-events: none;
 }
 
-.landing-enter-btn-subtle:hover::before {
+/* :active as well as :hover — a touch panel never fires hover, so the sweep
+   was dead on the TSW-1070. Same reason .gloss-sweep uses :active. */
+.landing-enter-btn-subtle:hover::before,
+.landing-enter-btn-subtle:active::before {
   transform: rotate(18deg) translateX(240%);
 }
 
@@ -1758,7 +1902,7 @@ button,
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 9999px;
-  background: var(--color-success, #10b981);
+  background: var(--color-success-500);
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.18);
 }
 
@@ -1803,8 +1947,7 @@ button,
 }
 
 .startup-step-caption-subtle {
-  color: rgba(179, 218, 232, 0.82);
-  color: color-mix(in srgb, var(--color-primary-100) 82%, transparent);
+  color: rgba(var(--rgb-primary-100), 0.82);
   font-size: clamp(0.86rem, 0.8rem + 0.2vw, 1rem);
   letter-spacing: 0.04em;
 }
@@ -1826,13 +1969,12 @@ button,
 }
 
 .startup-mini-step.is-active {
-  background: rgba(179, 218, 232, 0.92);
-  background: color-mix(in srgb, var(--color-primary-100) 92%, transparent);
+  background: rgba(var(--rgb-primary-100), 0.92);
   transform: scale(1.15);
 }
 
 .startup-mini-step.is-done {
-  background: var(--color-success, #10b981);
+  background: var(--color-success-500);
 }
 
 .startup-progress-meta {
@@ -1846,18 +1988,11 @@ button,
 .startup-progress-fill-subtle {
   background: linear-gradient(
     90deg,
-    rgba(179, 218, 232, 0.72) 0%,
-    rgba(128, 194, 216, 0.92) 55%,
-    rgba(38, 146, 184, 0.98) 100%
+    rgba(var(--rgb-primary-100), 0.72) 0%,
+    rgba(var(--rgb-primary-200), 0.92) 55%,
+    rgba(var(--rgb-primary-400), 0.98) 100%
   );
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--color-primary-100) 72%, transparent) 0%,
-    color-mix(in srgb, var(--color-primary-200) 92%, transparent) 55%,
-    color-mix(in srgb, var(--color-primary-400) 98%, transparent) 100%
-  );
-  box-shadow: 0 0 10px rgba(128, 194, 216, 0.16);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color-primary-200) 16%, transparent);
+  box-shadow: 0 0 10px rgba(var(--rgb-primary-200), 0.16);
 }
 
 .startup-counter-subtle {
@@ -1880,6 +2015,66 @@ button,
 }
 
 /* ============================================================================
+   SELECTED CONTROLS READ AS "LIT"
+   ----------------------------------------------------------------------------
+   Sits after @tailwind utilities so it beats Button's shadow-rest utility.
+   :not(:active) is load-bearing: this selector is class+attribute (0,2,0), the
+   same weight as .active\:shadow-pressed:active, so without it this block wins
+   on source order and swallows the press feedback.
+   Navbar pills are unaffected — Navbar sets [&_button]:!shadow-nav-button, and
+   the liquid block below sets its own !important shadows for them.
+   `danger` is excluded on purpose: Shutdown stays flat and unambiguous.
+   ============================================================================ */
+.ui-btn[data-variant="primary"]:not(:active):not(:disabled),
+.ui-btn[data-variant="success"]:not(:active):not(:disabled) {
+  box-shadow: var(--elev-lit);
+}
+
+/* Gradient surfaces. background-IMAGE, so each variant keeps its own
+   background-color underneath (secondary's is set inline by Button.jsx) and the
+   .gloss-sweep ::after band still composites on top. */
+.ui-btn[data-variant="primary"] {
+  background-image: var(--btn-surface-primary);
+}
+
+.ui-btn[data-variant="secondary"],
+.ui-btn[data-variant="danger"],
+.ui-btn[data-variant="success"] {
+  background-image: var(--btn-surface-raised);
+}
+
+/* success used Tailwind's stock green-500 (#22c55e), which bypassed this
+   project's own --color-success. The numbered step, not the alias. */
+.ui-btn[data-variant="success"] {
+  background-color: var(--color-success-500);
+}
+
+/* ============================================================================
+   16:9 WITHOUT aspect-ratio
+   ----------------------------------------------------------------------------
+   aspect-ratio needs Chromium 88 and the TSW-1070 floor is 87. These boxes are
+   HEIGHT-driven, so the padding-percentage trick cannot work (percentage padding
+   resolves against WIDTH). The ::before is a replaced element — an inline SVG
+   with an intrinsic 16:9 ratio — so at height:100% it resolves its own width.
+   Both call sites hold their content in a position:relative box with absolutely
+   positioned children, so the spacer displaces nothing.
+   ============================================================================ */
+.ratio-16x9 {
+  aspect-ratio: 16 / 9;
+}
+
+@supports not (aspect-ratio: 16 / 9) {
+  .ratio-16x9 {
+    aspect-ratio: auto;
+  }
+  .ratio-16x9::before {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'/%3E");
+    display: block;
+    height: 100%;
+  }
+}
+
+/* ============================================================================
    LIQUID GLASS — opt-in appearance mode
    ----------------------------------------------------------------------------
    Everything below is scoped under [data-liquid="true"], set on <html> by
@@ -1895,7 +2090,9 @@ button,
    old "panels have no GPU" claim — backdrop-filter, blur, mix-blend-mode and
    box-shadow all render on the panel. What does NOT survive is Tailwind
    slash-opacity (bg-white/20) and arbitrary bracket colours, so every colour
-   here is a real rgba()/color-mix() in a stylesheet rule.
+   here is a real rgba() in a stylesheet rule — composed from an --rgb-* triplet
+   where it has to follow the theme, since color-mix() needs Chromium 111 and the
+   panel is 87-100.
 
    This block sits after `@tailwind utilities` (line 3), so it wins ties on
    specificity order. !important appears only where a component sets the same
@@ -1912,7 +2109,7 @@ button,
      opaque background backdrop-filter silently does nothing. */
   --liquid-fill: rgba(255, 255, 255, 0.18);
   --liquid-fill-strong: rgba(255, 255, 255, 0.30);
-  --liquid-card-fill: color-mix(in srgb, var(--color-bg-secondary) 58%, transparent);
+  --liquid-card-fill: rgba(var(--rgb-bg-secondary), 0.58);
 
   /* Rim light: bright top edge, faint bottom bounce. The two-edge version is
      what separates "liquid glass" from a flat translucent panel. */
@@ -1930,7 +2127,7 @@ button,
      the existing --surface-hairline override makes the same correction. */
   --liquid-fill: rgba(255, 255, 255, 0.09);
   --liquid-fill-strong: rgba(255, 255, 255, 0.16);
-  --liquid-card-fill: color-mix(in srgb, var(--color-bg-secondary) 62%, transparent);
+  --liquid-card-fill: rgba(var(--rgb-bg-secondary), 0.62);
   --liquid-rim: inset 0 1px 0 rgba(255, 255, 255, 0.18),
                 inset 0 -1px 0 rgba(255, 255, 255, 0.05);
   --liquid-edge: 0 0 0 1px rgba(255, 255, 255, 0.10);

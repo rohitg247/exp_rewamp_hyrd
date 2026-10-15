@@ -138,6 +138,25 @@ export function readableTextOn(hex) {
 }
 
 /**
+ * Hex -> bare "r, g, b" channels, for composing alpha at a use site as
+ * rgba(var(--rgb-x), 0.22).
+ *
+ * The TSW-1070 runs Chromium 87-100 and color-mix() needs 111, so translucency
+ * over a theme colour has to be built this way. global.css declares an
+ * --rgb-* triplet per theme block; a picked hue has no theme block, so the
+ * triplets are written inline here alongside the scale they come from.
+ *
+ * @param {string} hex - #rgb or #rrggbb
+ * @returns {string} "r, g, b"
+ */
+export function hexToRgbChannels(hex) {
+  let h = String(hex).trim().replace(/^#/, '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(', ');
+}
+
+/**
  * Apply a custom primary color to the DOM.
  *
  * Sets ONLY the raw --color-primary-50..900 scale plus the two foreground
@@ -157,7 +176,14 @@ export function applyCustomColorToDOM(hex) {
 
   Object.entries(shades).forEach(([shade, color]) => {
     root.style.setProperty(`--color-primary-${shade}`, color);
+    // Panel tint channels for the same shade — see hexToRgbChannels().
+    root.style.setProperty(`--rgb-primary-${shade}`, hexToRgbChannels(color));
   });
+
+  // NOTE: --rgb-primary (the alias) is deliberately NOT written here. It has to
+  // follow dark mode, and an inline value would go stale the moment the user
+  // toggles it. The [data-custom-color] blocks in global.css derive it from the
+  // triplets above, exactly as they already derive --color-primary.
 
   // Foregrounds depend on the picked colour, not on the theme, so they stay
   // inline. Hardcoding #ffffff here is what made pale picks unreadable.
@@ -174,8 +200,10 @@ export function clearCustomColorFromDOM() {
   const root = document.documentElement;
   const props = [
     '--color-primary-foreground', '--color-button-primary-text',
+    // Tint channels written alongside the scale by applyCustomColorToDOM().
+    '--rgb-primary',
     ...['50', '100', '200', '300', '400', '500', '600', '700', '800', '900']
-      .map(s => `--color-primary-${s}`),
+      .flatMap(s => [`--color-primary-${s}`, `--rgb-primary-${s}`]),
     // Written by earlier builds — cleared so a panel that ran the old code
     // doesn't keep a stale inline override after an update.
     '--color-primary', '--color-primary-light', '--color-heading',

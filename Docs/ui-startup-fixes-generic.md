@@ -8,6 +8,10 @@ shutdown), deployed to **Crestron touch panels** (e.g. TSW-1070).
 Each section: **Symptom → Cause → Fix → Code pattern.** Replace `<PLACEHOLDER>`
 names with your project's join numbers / storage keys / component names.
 
+> Project-specific note: see [TOUCHPANEL-BREAKPOINT.md](../TOUCHPANEL-BREAKPOINT.md) -
+> in this project the `touchPanel:` variant never matches, so every panel-only
+> utility below is inert. Left that way deliberately.
+
 > 🔴 **The single most important section is Part C (Crestron panel-safe CSS).**
 > It explains why CSS that works in the laptop dev browser can break on the panel,
 > and the inline-style rule that prevents it.
